@@ -1,0 +1,27 @@
+{
+    "name": "sonatra/resource-bundle",
+    "type": "symfony-bundle",
+    "description": "Sonatra Resource Bundle",
+    "keywords": ["Resource", "Storage", "Object", "Entity"],
+    "homepage": "http://sonatra.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "François Pluchino",
+            "email": "francois.pluchino@sonatra.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/framework-bundle": "~2.5"
+    },
+    "autoload": {
+        "psr-4": { "Sonatra\\Bundle\\ResourceBundle\\": "" }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    }
+}
