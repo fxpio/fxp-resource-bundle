@@ -11,6 +11,9 @@
 
 namespace Sonatra\Bundle\ResourceBundle;
 
+use Sonatra\Bundle\ResourceBundle\DependencyInjection\Compiler\DomainPass;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
@@ -18,4 +21,12 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class SonatraResourceBundle extends Bundle
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function build(ContainerBuilder $container)
+    {
+        parent::build($container);
+        $container->addCompilerPass(new DomainPass(), PassConfig::TYPE_OPTIMIZE);
+    }
 }
