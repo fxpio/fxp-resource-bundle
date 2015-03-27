@@ -1,7 +1,7 @@
 Sonatra Resource Bundle
 =======================
 
-The Sonatra ResourceBundle provides centralized management of objects/entities.
+The Sonatra ResourceBundle is a resource management layer for doctrine.
 
 Features include:
 

@@ -1,7 +1,7 @@
 {
     "name": "sonatra/resource-bundle",
     "type": "symfony-bundle",
-    "description": "Sonatra Resource Bundle",
+    "description": "Resource management layer for doctrine",
     "keywords": ["Resource", "Storage", "Object", "Entity"],
     "homepage": "http://sonatra.com",
     "license": "MIT",
