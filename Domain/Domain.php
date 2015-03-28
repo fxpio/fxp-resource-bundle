@@ -11,6 +11,7 @@
 
 namespace Sonatra\Bundle\ResourceBundle\Domain;
 
+use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\Common\Persistence\ObjectManager;
 use Sonatra\Bundle\DefaultValueBundle\DefaultValue\ObjectFactoryInterface;
 use Sonatra\Bundle\ResourceBundle\Exception\InvalidConfigurationException;
@@ -67,8 +68,11 @@ class Domain implements DomainInterface
     {
         $this->om = $om;
 
-        if (!$om->getMetadataFactory()->hasMetadataFor($this->getClass())) {
-            throw new InvalidConfigurationException(sprintf('The "%s" class is not managed by doctrine object manager', $this->getClass()));
+        try {
+            $this->getClassMetadata();
+        } catch (MappingException $e) {
+            $msg = sprintf('The "%s" class is not managed by doctrine object manager', $this->getClass());
+            throw new InvalidConfigurationException($msg, 0, $e);
         }
     }
 
