@@ -12,7 +12,6 @@
 namespace Sonatra\Bundle\ResourceBundle\DependencyInjection\Compiler;
 
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -52,10 +51,6 @@ class DomainPass implements CompilerPassInterface
     {
         $classes = array();
         $registry = $container->get('doctrine');
-
-        /* @var Connection $connection */
-        $connection = $registry->getConnection();
-        $tables = $connection->getSchemaManager()->listTableNames();
         $dManagers = $registry->getManagers();
 
         /* @var ObjectManager $manager */
@@ -64,8 +59,8 @@ class DomainPass implements CompilerPassInterface
             $metadatas = $manager->getMetadataFactory()->getAllMetadata();
 
             foreach ($metadatas as $meta) {
-                if (in_array($meta->getTableName(), $tables)) {
-                    $classes[] = $meta->getReflectionClass()->getName();
+                if (!$meta->isMappedSuperclass) {
+                    $classes[] = $meta->getName();
                 }
             }
         }
