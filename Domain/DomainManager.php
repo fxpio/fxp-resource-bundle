@@ -17,6 +17,7 @@ use Sonatra\Bundle\DefaultValueBundle\DefaultValue\ObjectFactoryInterface;
 use Sonatra\Bundle\ResourceBundle\Exception\InvalidArgumentException;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Domain manager.
@@ -46,6 +47,11 @@ class DomainManager implements DomainManagerInterface
     protected $of;
 
     /**
+     * @var ValidatorInterface
+     */
+    protected $validator;
+
+    /**
      * @var array
      */
     protected $cache;
@@ -53,18 +59,21 @@ class DomainManager implements DomainManagerInterface
     /**
      * Constructor.
      *
-     * @param DomainInterface[]        $domains The resource domains
-     * @param ManagerRegistry          $or      The doctrine object manager
-     * @param EventDispatcherInterface $ed      The event dispatcher
-     * @param ObjectFactoryInterface   $of      The object factory
+     * @param DomainInterface[]        $domains   The resource domains
+     * @param ManagerRegistry          $or        The doctrine object manager
+     * @param EventDispatcherInterface $ed        The event dispatcher
+     * @param ObjectFactoryInterface   $of        The object factory
+     * @param ValidatorInterface       $validator The validator
      */
     public function __construct(array $domains, ManagerRegistry $or,
-                                EventDispatcherInterface $ed, ObjectFactoryInterface $of)
+                                EventDispatcherInterface $ed, ObjectFactoryInterface $of,
+                                ValidatorInterface $validator)
     {
         $this->domains = array();
         $this->or = $or;
         $this->ed = $ed;
         $this->of = $of;
+        $this->validator = $validator;
         $this->cache = array();
 
         foreach ($domains as $domain) {
