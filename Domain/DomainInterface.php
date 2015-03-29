@@ -98,11 +98,15 @@ interface DomainInterface
     /**
      * Create resources.
      *
-     * @param object[] $resources The list of object resource instance
+     * Warning: It's recommended to limit the number of resources.
+     *
+     * @param object[] $resources  The list of object resource instance
+     * @param bool     $autoCommit Check if each resource must be flushed immediately or in the end
+     * @param bool     $skipError  Check if the error can be skipped and continued to do the job
      *
      * @return ResourceInterface[]
      */
-    public function creates(array $resources);
+    public function creates(array $resources, $autoCommit = false, $skipError = false);
 
     /**
      * Update a resource.
@@ -116,11 +120,15 @@ interface DomainInterface
     /**
      * Update resources.
      *
-     * @param object[] $resources The list of object resource instance
+     * Warning: It's recommended to limit the number of resources.
+     *
+     * @param object[] $resources  The list of object resource instance
+     * @param bool     $autoCommit Check if each resource must be flushed immediately or in the end
+     * @param bool     $skipError  Check if the error can be skipped and continued to do the job
      *
      * @return ResourceInterface[]
      */
-    public function updates(array $resources);
+    public function updates(array $resources, $autoCommit = false, $skipError = false);
 
     /**
      * Update or insert a resource.
@@ -134,11 +142,15 @@ interface DomainInterface
     /**
      * Update or insert resources.
      *
-     * @param object[] $resources The list of object resource instance
+     * Warning: It's recommended to limit the number of resources.
+     *
+     * @param object[] $resources  The list of object resource instance
+     * @param bool     $autoCommit Check if each resource must be flushed immediately or in the end
+     * @param bool     $skipError  Check if the error can be skipped and continued to do the job
      *
      * @return ResourceInterface[]
      */
-    public function upserts(array $resources);
+    public function upserts(array $resources, $autoCommit = false, $skipError = false);
 
     /**
      * Delete a resource.
@@ -153,12 +165,16 @@ interface DomainInterface
     /**
      * Delete resources.
      *
-     * @param object[] $resources The list of object resource instance
-     * @param bool     $soft      Check if the delete must be hard or soft for the objects compatibles
+     * Warning: It's recommended to limit the number of resources.
+     *
+     * @param object[] $resources  The list of object resource instance
+     * @param bool     $soft       Check if the delete must be hard or soft for the objects compatibles
+     * @param bool     $autoCommit Check if each resource must be flushed immediately or in the end
+     * @param bool     $skipError  Check if the error can be skipped and continued to do the job
      *
      * @return ResourceInterface[]
      */
-    public function deletes(array $resources, $soft = true);
+    public function deletes(array $resources, $soft = true, $autoCommit = false, $skipError = false);
 
     /**
      * Undelete a resource.
@@ -172,9 +188,13 @@ interface DomainInterface
     /**
      * Undelete resources.
      *
+     * Warning: It's recommended to limit the number of resources.
+     *
      * @param object[] $identifiers The list of object identifier
+     * @param bool     $autoCommit  Check if each resource must be flushed immediately or in the end
+     * @param bool     $skipError   Check if the error can be skipped and continued to do the job
      *
      * @return ResourceInterface[]
      */
-    public function undeletes(array $identifiers);
+    public function undeletes(array $identifiers, $autoCommit = false, $skipError = false);
 }

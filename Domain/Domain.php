@@ -158,7 +158,7 @@ class Domain implements DomainInterface
     /**
      * {@inheritdoc}
      */
-    public function creates(array $resources)
+    public function creates(array $resources, $autoCommit = false, $skipError = false)
     {
         //TODO
 
@@ -176,7 +176,7 @@ class Domain implements DomainInterface
     /**
      * {@inheritdoc}
      */
-    public function updates(array $resources)
+    public function updates(array $resources, $autoCommit = false, $skipError = false)
     {
         //TODO
 
@@ -194,7 +194,7 @@ class Domain implements DomainInterface
     /**
      * {@inheritdoc}
      */
-    public function upserts(array $resources)
+    public function upserts(array $resources, $autoCommit = false, $skipError = false)
     {
         //TODO
 
@@ -212,7 +212,7 @@ class Domain implements DomainInterface
     /**
      * {@inheritdoc}
      */
-    public function deletes(array $resources, $soft = true)
+    public function deletes(array $resources, $soft = true, $autoCommit = false, $skipError = false)
     {
         //TODO
 
@@ -230,7 +230,7 @@ class Domain implements DomainInterface
     /**
      * {@inheritdoc}
      */
-    public function undeletes(array $identifiers)
+    public function undeletes(array $identifiers, $autoCommit = false, $skipError = false)
     {
         //TODO
 
