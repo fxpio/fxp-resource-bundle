@@ -15,6 +15,7 @@ use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\Common\Persistence\ObjectManager;
 use Sonatra\Bundle\DefaultValueBundle\DefaultValue\ObjectFactoryInterface;
 use Sonatra\Bundle\ResourceBundle\Exception\InvalidConfigurationException;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -64,7 +65,7 @@ class Domain implements DomainInterface
     public function __construct($class)
     {
         $this->class = $class;
-        $this->eventPrefix = $this->getEventPrefix($class);
+        $this->eventPrefix = $this->formatEventPrefix($class);
     }
 
     /**
@@ -128,6 +129,14 @@ class Domain implements DomainInterface
     public function getClassMetadata()
     {
         return $this->om->getClassMetadata($this->getClass());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEventPrefix()
+    {
+        return $this->eventPrefix;
     }
 
     /**
@@ -243,9 +252,18 @@ class Domain implements DomainInterface
         return $this->ed->dispatch($name, $event);
     }
 
-    private function getEventPrefix($class)
+
+    /**
+     * Format the prefix event.
+     *
+     * @param string $class The class name
+     *
+     * @return string
+     */
+    private function formatEventPrefix($class)
     {
-        //TODO
-        return $class;
+        $name = Container::underscore($class);
+
+        return str_replace(array('\\', '/'), '_', $name);
     }
 }

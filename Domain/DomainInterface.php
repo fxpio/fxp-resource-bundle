@@ -71,6 +71,13 @@ interface DomainInterface
     public function getRepository();
 
     /**
+     * Get the prefix event of this domain.
+     *
+     * @return string
+     */
+    public function getEventPrefix();
+
+    /**
      * Generate a new resource instance with default values.
      *
      * @param array $options The options of sonatra default value factory
