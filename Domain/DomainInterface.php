@@ -15,6 +15,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Sonatra\Bundle\DefaultValueBundle\DefaultValue\ObjectFactoryInterface;
 use Sonatra\Bundle\ResourceBundle\Exception\InvalidConfigurationException;
+use Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -83,7 +84,7 @@ interface DomainInterface
      *
      * @param object $resource The object resource instance of defined class name
      *
-     * @return object
+     * @return ResourceInterface
      */
     public function create($resource);
 
@@ -92,7 +93,7 @@ interface DomainInterface
      *
      * @param object[] $resources The list of object resource instance
      *
-     * @return object[]
+     * @return ResourceInterface[]
      */
     public function creates(array $resources);
 
@@ -101,7 +102,7 @@ interface DomainInterface
      *
      * @param object $resource The object resource
      *
-     * @return object
+     * @return ResourceInterface
      */
     public function update($resource);
 
@@ -110,7 +111,7 @@ interface DomainInterface
      *
      * @param object[] $resources The list of object resource instance
      *
-     * @return object[]
+     * @return ResourceInterface[]
      */
     public function updates(array $resources);
 
@@ -119,7 +120,7 @@ interface DomainInterface
      *
      * @param object $resource The object resource
      *
-     * @return object
+     * @return ResourceInterface
      */
     public function upsert($resource);
 
@@ -128,7 +129,7 @@ interface DomainInterface
      *
      * @param object[] $resources The list of object resource instance
      *
-     * @return object[]
+     * @return ResourceInterface[]
      */
     public function upserts(array $resources);
 
@@ -138,7 +139,7 @@ interface DomainInterface
      * @param object $resource The object resource
      * @param bool   $soft     Check if the delete must be hard or soft for the objects compatibles
      *
-     * @return object
+     * @return ResourceInterface
      */
     public function delete($resource, $soft = true);
 
@@ -148,7 +149,7 @@ interface DomainInterface
      * @param object[] $resources The list of object resource instance
      * @param bool     $soft      Check if the delete must be hard or soft for the objects compatibles
      *
-     * @return object[]
+     * @return ResourceInterface[]
      */
     public function deletes(array $resources, $soft = true);
 
@@ -157,7 +158,7 @@ interface DomainInterface
      *
      * @param int|string $identifier The object identifier
      *
-     * @return object
+     * @return ResourceInterface
      */
     public function undelete($identifier);
 
@@ -166,7 +167,7 @@ interface DomainInterface
      *
      * @param object[] $identifiers The list of object identifier
      *
-     * @return object[]
+     * @return ResourceInterface[]
      */
     public function undeletes(array $identifiers);
 }
