@@ -1,12 +1,39 @@
 Sonatra Resource Bundle
 =======================
 
-The Sonatra ResourceBundle is a resource management layer for doctrine.
+The Sonatra ResourceBundle is a resource management layer for doctrine. This bundle has been
+designed to facilitate the creation of a Batch API for processing a list of resources<sup>1</sup>
+(ex. external data loader).
+
+However, it is entirely possible to build an API Bulk above this bundle.
+
+It allows to easily perform actions on Doctrine using the best practices automatically according
+to selected options (flush for each resource or for all resources, but also skip errors of the
+invalid resources), whether for a resource or set of resources.
 
 Features include:
 
-- Easy CRUDU
-- Standard controller
+- Resource Domain Manager for get a resource domain for an doctrine resource
+- Resource Domain for each doctrine resource for easy management:
+  - generate new instance of resource with default value configured by Sonatra DefaultValueBundle
+  - create one resource with validation
+  - create a list of resources with validation for each resource
+  - update one resource with validation
+  - update a list of resources with validation for each resource
+  - upsert one resource with validation (create or update)
+  - upsert a list of resources with validation for each resource (create or update)
+  - delete one resource with soft delete or hard delete for compatible resources
+  - delete a list of resources with soft delete or hard delete for compatible resources
+  - undelete one resource for compatible resources with soft delete
+  - undelete a list of resources for compatible resources with soft delete
+- Each resource domain allow:
+  - to have the possibility to do an transaction with rollback for each resource of the list or for all resources in only one time
+  - to have the possibility to skip the errors of an resource, and continue to run the rest of the list (compatible only with the transaction for each resource)
+  - to return the list of resources with the status of the action (created, updated, error ...) on each resource of the list
+- Compiler pass for override or add a custom resource domain
+
+> **Note:**
+> <sup>1</sup> A resource is an doctrine entity or doctrine document
 
 Documentation
 -------------
