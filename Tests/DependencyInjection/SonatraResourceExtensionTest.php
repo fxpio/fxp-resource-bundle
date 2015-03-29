@@ -35,7 +35,7 @@ class SonatraResourceExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $container = $this->createContainer();
 
-        //$this->assertTrue($container->hasDefinition('sonatra_resource.domain'));
+        $this->assertTrue($container->hasDefinition('sonatra_resource.domain_manager'));
     }
 
     protected function createContainer(array $configs = array())
@@ -45,11 +45,11 @@ class SonatraResourceExtensionTest extends \PHPUnit_Framework_TestCase
                 'FrameworkBundle'       => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle',
                 'SonatraResourceBundle' => 'Sonatra\\Bundle\\ResourceBundle\\SonatraResourceBundle',
             ),
-            'kernel.cache_dir'   => __DIR__,
+            'kernel.cache_dir'   => sys_get_temp_dir().'/sonatra_resource_bundle',
             'kernel.debug'       => false,
             'kernel.environment' => 'test',
             'kernel.name'        => 'kernel',
-            'kernel.root_dir'    => __DIR__,
+            'kernel.root_dir'    => sys_get_temp_dir().'/sonatra_resource_bundle',
             'kernel.charset'     => 'UTF-8',
         )));
 
