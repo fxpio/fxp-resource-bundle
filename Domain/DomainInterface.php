@@ -15,7 +15,6 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Sonatra\Bundle\DefaultValueBundle\DefaultValue\ObjectFactoryInterface;
 use Sonatra\Bundle\ResourceBundle\Exception\InvalidConfigurationException;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
