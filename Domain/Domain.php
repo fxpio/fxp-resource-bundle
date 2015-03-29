@@ -14,9 +14,9 @@ namespace Sonatra\Bundle\ResourceBundle\Domain;
 use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\Common\Persistence\ObjectManager;
 use Sonatra\Bundle\DefaultValueBundle\DefaultValue\ObjectFactoryInterface;
+use Sonatra\Bundle\ResourceBundle\Event\ResourceEvent;
 use Sonatra\Bundle\ResourceBundle\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -240,12 +240,12 @@ class Domain implements DomainInterface
     /**
      * Dispatch the event.
      *
-     * @param string $name  The event name
-     * @param Event  $event The event
+     * @param string        $name  The event name
+     * @param ResourceEvent $event The event
      *
-     * @return Event
+     * @return ResourceEvent
      */
-    protected function dispatchEvent($name, Event $event)
+    protected function dispatchEvent($name, ResourceEvent $event)
     {
         $name = $this->eventPrefix.$name;
 
