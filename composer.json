@@ -2,8 +2,8 @@
     "name": "sonatra/resource-bundle",
     "type": "symfony-bundle",
     "description": "Resource management layer for doctrine",
-    "keywords": ["Resource", "Storage", "Object", "Entity"],
-    "homepage": "http://sonatra.com",
+    "keywords": ["resource", "doctrine", "batch", "manager", "validation"],
+    "homepage": "https://github.com/sonatra/SonatraResourceBundle",
     "license": "MIT",
     "authors": [
         {
@@ -20,14 +20,14 @@
         "sonatra/default-value-bundle": "1.0.*@dev"
     },
     "require-dev": {
-        "doctrine/orm": "~2.2,>=2.2.3"
+        "doctrine/orm": "~2.4"
     },
     "autoload": {
         "psr-4": { "Sonatra\\Bundle\\ResourceBundle\\": "" }
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.0.x-dev"
+            "dev-master": "1.0-dev"
         }
     }
 }
