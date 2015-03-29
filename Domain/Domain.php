@@ -17,6 +17,7 @@ use Sonatra\Bundle\DefaultValueBundle\DefaultValue\ObjectFactoryInterface;
 use Sonatra\Bundle\ResourceBundle\Exception\InvalidConfigurationException;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * A resource domain.
@@ -44,6 +45,11 @@ class Domain implements DomainInterface
      * @var ObjectFactoryInterface
      */
     protected $of;
+
+    /**
+     * @var ValidatorInterface;
+     */
+    protected $validator;
 
     /**
      * @var string
@@ -90,6 +96,14 @@ class Domain implements DomainInterface
     public function setObjectFactory(ObjectFactoryInterface $of)
     {
         $this->of = $of;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setValidator(ValidatorInterface $validator)
+    {
+        $this->validator = $validator;
     }
 
     /**

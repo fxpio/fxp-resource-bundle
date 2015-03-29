@@ -96,6 +96,7 @@ class DomainManager implements DomainManagerInterface
         $domain->setObjectManager($this->or->getManagerForClass($domain->getClass()));
         $domain->setEventDispatcher($this->ed);
         $domain->setObjectFactory($this->of);
+        $domain->setValidator($this->validator);
         $this->domains[$domain->getClass()] = $domain;
     }
 
