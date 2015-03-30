@@ -13,6 +13,7 @@ namespace Sonatra\Bundle\ResourceBundle\Resource;
 
 use Sonatra\Bundle\ResourceBundle\ResourceStatutes;
 use Sonatra\Bundle\ResourceBundle\ResourceListStatutes;
+use Symfony\Component\Validator\ConstraintViolationList;
 
 /**
  * Resource list.
@@ -129,11 +130,11 @@ class ResourceList implements \IteratorAggregate, ResourceListInterface
      */
     public function getErrors()
     {
-        $errors = array();
+        $errors = new ConstraintViolationList();
 
         foreach ($this->resources as $i => $resource) {
             if (ResourceStatutes::ERROR === $resource->getStatus()) {
-                $errors[$i] = $resource->getErrors();
+                $errors->addAll($resource->getErrors());
             }
         }
 
