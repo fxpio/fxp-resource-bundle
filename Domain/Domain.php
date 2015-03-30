@@ -17,6 +17,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Sonatra\Bundle\DefaultValueBundle\DefaultValue\ObjectFactoryInterface;
 use Sonatra\Bundle\ResourceBundle\Event\ResourceEvent;
+use Sonatra\Bundle\ResourceBundle\Resource\ResourceUtil;
 use Sonatra\Bundle\ResourceBundle\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -163,7 +164,7 @@ class Domain implements DomainInterface
      */
     public function create($resource)
     {
-        return current($this->creates(array($resource)));
+        return $this->creates(array($resource), true)->getIterator()->current();
     }
 
     /**
@@ -172,8 +173,9 @@ class Domain implements DomainInterface
     public function creates(array $resources, $autoCommit = false, $skipError = false)
     {
         //TODO
+        $list = ResourceUtil::convertObjectsToResourceList($resources, $this->getClass());
 
-        return $resources;
+        return $list;
     }
 
     /**
@@ -181,7 +183,7 @@ class Domain implements DomainInterface
      */
     public function update($resource)
     {
-        return current($this->updates(array($resource)));
+        return $this->updates(array($resource), true)->getIterator()->current();
     }
 
     /**
@@ -189,9 +191,10 @@ class Domain implements DomainInterface
      */
     public function updates(array $resources, $autoCommit = false, $skipError = false)
     {
+        $list = ResourceUtil::convertObjectsToResourceList($resources, $this->getClass());
         //TODO
 
-        return $resources;
+        return $list;
     }
 
     /**
@@ -199,7 +202,7 @@ class Domain implements DomainInterface
      */
     public function upsert($resource)
     {
-        return current($this->upserts(array($resource)));
+        return $this->upserts(array($resource), true)->getIterator()->current();
     }
 
     /**
@@ -207,9 +210,10 @@ class Domain implements DomainInterface
      */
     public function upserts(array $resources, $autoCommit = false, $skipError = false)
     {
+        $list = ResourceUtil::convertObjectsToResourceList($resources, $this->getClass());
         //TODO
 
-        return $resources;
+        return $list;
     }
 
     /**
@@ -217,7 +221,7 @@ class Domain implements DomainInterface
      */
     public function delete($resource, $soft = true)
     {
-        return current($this->deletes(array($resource), true));
+        return $this->deletes(array($resource), true)->getIterator()->current();
     }
 
     /**
@@ -225,9 +229,10 @@ class Domain implements DomainInterface
      */
     public function deletes(array $resources, $soft = true, $autoCommit = false, $skipError = false)
     {
+        $list = ResourceUtil::convertObjectsToResourceList($resources, $this->getClass());
         //TODO
 
-        return $resources;
+        return $list;
     }
 
     /**
@@ -235,7 +240,7 @@ class Domain implements DomainInterface
      */
     public function undelete($identifier)
     {
-        return current($this->deletes(array($identifier)));
+        return $this->undeletes(array($identifier), true)->getIterator()->current();
     }
 
     /**
@@ -243,9 +248,10 @@ class Domain implements DomainInterface
      */
     public function undeletes(array $identifiers, $autoCommit = false, $skipError = false)
     {
+        $list = ResourceUtil::convertObjectsToResourceList($identifiers, $this->getClass());
         //TODO
 
-        return $identifiers;
+        return $list;
     }
 
     /**
