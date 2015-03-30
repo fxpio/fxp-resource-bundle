@@ -11,6 +11,8 @@
 
 namespace Sonatra\Bundle\ResourceBundle\Resource;
 
+use Sonatra\Bundle\ResourceBundle\ResourceStatutes;
+use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
@@ -38,15 +40,14 @@ class Resource implements ResourceInterface
     /**
      * Constructor.
      *
-     * @param string                           $status The action status of resource
      * @param object                           $data   The data instance of resource
      * @param ConstraintViolationListInterface $errors The list of errors
      */
-    public function __construct($status, $data, ConstraintViolationListInterface $errors)
+    public function __construct($data, ConstraintViolationListInterface $errors = null)
     {
-        $this->status = $status;
+        $this->status = ResourceStatutes::PENDING;
         $this->data = $data;
-        $this->errors = $errors;
+        $this->errors = null !== $errors ? $errors : new ConstraintViolationList();
     }
 
     /**
