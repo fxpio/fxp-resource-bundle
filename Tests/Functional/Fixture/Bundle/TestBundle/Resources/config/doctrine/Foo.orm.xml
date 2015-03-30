@@ -14,6 +14,8 @@
 
         <field name="description" column="description" type="string" length="255" nullable="true" />
 
+        <field name="detail" column="detail" type="string" length="255" nullable="false" />
+
     </entity>
 
 </doctrine-mapping>

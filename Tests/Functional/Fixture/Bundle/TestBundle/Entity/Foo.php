@@ -34,6 +34,11 @@ class Foo
     protected $description;
 
     /**
+     * @var string
+     */
+    protected $detail;
+
+    /**
      * @return int
      */
     public function getId()
@@ -71,5 +76,21 @@ class Foo
     public function getDescription()
     {
         return $this->description;
+    }
+
+    /**
+     * @param string $detail
+     */
+    public function setDetail($detail)
+    {
+        $this->detail = $detail;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDetail()
+    {
+        return $this->detail;
     }
 }
