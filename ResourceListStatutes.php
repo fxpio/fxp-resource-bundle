@@ -21,6 +21,15 @@ use Sonatra\Bundle\ResourceBundle\Exception\ClassNotInstantiableException;
 final class ResourceListStatutes
 {
     /**
+     * The ResourceStatutes::PENDING status is used when none of the resources is
+     * executed.
+     *
+     * This status is used in Sonatra\Bundle\ResourceBundle\Event\ResourceEvent
+     * and Sonatra\Bundle\ResourceBundle\Domain\DomainInterface instances.
+     */
+    const PENDING = 'pending';
+
+    /**
      * The ResourceStatutes::SUCCESSFULLY status is used when the all resources in the
      * list has been executed successfully.
      *
@@ -30,22 +39,31 @@ final class ResourceListStatutes
     const SUCCESSFULLY = 'successfully';
 
     /**
-     * The ResourceStatutes::PARTIAL_SUCCESSFULLY status is used when part of the
-     * resource has been executed successfully.
+     * The ResourceStatutes::MIXED status is used when several different statuses are
+     * in the list.
      *
      * This status is used in Sonatra\Bundle\ResourceBundle\Event\ResourceEvent
      * and Sonatra\Bundle\ResourceBundle\Domain\DomainInterface instances.
      */
-    const PARTIAL_SUCCESSFULLY = 'partial successfully';
+    const MIXED = 'mixed';
 
     /**
-     * The ResourceStatutes::ERRORS status is used when the all resources in the
+     * The ResourceStatutes::CANCEL status is used when the all resources in the
+     * list has canceled.
+     *
+     * This status is used in Sonatra\Bundle\ResourceBundle\Event\ResourceEvent
+     * and Sonatra\Bundle\ResourceBundle\Domain\DomainInterface instances.
+     */
+    const CANCEL = 'cancel';
+
+    /**
+     * The ResourceStatutes::ERROR status is used when the all resources in the
      * list has errors.
      *
      * This status is used in Sonatra\Bundle\ResourceBundle\Event\ResourceEvent
      * and Sonatra\Bundle\ResourceBundle\Domain\DomainInterface instances.
      */
-    const ERRORS = 'errors';
+    const ERROR = 'error';
 
     /**
      * Constructor.

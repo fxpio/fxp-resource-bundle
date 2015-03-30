@@ -36,9 +36,13 @@ class ResourceList implements \IteratorAggregate, ResourceListInterface
      *
      * @param ResourceInterface[] $resources The list of resource
      */
-    public function __construct(array $resources)
+    public function __construct(array $resources = array())
     {
-        $this->addResources($resources);
+        $this->resources = array();
+
+        foreach ($resources as $resource) {
+            $this->add($resource);
+        }
     }
 
     /**
@@ -75,7 +79,11 @@ class ResourceList implements \IteratorAggregate, ResourceListInterface
      */
     public function addAll(ResourceListInterface $otherList)
     {
-        $this->addResources($otherList);
+        $this->status = null;
+
+        foreach ($otherList as $resource) {
+            $this->resources[] = $resource;
+        }
     }
 
     /**
@@ -185,37 +193,64 @@ class ResourceList implements \IteratorAggregate, ResourceListInterface
     }
 
     /**
-     * Add resources.
-     *
-     * @param array|\ArrayAccess $resources
-     */
-    protected function addResources($resources)
-    {
-        $this->status = null;
-
-        foreach ($resources as $resource) {
-            $this->resources[] = $resource;
-        }
-    }
-
-    /**
      * Refresh the status of this list.
      */
     protected function refreshStatus()
     {
-        $this->status = ResourceListStatutes::SUCCESSFULLY;
-        $countErrors = 0;
+        $countPending = 0;
+        $countCancel = 0;
+        $countError = 0;
+        $countSuccess = 0;
 
         foreach ($this->resources as $resource) {
-            if (ResourceStatutes::ERROR === $resource->getStatus()) {
-                $countErrors++;
+            switch ($resource->getStatus()) {
+                case ResourceStatutes::PENDING:
+                    $countPending++;
+                    break;
+                case ResourceStatutes::CANCELED:
+                    $countCancel++;
+                    break;
+                case ResourceStatutes::ERROR:
+                    $countError++;
+                    break;
+                default:
+                    $countSuccess++;
+                    break;
             }
         }
 
-        if ($countErrors === $this->count()) {
-            $this->status = ResourceListStatutes::ERRORS;
-        } elseif ($countErrors > 0) {
-            $this->status = ResourceListStatutes::PARTIAL_SUCCESSFULLY;
+        $this->status = $this->getStatusValue($countPending, $countCancel, $countError, $countSuccess);
+    }
+
+    /**
+     * Get the final status value.
+     *
+     * @param int $countPending
+     * @param int $countCancel
+     * @param int $countError
+     * @param int $countSuccess
+     *
+     * @return string
+     */
+    private function getStatusValue($countPending, $countCancel, $countError, $countSuccess)
+    {
+        $status = ResourceListStatutes::SUCCESSFULLY;
+        $count = $this->count();
+
+        if ($count > 0) {
+            $status = ResourceListStatutes::MIXED;
+
+            if ($count === $countPending) {
+                $status = ResourceListStatutes::PENDING;
+            } elseif ($count === $countCancel) {
+                $status = ResourceListStatutes::CANCEL;
+            } elseif ($count === $countError) {
+                $status = ResourceListStatutes::ERROR;
+            } elseif ($count === $countSuccess) {
+                $status = ResourceListStatutes::SUCCESSFULLY;
+            }
         }
+
+        return $status;
     }
 }
