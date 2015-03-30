@@ -16,6 +16,7 @@ use Doctrine\Common\Persistence\ObjectRepository;
 use Sonatra\Bundle\DefaultValueBundle\DefaultValue\ObjectFactoryInterface;
 use Sonatra\Bundle\ResourceBundle\Exception\InvalidConfigurationException;
 use Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface;
+use Sonatra\Bundle\ResourceBundle\Resource\ResourceListInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -104,7 +105,7 @@ interface DomainInterface
      * @param bool     $autoCommit Check if each resource must be flushed immediately or in the end
      * @param bool     $skipError  Check if the error can be skipped and continued to do the job
      *
-     * @return ResourceInterface[]
+     * @return ResourceListInterface
      */
     public function creates(array $resources, $autoCommit = false, $skipError = false);
 
@@ -126,7 +127,7 @@ interface DomainInterface
      * @param bool     $autoCommit Check if each resource must be flushed immediately or in the end
      * @param bool     $skipError  Check if the error can be skipped and continued to do the job
      *
-     * @return ResourceInterface[]
+     * @return ResourceListInterface
      */
     public function updates(array $resources, $autoCommit = false, $skipError = false);
 
@@ -148,7 +149,7 @@ interface DomainInterface
      * @param bool     $autoCommit Check if each resource must be flushed immediately or in the end
      * @param bool     $skipError  Check if the error can be skipped and continued to do the job
      *
-     * @return ResourceInterface[]
+     * @return ResourceListInterface
      */
     public function upserts(array $resources, $autoCommit = false, $skipError = false);
 
@@ -172,7 +173,7 @@ interface DomainInterface
      * @param bool     $autoCommit Check if each resource must be flushed immediately or in the end
      * @param bool     $skipError  Check if the error can be skipped and continued to do the job
      *
-     * @return ResourceInterface[]
+     * @return ResourceListInterface
      */
     public function deletes(array $resources, $soft = true, $autoCommit = false, $skipError = false);
 
@@ -194,7 +195,7 @@ interface DomainInterface
      * @param bool     $autoCommit  Check if each resource must be flushed immediately or in the end
      * @param bool     $skipError   Check if the error can be skipped and continued to do the job
      *
-     * @return ResourceInterface[]
+     * @return ResourceListInterface
      */
     public function undeletes(array $identifiers, $autoCommit = false, $skipError = false);
 }
