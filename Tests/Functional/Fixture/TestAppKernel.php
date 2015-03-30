@@ -19,6 +19,8 @@ use Sonatra\Bundle\ResourceBundle\SonatraResourceBundle;
 use Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\Bundle\TestBundle\TestBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpKernel\Kernel;
 
 /**
@@ -74,5 +76,26 @@ class TestAppKernel extends Kernel
     public function getLogDir()
     {
         return $this->getRootDir().'/logs';
+    }
+
+    /**
+     * Get the container builder for the compiler pass tests.
+     *
+     * @param Definition[] $definitions The definitions
+     *
+     * @return ContainerBuilder
+     */
+    public function getContainerBuilderForCompilerPass(array $definitions = array())
+    {
+        $this->initializeBundles();
+        $containerBuilder = $this->buildContainer();
+
+        foreach ($definitions as $id => $definition) {
+            $containerBuilder->setDefinition($id, $definition);
+        }
+
+        $containerBuilder->compile();
+
+        return $containerBuilder;
     }
 }
