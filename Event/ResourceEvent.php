@@ -12,7 +12,7 @@
 namespace Sonatra\Bundle\ResourceBundle\Event;
 
 use Sonatra\Bundle\ResourceBundle\Domain\DomainInterface;
-use Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface;
+use Sonatra\Bundle\ResourceBundle\Resource\ResourceListInterface;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
@@ -28,17 +28,17 @@ class ResourceEvent extends Event
     private $domain;
 
     /**
-     * @var ResourceInterface[]
+     * @var ResourceListInterface
      */
     private $resources;
 
     /**
      * Constructor.
      *
-     * @param DomainInterface     $domain    The resource domain for this resources
-     * @param ResourceInterface[] $resources The list of resource instances
+     * @param DomainInterface       $domain    The resource domain for this resources
+     * @param ResourceListInterface $resources The list of resource instances
      */
-    public function __construct(DomainInterface $domain, array $resources)
+    public function __construct(DomainInterface $domain, ResourceListInterface $resources)
     {
         $this->domain = $domain;
         $this->resources = $resources;
@@ -57,7 +57,7 @@ class ResourceEvent extends Event
     /**
      * Get the list of resource instances.
      *
-     * @return ResourceInterface[]
+     * @return ResourceListInterface
      */
     public function getResources()
     {
