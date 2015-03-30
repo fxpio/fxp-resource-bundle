@@ -52,6 +52,14 @@ class Resource implements ResourceInterface
     /**
      * {@inheritdoc}
      */
+    public function setStatus($status)
+    {
+        $this->status = $status;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getStatus()
     {
         return $this->status;

@@ -21,6 +21,13 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
 interface ResourceInterface
 {
     /**
+     * Set status.
+     *
+     * @param string $status The status defined in ResourceStatutes class.
+     */
+    public function setStatus($status);
+
+    /**
      * Get the status of action by the resource domain.
      *
      * @return string
