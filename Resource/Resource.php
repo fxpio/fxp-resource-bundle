@@ -28,7 +28,7 @@ class Resource implements ResourceInterface
     /**
      * @var object
      */
-    protected $resource;
+    protected $data;
 
     /**
      * @var ConstraintViolationListInterface
@@ -38,14 +38,14 @@ class Resource implements ResourceInterface
     /**
      * Constructor.
      *
-     * @param string                           $status   The action status of resource
-     * @param object                           $resource The resource
-     * @param ConstraintViolationListInterface $errors   The list of errors
+     * @param string                           $status The action status of resource
+     * @param object                           $data   The data instance of resource
+     * @param ConstraintViolationListInterface $errors The list of errors
      */
-    public function __construct($status, $resource, ConstraintViolationListInterface $errors)
+    public function __construct($status, $data, ConstraintViolationListInterface $errors)
     {
         $this->status = $status;
-        $this->resource = $resource;
+        $this->data = $data;
         $this->errors = $errors;
     }
 
@@ -60,9 +60,9 @@ class Resource implements ResourceInterface
     /**
      * {@inheritdoc}
      */
-    public function getResource()
+    public function getData()
     {
-        return $this->resource;
+        return $this->data;
     }
 
     /**

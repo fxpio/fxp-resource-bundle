@@ -28,11 +28,11 @@ interface ResourceInterface
     public function getStatus();
 
     /**
-     * Get the resource instance.
+     * Get the data instance of this resource.
      *
      * @return object
      */
-    public function getResource();
+    public function getData();
 
     /**
      * Get the list of errors.
