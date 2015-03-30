@@ -14,13 +14,20 @@ namespace Sonatra\Bundle\ResourceBundle\Domain;
 use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\ORM\EntityManagerInterface;
 use Sonatra\Bundle\DefaultValueBundle\DefaultValue\ObjectFactoryInterface;
 use Sonatra\Bundle\ResourceBundle\Event\ResourceEvent;
 use Sonatra\Bundle\ResourceBundle\Resource\ResourceUtil;
+use Sonatra\Bundle\ResourceBundle\ResourceEvents;
+use Sonatra\Bundle\ResourceBundle\Exception\InvalidArgumentException;
 use Sonatra\Bundle\ResourceBundle\Exception\InvalidConfigurationException;
+use Sonatra\Bundle\ResourceBundle\ResourceStatutes;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -172,8 +179,51 @@ class Domain implements DomainInterface
      */
     public function creates(array $resources, $autoCommit = false, $skipError = false)
     {
-        //TODO
+        $resources = array_values($resources);
+        $hasError = false;
         $list = ResourceUtil::convertObjectsToResourceList($resources, $this->getClass());
+
+        $this->dispatchEvent(ResourceEvents::PRE_CREATES, new ResourceEvent($this, $list));
+        $this->beginTransaction($autoCommit);
+
+        foreach ($resources as $i => $resource) {
+            $listResources = $list->getResources();
+
+            if (!$skipError && $hasError) {
+                $listResources[$i]->setStatus(ResourceStatutes::CANCELED);
+                continue;
+            }
+
+            $errors = $this->validateResource($resource);
+
+            if (0 === count($errors)) {
+                $this->om->persist($resource);
+
+                if ($autoCommit) {
+                    $errors = $this->flushTransaction($resource);
+                }
+            }
+
+            if (0 !== count($errors)) {
+                $hasError = true;
+                $listResources[$i]->setStatus(ResourceStatutes::ERROR);
+                $listResources[$i]->getErrors()->addAll($errors);
+            } else {
+                $listResources[$i]->setStatus(ResourceStatutes::CREATED);
+            }
+        }
+
+        if (!$autoCommit) {
+            $errors = $this->flushTransaction();
+
+            if (count($errors) > 0) {
+                foreach ($list->getResources() as $resource) {
+                    $resource->setStatus(ResourceStatutes::ERROR);
+                }
+            }
+        }
+
+        $this->dispatchEvent(ResourceEvents::POST_CREATES, new ResourceEvent($this, $list));
 
         return $list;
     }
@@ -269,6 +319,89 @@ class Domain implements DomainInterface
         return $this->ed->dispatch($name, $event);
     }
 
+    /**
+     * Begin automatically the database transaction.
+     *
+     * @param bool $autoCommit Check if each resource must be flushed immediately or in the end
+     */
+    protected function beginTransaction($autoCommit = false)
+    {
+        if (!$autoCommit && null !== $this->connection) {
+            $this->connection->beginTransaction();
+        }
+    }
+
+    /**
+     * Flush data in database with automatic declaration of the transaction for the collection.
+     *
+     * @param object|null $resource The resource for auto commit or null for flush at the end
+     *
+     * @return ConstraintViolationList
+     */
+    protected function flushTransaction($resource = null)
+    {
+        $violations = new ConstraintViolationList();
+
+        try {
+            $this->flush($resource);
+        } catch (\Exception $e) {
+            if ($this->om instanceof EntityManagerInterface) {
+                $this->om->close();
+            }
+
+            if (null !== $this->connection && null === $resource) {
+                $this->connection->rollback();
+            }
+
+            $messageTpl = $e->getMessage();
+            $message = $messageTpl;
+
+            if ($e instanceof DriverException) {
+                $messageTpl = 'Database error code "%s"';
+                $message = sprintf($messageTpl, $e->getSQLState());
+            }
+
+            $violations->add(new ConstraintViolation($message, $messageTpl, array(), null, null, null));
+        }
+
+        return $violations;
+    }
+
+    /**
+     * Flush the data in database.
+     *
+     * @param object|null $resource The resource for auto commit or null for flush at the end
+     */
+    protected function flush($resource = null)
+    {
+        $this->om->flush();
+
+        if (null !== $resource) {
+            $this->om->detach($resource);
+        } else {
+            $this->om->clear();
+        }
+    }
+
+    /**
+     * Validate the resource.
+     *
+     * @param object $resource The resource instance
+     *
+     * @return ConstraintViolationListInterface
+     *
+     * @throws InvalidArgumentException When the resource isn't an instance of the managed class
+     */
+    protected function validateResource($resource)
+    {
+        $className = $this->getClass();
+
+        if (!$resource instanceof $className) {
+            throw new InvalidArgumentException(sprintf('The "%s" resource is not an instance of "%s"', get_class($resource), $className));
+        }
+
+        return $this->validator->validate($resource);
+    }
 
     /**
      * Format the prefix event.
