@@ -13,6 +13,8 @@ namespace Sonatra\Bundle\ResourceBundle\Domain;
 
 use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManagerInterface;
 use Sonatra\Bundle\DefaultValueBundle\DefaultValue\ObjectFactoryInterface;
 use Sonatra\Bundle\ResourceBundle\Event\ResourceEvent;
 use Sonatra\Bundle\ResourceBundle\Exception\InvalidConfigurationException;
@@ -31,6 +33,11 @@ class Domain implements DomainInterface
      * @var string
      */
     protected $class;
+
+    /**
+     * @var Connection
+     */
+    protected $connection;
 
     /**
      * @var ObjectManager
@@ -80,6 +87,10 @@ class Domain implements DomainInterface
         } catch (MappingException $e) {
             $msg = sprintf('The "%s" class is not managed by doctrine object manager', $this->getClass());
             throw new InvalidConfigurationException($msg, 0, $e);
+        }
+
+        if ($om instanceof EntityManagerInterface) {
+            $this->connection = $om->getConnection();
         }
     }
 
