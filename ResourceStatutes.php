@@ -39,6 +39,16 @@ final class ResourceStatutes
     const ERROR = 'error';
 
     /**
+     * The ResourceStatutes::CANCELED status is used when the action of the resource
+     * domain is canceled because of an error in the list (only for complete list of
+     * transactions).
+     *
+     * This status is used in Sonatra\Bundle\ResourceBundle\Event\ResourceEvent
+     * and Sonatra\Bundle\ResourceBundle\Domain\DomainInterface instances.
+     */
+    const CANCELED = 'canceled';
+
+    /**
      * The ResourceStatutes::CREATED status is used when the action of domain has
      * created the resource successfully.
      *
