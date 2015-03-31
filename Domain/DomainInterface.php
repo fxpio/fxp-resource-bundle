@@ -102,12 +102,12 @@ interface DomainInterface
      * Warning: It's recommended to limit the number of resources.
      *
      * @param object[] $resources  The list of object resource instance
-     * @param bool     $autoCommit Check if each resource must be flushed immediately or in the end
-     * @param bool     $skipError  Check if the error can be skipped and continued to do the job
+     * @param bool     $autoCommit Commit transaction for each resource or all
+     *                             (continue the action even if there is an error on a resource)
      *
      * @return ResourceListInterface
      */
-    public function creates(array $resources, $autoCommit = false, $skipError = false);
+    public function creates(array $resources, $autoCommit = false);
 
     /**
      * Update a resource.
@@ -124,12 +124,12 @@ interface DomainInterface
      * Warning: It's recommended to limit the number of resources.
      *
      * @param object[] $resources  The list of object resource instance
-     * @param bool     $autoCommit Check if each resource must be flushed immediately or in the end
-     * @param bool     $skipError  Check if the error can be skipped and continued to do the job
+     * @param bool     $autoCommit Commit transaction for each resource or all
+     *                             (continue the action even if there is an error on a resource)
      *
      * @return ResourceListInterface
      */
-    public function updates(array $resources, $autoCommit = false, $skipError = false);
+    public function updates(array $resources, $autoCommit = false);
 
     /**
      * Update or insert a resource.
@@ -146,12 +146,12 @@ interface DomainInterface
      * Warning: It's recommended to limit the number of resources.
      *
      * @param object[] $resources  The list of object resource instance
-     * @param bool     $autoCommit Check if each resource must be flushed immediately or in the end
-     * @param bool     $skipError  Check if the error can be skipped and continued to do the job
+     * @param bool     $autoCommit Commit transaction for each resource or all
+     *                             (continue the action even if there is an error on a resource)
      *
      * @return ResourceListInterface
      */
-    public function upserts(array $resources, $autoCommit = false, $skipError = false);
+    public function upserts(array $resources, $autoCommit = false);
 
     /**
      * Delete a resource.
@@ -170,12 +170,12 @@ interface DomainInterface
      *
      * @param object[] $resources  The list of object resource instance
      * @param bool     $soft       Check if the delete must be hard or soft for the objects compatibles
-     * @param bool     $autoCommit Check if each resource must be flushed immediately or in the end
-     * @param bool     $skipError  Check if the error can be skipped and continued to do the job
+     * @param bool     $autoCommit Commit transaction for each resource or all
+     *                             (continue the action even if there is an error on a resource)
      *
      * @return ResourceListInterface
      */
-    public function deletes(array $resources, $soft = true, $autoCommit = false, $skipError = false);
+    public function deletes(array $resources, $soft = true, $autoCommit = false);
 
     /**
      * Undelete a resource.
@@ -192,10 +192,10 @@ interface DomainInterface
      * Warning: It's recommended to limit the number of resources.
      *
      * @param object[] $identifiers The list of object identifier
-     * @param bool     $autoCommit  Check if each resource must be flushed immediately or in the end
-     * @param bool     $skipError   Check if the error can be skipped and continued to do the job
+     * @param bool     $autoCommit  Commit transaction for each resource or all
+     *                              (continue the action even if there is an error on a resource)
      *
      * @return ResourceListInterface
      */
-    public function undeletes(array $identifiers, $autoCommit = false, $skipError = false);
+    public function undeletes(array $identifiers, $autoCommit = false);
 }

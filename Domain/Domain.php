@@ -177,7 +177,7 @@ class Domain implements DomainInterface
     /**
      * {@inheritdoc}
      */
-    public function creates(array $resources, $autoCommit = false, $skipError = false)
+    public function creates(array $resources, $autoCommit = false)
     {
         $resources = array_values($resources);
         $hasError = false;
@@ -240,7 +240,7 @@ class Domain implements DomainInterface
     /**
      * {@inheritdoc}
      */
-    public function updates(array $resources, $autoCommit = false, $skipError = false)
+    public function updates(array $resources, $autoCommit = false)
     {
         $list = ResourceUtil::convertObjectsToResourceList($resources, $this->getClass());
         //TODO
@@ -259,7 +259,7 @@ class Domain implements DomainInterface
     /**
      * {@inheritdoc}
      */
-    public function upserts(array $resources, $autoCommit = false, $skipError = false)
+    public function upserts(array $resources, $autoCommit = false)
     {
         $list = ResourceUtil::convertObjectsToResourceList($resources, $this->getClass());
         //TODO
@@ -278,7 +278,7 @@ class Domain implements DomainInterface
     /**
      * {@inheritdoc}
      */
-    public function deletes(array $resources, $soft = true, $autoCommit = false, $skipError = false)
+    public function deletes(array $resources, $soft = true, $autoCommit = false)
     {
         $list = ResourceUtil::convertObjectsToResourceList($resources, $this->getClass());
         //TODO
@@ -297,7 +297,7 @@ class Domain implements DomainInterface
     /**
      * {@inheritdoc}
      */
-    public function undeletes(array $identifiers, $autoCommit = false, $skipError = false)
+    public function undeletes(array $identifiers, $autoCommit = false)
     {
         $list = ResourceUtil::convertObjectsToResourceList($identifiers, $this->getClass());
         //TODO
