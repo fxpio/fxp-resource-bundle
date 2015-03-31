@@ -84,10 +84,17 @@ interface ResourceListInterface extends \Traversable, \Countable, \ArrayAccess
     public function remove($offset);
 
     /**
+     * Get the errors defined for this list.
+     *
+     * @return ConstraintViolationListInterface[]
+     */
+    public function getErrors();
+
+    /**
      * Get the list of resource errors with the array key corresponding to the
      * resource position in the list.
      *
      * @return ConstraintViolationListInterface[]
      */
-    public function getErrors();
+    public function getChildrenErrors();
 }

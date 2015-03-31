@@ -14,6 +14,7 @@ namespace Sonatra\Bundle\ResourceBundle\Resource;
 use Sonatra\Bundle\ResourceBundle\ResourceStatutes;
 use Sonatra\Bundle\ResourceBundle\ResourceListStatutes;
 use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
  * Resource list.
@@ -33,13 +34,25 @@ class ResourceList implements \IteratorAggregate, ResourceListInterface
     protected $resources;
 
     /**
+     * @var ConstraintViolationListInterface
+     */
+    protected $errors;
+
+    /**
+     * @var ConstraintViolationListInterface|null
+     */
+    protected $childrenErrors;
+
+    /**
      * Constructor.
      *
-     * @param ResourceInterface[] $resources The list of resource
+     * @param ResourceInterface[]              $resources The list of resource
+     * @param ConstraintViolationListInterface $errors    The list of errors
      */
-    public function __construct(array $resources = array())
+    public function __construct(array $resources = array(), ConstraintViolationListInterface $errors = null)
     {
         $this->resources = array();
+        $this->errors = null !== $errors ? $errors : new ConstraintViolationList();
 
         foreach ($resources as $resource) {
             $this->add($resource);
@@ -71,7 +84,7 @@ class ResourceList implements \IteratorAggregate, ResourceListInterface
      */
     public function add(ResourceInterface $resource)
     {
-        $this->status = null;
+        $this->reset();
         $this->resources[] = $resource;
     }
 
@@ -80,7 +93,7 @@ class ResourceList implements \IteratorAggregate, ResourceListInterface
      */
     public function addAll(ResourceListInterface $otherList)
     {
-        $this->status = null;
+        $this->reset();
 
         foreach ($otherList as $resource) {
             $this->resources[] = $resource;
@@ -112,7 +125,7 @@ class ResourceList implements \IteratorAggregate, ResourceListInterface
      */
     public function set($offset, ResourceInterface $resource)
     {
-        $this->status = null;
+        $this->reset();
         $this->resources[$offset] = $resource;
     }
 
@@ -121,7 +134,7 @@ class ResourceList implements \IteratorAggregate, ResourceListInterface
      */
     public function remove($offset)
     {
-        $this->status = null;
+        $this->reset();
         unset($this->resources[$offset]);
     }
 
@@ -130,15 +143,27 @@ class ResourceList implements \IteratorAggregate, ResourceListInterface
      */
     public function getErrors()
     {
-        $errors = new ConstraintViolationList();
+        return $this->errors;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getChildrenErrors()
+    {
+        if (null !== $this->childrenErrors) {
+            return $this->childrenErrors;
+        }
+
+        $this->childrenErrors = new ConstraintViolationList();
 
         foreach ($this->resources as $i => $resource) {
             if (ResourceStatutes::ERROR === $resource->getStatus()) {
-                $errors->addAll($resource->getErrors());
+                $this->childrenErrors->addAll($resource->getErrors());
             }
         }
 
-        return $errors;
+        return $this->childrenErrors;
     }
 
     /**
@@ -191,6 +216,15 @@ class ResourceList implements \IteratorAggregate, ResourceListInterface
     public function offsetUnset($offset)
     {
         $this->remove($offset);
+    }
+
+    /**
+     * Reset the value of status and children errors.
+     */
+    protected function reset()
+    {
+        $this->status = null;
+        $this->childrenErrors = null;
     }
 
     /**

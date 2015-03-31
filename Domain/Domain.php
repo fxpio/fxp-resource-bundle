@@ -217,6 +217,7 @@ class Domain implements DomainInterface
             $errors = $this->flushTransaction();
 
             if (count($errors) > 0) {
+                $list->getErrors()->addAll($errors);
                 foreach ($list->getResources() as $resource) {
                     $resource->setStatus(ResourceStatutes::ERROR);
                 }
