@@ -20,14 +20,12 @@ use Sonatra\Bundle\DefaultValueBundle\DefaultValue\ObjectFactoryInterface;
 use Sonatra\Bundle\ResourceBundle\Event\ResourceEvent;
 use Sonatra\Bundle\ResourceBundle\Resource\ResourceUtil;
 use Sonatra\Bundle\ResourceBundle\ResourceEvents;
-use Sonatra\Bundle\ResourceBundle\Exception\InvalidArgumentException;
 use Sonatra\Bundle\ResourceBundle\Exception\InvalidConfigurationException;
 use Sonatra\Bundle\ResourceBundle\ResourceStatutes;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -194,7 +192,7 @@ class Domain implements DomainInterface
                 continue;
             }
 
-            $errors = $this->validateResource($resource);
+            $errors = $this->validator->validate($resource);
 
             if (0 === count($errors)) {
                 $this->om->persist($resource);
@@ -382,26 +380,6 @@ class Domain implements DomainInterface
         } else {
             $this->om->clear();
         }
-    }
-
-    /**
-     * Validate the resource.
-     *
-     * @param object $resource The resource instance
-     *
-     * @return ConstraintViolationListInterface
-     *
-     * @throws InvalidArgumentException When the resource isn't an instance of the managed class
-     */
-    protected function validateResource($resource)
-    {
-        $className = $this->getClass();
-
-        if (!$resource instanceof $className) {
-            throw new InvalidArgumentException(sprintf('The "%s" resource is not an instance of "%s"', get_class($resource), $className));
-        }
-
-        return $this->validator->validate($resource);
     }
 
     /**
