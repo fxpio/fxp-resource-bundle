@@ -189,7 +189,7 @@ class Domain implements DomainInterface
         foreach ($resources as $i => $resource) {
             $listResources = $list->getResources();
 
-            if (!$skipError && $hasError) {
+            if (!$autoCommit && $hasError) {
                 $listResources[$i]->setStatus(ResourceStatutes::CANCELED);
                 continue;
             }
@@ -345,11 +345,11 @@ class Domain implements DomainInterface
 
         try {
             $this->flush($resource);
-        } catch (\Exception $e) {
-            if ($this->om instanceof EntityManagerInterface) {
-                $this->om->close();
-            }
 
+            if (null !== $this->connection && null === $resource) {
+                $this->connection->commit();
+            }
+        } catch (\Exception $e) {
             if (null !== $this->connection && null === $resource) {
                 $this->connection->rollback();
             }
