@@ -68,11 +68,7 @@ class DomainManagerTest extends \PHPUnit_Framework_TestCase
         $or->expects($this->any())
             ->method('getManagerForClass')
             ->will($this->returnCallback(function ($value) use ($om) {
-                if ('InvalidClass' === $value) {
-                    return;
-                }
-
-                return $om;
+                return 'InvalidClass' === $value ? null : $om;
             }));
 
         /* @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject $ed */
