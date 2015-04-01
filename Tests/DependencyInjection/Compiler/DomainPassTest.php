@@ -144,7 +144,7 @@ class DomainPassTest extends KernelTestCase
     public function testProcessWithResourceNotManagedByDoctrine()
     {
         $msg = '/The "(\w+)" class is not managed by doctrine object manager/';
-        $this->setExpectedExceptionRegExp('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException', $msg);
+        $this->setExpectedExceptionRegExp('Sonatra\Bundle\ResourceBundle\Exception\InvalidConfigurationException', $msg);
 
         $className = 'DateTime';
         $def = new Definition('Sonatra\Bundle\ResourceBundle\Domain\Domain', array($className));

@@ -13,10 +13,10 @@ namespace Sonatra\Bundle\ResourceBundle\DependencyInjection\Compiler;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Sonatra\Bundle\ResourceBundle\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
  * @author François Pluchino <francois.pluchino@sonatra.com>
@@ -86,7 +86,7 @@ class DomainPass implements CompilerPassInterface
             $pos = array_search($sClass, $classes, true);
 
             if (null === $registry->getManagerForClass($sClass)) {
-                throw new InvalidArgumentException(sprintf('The "%s" class is not managed by doctrine object manager', $sClass));
+                throw new InvalidConfigurationException(sprintf('The "%s" class is not managed by doctrine object manager', $sClass));
             }
 
             if (false !== $pos) {

@@ -11,7 +11,7 @@
 
 namespace Sonatra\Bundle\ResourceBundle\Resource;
 
-use Sonatra\Bundle\ResourceBundle\Exception\InvalidArgumentException;
+use Sonatra\Bundle\ResourceBundle\Exception\InvalidResourceException;
 
 /**
  * Util for resource.
@@ -28,7 +28,7 @@ abstract class ResourceUtil
      *
      * @return ResourceList
      *
-     * @throws InvalidArgumentException When the instance object in the list is not an instance of the required class
+     * @throws InvalidResourceException When the instance object in the list is not an instance of the required class
      */
     public static function convertObjectsToResourceList(array $objects, $requireClass)
     {
@@ -49,19 +49,19 @@ abstract class ResourceUtil
      * @param string $requireClass The required class
      * @param int    $i            The position of the object in the list
      *
-     * @throws InvalidArgumentException When the object parameter is not an object
-     * @throws InvalidArgumentException When the object instance is not an instance of the required class
+     * @throws InvalidResourceException When the object parameter is not an object
+     * @throws InvalidResourceException When the object instance is not an instance of the required class
      */
     public static function validateObjectResource($object, $requireClass, $i)
     {
         if (!is_object($object)) {
             $msg = sprintf('The resource at the position "%s" is not an object instance', $i);
-            throw new InvalidArgumentException($msg);
+            throw new InvalidResourceException($msg);
         }
 
         if (!$object instanceof $requireClass) {
             $msg = sprintf('The object instance ("%s") is not an instance of "%s"', get_class($object), $requireClass);
-            throw new InvalidArgumentException($msg);
+            throw new InvalidResourceException($msg);
         }
     }
 }
