@@ -35,6 +35,7 @@ class SonatraResourceExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $container = $this->createContainer();
 
+        $this->assertTrue($container->hasDefinition('sonatra_resource.converter_registry'));
         $this->assertTrue($container->hasDefinition('sonatra_resource.domain_manager'));
     }
 
