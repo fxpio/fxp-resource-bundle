@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Sonatra\Bundle\ResourceBundle\Tests\Compiler;
+namespace Sonatra\Bundle\ResourceBundle\Tests\DependencyInjection\Compiler;
 
 use Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\TestAppKernel;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
