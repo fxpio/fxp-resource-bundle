@@ -11,6 +11,7 @@
 
 namespace Sonatra\Bundle\ResourceBundle;
 
+use Sonatra\Bundle\ResourceBundle\DependencyInjection\Compiler\ConverterPass;
 use Sonatra\Bundle\ResourceBundle\DependencyInjection\Compiler\DomainPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -27,6 +28,7 @@ class SonatraResourceBundle extends Bundle
     public function build(ContainerBuilder $container)
     {
         parent::build($container);
+        $container->addCompilerPass(new ConverterPass());
         $container->addCompilerPass(new DomainPass(), PassConfig::TYPE_OPTIMIZE);
     }
 }
