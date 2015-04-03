@@ -18,6 +18,7 @@ use Sonatra\Bundle\ResourceBundle\Exception\InvalidConfigurationException;
 use Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface;
 use Sonatra\Bundle\ResourceBundle\Resource\ResourceListInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -90,7 +91,7 @@ interface DomainInterface
     /**
      * Create a resource.
      *
-     * @param object $resource The object resource instance of defined class name
+     * @param object|FormInterface $resource The object resource instance of defined class name
      *
      * @return ResourceInterface
      */
@@ -101,9 +102,9 @@ interface DomainInterface
      *
      * Warning: It's recommended to limit the number of resources.
      *
-     * @param object[] $resources  The list of object resource instance
-     * @param bool     $autoCommit Commit transaction for each resource or all
-     *                             (continue the action even if there is an error on a resource)
+     * @param object[]|FormInterface[] $resources  The list of object resource instance
+     * @param bool                     $autoCommit Commit transaction for each resource or all
+     *                                             (continue the action even if there is an error on a resource)
      *
      * @return ResourceListInterface
      */
@@ -112,7 +113,7 @@ interface DomainInterface
     /**
      * Update a resource.
      *
-     * @param object $resource The object resource
+     * @param object|FormInterface $resource The object resource
      *
      * @return ResourceInterface
      */
@@ -123,9 +124,9 @@ interface DomainInterface
      *
      * Warning: It's recommended to limit the number of resources.
      *
-     * @param object[] $resources  The list of object resource instance
-     * @param bool     $autoCommit Commit transaction for each resource or all
-     *                             (continue the action even if there is an error on a resource)
+     * @param object[]|FormInterface[] $resources  The list of object resource instance
+     * @param bool                     $autoCommit Commit transaction for each resource or all
+     *                                             (continue the action even if there is an error on a resource)
      *
      * @return ResourceListInterface
      */
@@ -134,7 +135,7 @@ interface DomainInterface
     /**
      * Update or insert a resource.
      *
-     * @param object $resource The object resource
+     * @param object|FormInterface $resource The object resource
      *
      * @return ResourceInterface
      */
@@ -145,9 +146,9 @@ interface DomainInterface
      *
      * Warning: It's recommended to limit the number of resources.
      *
-     * @param object[] $resources  The list of object resource instance
-     * @param bool     $autoCommit Commit transaction for each resource or all
-     *                             (continue the action even if there is an error on a resource)
+     * @param object[]|FormInterface[] $resources  The list of object resource instance
+     * @param bool                     $autoCommit Commit transaction for each resource or all
+     *                                             (continue the action even if there is an error on a resource)
      *
      * @return ResourceListInterface
      */

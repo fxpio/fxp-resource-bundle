@@ -13,6 +13,7 @@ namespace Sonatra\Bundle\ResourceBundle\Resource;
 
 use Sonatra\Bundle\ResourceBundle\ResourceStatutes;
 use Sonatra\Bundle\ResourceBundle\ResourceListStatutes;
+use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
@@ -39,7 +40,7 @@ class ResourceList implements \IteratorAggregate, ResourceListInterface
     protected $errors;
 
     /**
-     * @var ConstraintViolationListInterface|null
+     * @var ConstraintViolationListInterface|FormErrorIterator[]|null
      */
     protected $childrenErrors;
 
@@ -149,21 +150,19 @@ class ResourceList implements \IteratorAggregate, ResourceListInterface
     /**
      * {@inheritdoc}
      */
-    public function getChildrenErrors()
+    public function hasErrors()
     {
-        if (null !== $this->childrenErrors) {
-            return $this->childrenErrors;
+        if ($this->getErrors()->count() > 0) {
+            return true;
         }
 
-        $this->childrenErrors = new ConstraintViolationList();
-
         foreach ($this->resources as $i => $resource) {
-            if (ResourceStatutes::ERROR === $resource->getStatus()) {
-                $this->childrenErrors->addAll($resource->getErrors());
+            if (ResourceStatutes::ERROR === $resource->getStatus() && !$resource->isValid()) {
+                return true;
             }
         }
 
-        return $this->childrenErrors;
+        return false;
     }
 
     /**

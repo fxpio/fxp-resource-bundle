@@ -1,6 +1,7 @@
 framework:
     test: ~
     secret: 'test'
+    form: ~
     validation: ~
     session:
         storage_id: session.storage.filesystem

@@ -11,6 +11,9 @@
 
 namespace Sonatra\Bundle\ResourceBundle\Resource;
 
+use Sonatra\Bundle\ResourceBundle\Exception\InvalidArgumentException;
+use Symfony\Component\Form\FormErrorIterator;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
@@ -37,7 +40,7 @@ interface ResourceInterface
     /**
      * Get the data instance of this resource.
      *
-     * @return object
+     * @return object|FormInterface
      */
     public function getData();
 
@@ -47,4 +50,27 @@ interface ResourceInterface
      * @return ConstraintViolationListInterface
      */
     public function getErrors();
+
+    /**
+     * Get the form errors.
+     *
+     * @return FormErrorIterator
+     *
+     * @throws InvalidArgumentException When the data is not a form
+     */
+    public function getFormErrors();
+
+    /**
+     * Check if the resource is a resource for a form.
+     *
+     * @return bool
+     */
+    public function isForm();
+
+    /**
+     * Check if the resource has errors.
+     *
+     * @return bool
+     */
+    public function isValid();
 }

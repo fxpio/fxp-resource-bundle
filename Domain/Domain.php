@@ -24,8 +24,11 @@ use Sonatra\Bundle\ResourceBundle\Exception\InvalidConfigurationException;
 use Sonatra\Bundle\ResourceBundle\ResourceStatutes;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormErrorIterator;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -190,20 +193,24 @@ class Domain implements DomainInterface
                 continue;
             }
 
-            $errors = $this->validator->validate($resource);
+            $rErrors = $this->validateResource($resource);
 
-            if (0 === count($errors)) {
+            if (0 === count($rErrors)) {
+                $resource = $this->getResourceData($resource);
                 $this->om->persist($resource);
 
                 if ($autoCommit) {
-                    $errors = $this->flushTransaction($resource);
+                    $rErrors = $this->flushTransaction($resource);
                 }
             }
 
-            if (0 !== count($errors)) {
+            if (0 !== count($rErrors)) {
                 $hasError = true;
                 $list[$i]->setStatus(ResourceStatutes::ERROR);
-                $list[$i]->getErrors()->addAll($rErrors);
+
+                if ($rErrors instanceof ConstraintViolationListInterface) {
+                    $list[$i]->getErrors()->addAll($rErrors);
+                }
             } else {
                 $list[$i]->setStatus(ResourceStatutes::CREATED);
             }
@@ -378,6 +385,38 @@ class Domain implements DomainInterface
         } else {
             $this->om->clear();
         }
+    }
+
+    /**
+     * Validate the resource and get the error list.
+     *
+     * @param object|FormInterface $resource The resource
+     *
+     * @return ConstraintViolationListInterface|FormErrorIterator
+     */
+    protected function validateResource($resource)
+    {
+        if ($resource instanceof FormInterface) {
+            if (!$resource->isSubmitted()) {
+                $resource->submit(array());
+            }
+
+            return $resource->getErrors(true);
+        }
+
+        return $this->validator->validate($resource);
+    }
+
+    /**
+     * Get the real resource data.
+     *
+     * @param object|FormInterface $resource The resource instance or form instance
+     *
+     * @return object
+     */
+    protected function getResourceData($resource)
+    {
+        return $resource instanceof FormInterface ? $resource->getData() : $resource;
     }
 
     /**

@@ -21,11 +21,18 @@ class UnexpectedTypeException extends InvalidArgumentException
     /**
      * Constructor.
      *
-     * @param mixed  $value        The value given
-     * @param string $expectedType The expected type
+     * @param mixed    $value        The value given
+     * @param string   $expectedType The expected type
+     * @param int|null $position     The position in list
      */
-    public function __construct($value, $expectedType)
+    public function __construct($value, $expectedType, $position = null)
     {
-        parent::__construct(sprintf('Expected argument of type "%s", "%s" given', $expectedType, is_object($value) ? get_class((object) $value) : gettype($value)));
+        $msg = sprintf('Expected argument of type "%s", "%s" given', $expectedType, is_object($value) ? get_class((object) $value) : gettype($value));
+
+        if (is_int($position)) {
+            $msg .= sprintf(' at the position "%s"', $position);
+        }
+
+        parent::__construct($msg);
     }
 }

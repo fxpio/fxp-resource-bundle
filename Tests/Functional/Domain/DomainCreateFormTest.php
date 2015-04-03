@@ -17,36 +17,25 @@ use Sonatra\Bundle\ResourceBundle\ResourceEvents;
 use Sonatra\Bundle\ResourceBundle\ResourceListStatutes;
 use Sonatra\Bundle\ResourceBundle\ResourceStatutes;
 use Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\Bundle\TestBundle\Entity\Foo;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
+use Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\Bundle\TestBundle\Form\FooType;
+use Symfony\Component\Form\FormInterface;
 
 /**
- * Functional tests for create methods of Domain.
+ * Functional tests for create methods of Domain with form resources.
  *
  * @author François Pluchino <francois.pluchino@sonatra.com>
  */
-class DomainCreateTest extends AbstractDomainTest
+class DomainCreateFormTest extends AbstractDomainTest
 {
     public function testCreateWithErrorValidation()
     {
         $domain = $this->createDomain();
         /* @var Foo $foo */
         $foo = $domain->newInstance();
+        $form = $this->buildForm($foo, array(
+            'description' => 'test',
+        ));
 
-        $this->runTestCreateException($domain, $foo, '/This value should not be blank./');
-    }
-
-    public function testCreateWithErrorDatabase()
-    {
-        $domain = $this->createDomain();
-        /* @var Foo $foo */
-        $foo = $domain->newInstance();
-        $foo->setName('Bar');
-
-        $this->runTestCreateException($domain, $foo, '/Database error code "(\d+)"/');
-    }
-
-    protected function runTestCreateException(DomainInterface $domain, $object, $errorMessage)
-    {
         $this->loadFixtures(array());
 
         $preEvent = false;
@@ -68,9 +57,56 @@ class DomainCreateTest extends AbstractDomainTest
 
         $this->assertCount(0, $domain->getRepository()->findAll());
 
-        $resource = $domain->create($object);
+        $resource = $domain->create($form);
+        $this->assertCount(0, $resource->getErrors());
+        $this->assertCount(1, $resource->getFormErrors());
+
+        $errors = $resource->getFormErrors();
+        $this->assertRegExp('/This value should not be blank./', $errors[0]->getMessage());
+
+        $this->assertTrue($preEvent);
+        $this->assertTrue($postEvent);
+
+        $this->assertCount(0, $domain->getRepository()->findAll());
+    }
+
+    public function testCreateWithErrorDatabase()
+    {
+        $domain = $this->createDomain();
+        /* @var Foo $foo */
+        $foo = $domain->newInstance();
+        $form = $this->buildForm($foo, array(
+            'name' => 'Bar',
+        ));
+
+        $this->loadFixtures(array());
+
+        $preEvent = false;
+        $postEvent = false;
+        $dispatcher = $this->getContainer()->get('event_dispatcher');
+
+        $dispatcher->addListener($domain->getEventPrefix().ResourceEvents::PRE_CREATES, function (ResourceEvent $e) use (&$preEvent) {
+            $preEvent = true;
+            foreach ($e->getResources() as $resource) {
+                $this->assertSame(ResourceStatutes::PENDING, $resource->getStatus());
+            }
+        });
+        $dispatcher->addListener($domain->getEventPrefix().ResourceEvents::POST_CREATES, function (ResourceEvent $e) use (&$postEvent) {
+            $postEvent = true;
+            foreach ($e->getResources() as $resource) {
+                $this->assertSame(ResourceStatutes::ERROR, $resource->getStatus());
+            }
+        });
+
+        $this->assertCount(0, $domain->getRepository()->findAll());
+
+        $resource = $domain->create($form);
+        $this->assertFalse($resource->isValid());
         $this->assertCount(1, $resource->getErrors());
-        $this->assertRegExp($errorMessage, $resource->getErrors()->get(0)->getMessage());
+        $this->assertCount(0, $resource->getFormErrors());
+
+        $errors = $resource->getErrors();
+        $this->assertRegExp('/Database error code "(\d+)"/', $errors[0]->getMessage());
 
         $this->assertTrue($preEvent);
         $this->assertTrue($postEvent);
@@ -83,8 +119,10 @@ class DomainCreateTest extends AbstractDomainTest
         $domain = $this->createDomain();
         /* @var Foo $foo */
         $foo = $domain->newInstance();
-        $foo->setName('Bar');
-        $foo->setDetail('Detail');
+        $form = $this->buildForm($foo, array(
+            'name' => 'Bar',
+            'detail' => 'Detail',
+        ));
 
         $this->loadFixtures(array());
 
@@ -107,8 +145,10 @@ class DomainCreateTest extends AbstractDomainTest
 
         $this->assertCount(0, $domain->getRepository()->findAll());
 
-        $resource = $domain->create($foo);
+        $resource = $domain->create($form);
+        $this->assertTrue($resource->isValid());
         $this->assertCount(0, $resource->getErrors());
+        $this->assertCount(0, $resource->getFormErrors());
 
         $this->assertTrue($preEvent);
         $this->assertTrue($postEvent);
@@ -124,7 +164,14 @@ class DomainCreateTest extends AbstractDomainTest
         /* @var Foo $foo2 */
         $foo2 = $domain->newInstance();
 
-        $this->runTestCreatesException($domain, array($foo1, $foo2), '/This value should not be blank./', true);
+        $form1 = $this->buildForm($foo1, array(
+            'description' => 'test',
+        ));
+        $form2 = $this->buildForm($foo2, array(
+            'description' => 'test',
+        ));
+
+        $this->runTestCreatesException($domain, array($form1, $form2), '/This value should not be blank./', true);
     }
 
     public function testCreatesWithErrorDatabase()
@@ -132,12 +179,17 @@ class DomainCreateTest extends AbstractDomainTest
         $domain = $this->createDomain();
         /* @var Foo $foo1 */
         $foo1 = $domain->newInstance();
-        $foo1->setName('Bar');
         /* @var Foo $foo2 */
         $foo2 = $domain->newInstance();
-        $foo2->setName('Bar');
 
-        $this->runTestCreatesException($domain, array($foo1, $foo2), '/Database error code "(\d+)"/', false);
+        $form1 = $this->buildForm($foo1, array(
+            'name' => 'Bar',
+        ));
+        $form2 = $this->buildForm($foo2, array(
+            'name' => 'Bar',
+        ));
+
+        $this->runTestCreatesException($domain, array($form1, $form2), '/Database error code "(\d+)"/', false);
     }
 
     protected function runTestCreatesException(DomainInterface $domain, array $objects, $errorMessage, $autoCommit = false)
@@ -169,11 +221,9 @@ class DomainCreateTest extends AbstractDomainTest
         $this->assertInstanceOf('Sonatra\Bundle\ResourceBundle\Resource\ResourceListInterface', $resources);
         $this->assertTrue($resources->hasErrors());
 
-        /* @var ConstraintViolationListInterface $errors */
         $errors = $autoCommit
-            ? $resources->get(0)->getErrors()
+            ? $resources->get(0)->getFormErrors()
             : $resources->getErrors();
-        $this->assertCount(1, $errors);
         $this->assertRegExp($errorMessage, $errors[0]->getMessage());
 
         $this->assertTrue($preEvent);
@@ -196,9 +246,13 @@ class DomainCreateTest extends AbstractDomainTest
         $foo1 = $domain->newInstance();
         /* @var Foo $foo2 */
         $foo2 = $domain->newInstance();
-        $foo2->setName('Bar');
 
-        $objects = array($foo1, $foo2);
+        $form1 = $this->buildForm($foo1, array());
+        $form2 = $this->buildForm($foo2, array(
+            'name' => 'Bar',
+        ));
+
+        $objects = array($form1, $form2);
 
         $this->loadFixtures(array());
 
@@ -225,7 +279,8 @@ class DomainCreateTest extends AbstractDomainTest
         $this->assertInstanceOf('Sonatra\Bundle\ResourceBundle\Resource\ResourceListInterface', $resources);
 
         $this->assertTrue($resources->hasErrors());
-        $this->assertRegExp('/This value should not be blank./', $resources->get(0)->getErrors()->get(0)->getMessage());
+        $errors1 = $resources->get(0)->getFormErrors();
+        $this->assertRegExp('/This value should not be blank./', $errors1[0]->getMessage());
         $this->assertRegExp('/Database error code "(\d+)"/', $resources->get(1)->getErrors()->get(0)->getMessage());
 
         $this->assertTrue($preEvent);
@@ -241,10 +296,14 @@ class DomainCreateTest extends AbstractDomainTest
         $foo1 = $domain->newInstance();
         /* @var Foo $foo2 */
         $foo2 = $domain->newInstance();
-        $foo2->setName('Bar');
-        $foo2->setDetail('Detail');
 
-        $objects = array($foo1, $foo2);
+        $form1 = $this->buildForm($foo1, array());
+        $form2 = $this->buildForm($foo2, array(
+            'name' => 'Bar',
+            'detail' => 'Detail',
+        ));
+
+        $objects = array($form1, $form2);
 
         $this->loadFixtures(array());
 
@@ -271,14 +330,19 @@ class DomainCreateTest extends AbstractDomainTest
         $domain = $this->createDomain();
         /* @var Foo $foo1 */
         $foo1 = $domain->newInstance();
-        $foo1->setName('Bar 1');
-        $foo1->setDetail('Detail 1');
         /* @var Foo $foo2 */
         $foo2 = $domain->newInstance();
-        $foo2->setName('Bar 2');
-        $foo2->setDetail('Detail 2');
 
-        $objects = array($foo1, $foo2);
+        $form1 = $this->buildForm($foo1, array(
+            'name' => 'Bar 1',
+            'detail' => 'Detail 1',
+        ));
+        $form2 = $this->buildForm($foo2, array(
+            'name' => 'Bar 2',
+            'detail' => 'Detail 2',
+        ));
+
+        $objects = array($form1, $form2);
 
         $this->loadFixtures(array());
 
@@ -292,6 +356,58 @@ class DomainCreateTest extends AbstractDomainTest
 
         $this->assertSame(ResourceListStatutes::SUCCESSFULLY, $resources->getStatus());
         $this->assertSame(ResourceStatutes::CREATED, $resources->get(0)->getStatus());
+        $this->assertTrue($resources->get(0)->isValid());
         $this->assertSame(ResourceStatutes::CREATED, $resources->get(1)->getStatus());
+        $this->assertTrue($resources->get(1)->isValid());
+    }
+
+    public function testCreateWithMissingFormSubmission()
+    {
+        $domain = $this->createDomain();
+        /* @var Foo $foo */
+        $foo = $domain->newInstance();
+
+        /* @var FormInterface $form */
+        $form = $this->getContainer()->get('form.factory')->create(new FooType(), $foo, array());
+
+        $this->loadFixtures(array());
+
+        $preEvent = false;
+        $postEvent = false;
+        $dispatcher = $this->getContainer()->get('event_dispatcher');
+
+        $dispatcher->addListener($domain->getEventPrefix().ResourceEvents::PRE_CREATES, function (ResourceEvent $e) use (&$preEvent) {
+            $preEvent = true;
+            foreach ($e->getResources() as $resource) {
+                $this->assertSame(ResourceStatutes::PENDING, $resource->getStatus());
+            }
+        });
+        $dispatcher->addListener($domain->getEventPrefix().ResourceEvents::POST_CREATES, function (ResourceEvent $e) use (&$postEvent) {
+            $postEvent = true;
+            foreach ($e->getResources() as $resource) {
+                $this->assertSame(ResourceStatutes::ERROR, $resource->getStatus());
+            }
+        });
+
+        $this->assertCount(0, $domain->getRepository()->findAll());
+
+        $resource = $domain->create($form);
+        $this->assertCount(0, $resource->getErrors());
+        $this->assertCount(1, $resource->getFormErrors());
+    }
+
+    /**
+     * @param object $object
+     * @param array  $data
+     *
+     * @return FormInterface
+     */
+    protected function buildForm($object, array $data)
+    {
+        /* @var FormInterface $form */
+        $form = $this->getContainer()->get('form.factory')->create(new FooType(), $object, array());
+        $form->submit($data, true);
+
+        return $form;
     }
 }
