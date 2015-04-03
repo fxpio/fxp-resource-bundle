@@ -185,10 +185,8 @@ class Domain implements DomainInterface
         $this->beginTransaction($autoCommit);
 
         foreach ($resources as $i => $resource) {
-            $listResources = $list->getResources();
-
             if (!$autoCommit && $hasError) {
-                $listResources[$i]->setStatus(ResourceStatutes::CANCELED);
+                $list[$i]->setStatus(ResourceStatutes::CANCELED);
                 continue;
             }
 
@@ -204,10 +202,10 @@ class Domain implements DomainInterface
 
             if (0 !== count($errors)) {
                 $hasError = true;
-                $listResources[$i]->setStatus(ResourceStatutes::ERROR);
-                $listResources[$i]->getErrors()->addAll($errors);
+                $list[$i]->setStatus(ResourceStatutes::ERROR);
+                $list[$i]->getErrors()->addAll($rErrors);
             } else {
-                $listResources[$i]->setStatus(ResourceStatutes::CREATED);
+                $list[$i]->setStatus(ResourceStatutes::CREATED);
             }
         }
 
@@ -216,7 +214,7 @@ class Domain implements DomainInterface
 
             if (count($errors) > 0) {
                 $list->getErrors()->addAll($errors);
-                foreach ($list->getResources() as $resource) {
+                foreach ($list as $resource) {
                     $resource->setStatus(ResourceStatutes::ERROR);
                 }
             }
