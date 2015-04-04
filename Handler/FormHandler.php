@@ -42,20 +42,27 @@ class FormHandler implements FormHandlerInterface
     protected $request;
 
     /**
+     * @var int|null
+     */
+    protected $defaultLimit;
+
+    /**
      * Constructor.
      *
      * @param ConverterRegistryInterface $converterRegistry The converter registry
      * @param FormFactoryInterface       $formFactory       The form factory
      * @param RequestStack               $requestStack      The request stack
+     * @param int|null                   $defaultLimit      The limit of max data rows
      *
      * @throws InvalidArgumentException When the current request is request stack is empty
      */
     public function __construct(ConverterRegistryInterface $converterRegistry,
-                                FormFactoryInterface $formFactory, RequestStack $requestStack)
+                                FormFactoryInterface $formFactory, RequestStack $requestStack, $defaultLimit = null)
     {
         $this->converterRegistry = $converterRegistry;
         $this->formFactory = $formFactory;
         $this->request = $requestStack->getCurrentRequest();
+        $this->defaultLimit = $this->validateLimit($defaultLimit);
 
         if (null === $this->request) {
             throw new InvalidArgumentException('The current request is required in request stack');
@@ -73,9 +80,17 @@ class FormHandler implements FormHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function processForms(FormConfigInterface $config, array $objects)
+    public function processForms(FormConfigInterface $config, array $objects, $limit = null)
     {
-        return $this->process($config, $objects, true);
+        return $this->process($config, $objects, true, $limit);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefaultLimit()
+    {
+        return $this->defaultLimit;
     }
 
     /**
@@ -84,19 +99,26 @@ class FormHandler implements FormHandlerInterface
      * @param FormConfigInterface $config  The form config
      * @param object[]            $objects The list of object instance
      * @param bool                $isList  Check if the request data is a list
+     * @param int|null            $limit   The limit of max row
      *
      * @return FormInterface[]
      *
      * @throws InvalidResourceException When the size if request data and the object instances is different
      */
-    private function process(FormConfigInterface $config, array $objects, $isList)
+    private function process(FormConfigInterface $config, array $objects, $isList, $limit = null)
     {
+        $limit = $this->getLimit($limit);
         $forms = array();
         $converter = $this->converterRegistry->get($config->getConverter());
         $dataList = $converter->convert($this->request->getContent());
 
         if (!$isList) {
             $dataList = array($dataList);
+        }
+
+        if (null !== $limit && count($dataList) > $limit) {
+            $msg = 'The list of resource sent exceeds the permitted limit (%s)';
+            throw new InvalidResourceException(sprintf($msg, $limit));
         }
 
         $objects = array_values($objects);
@@ -114,5 +136,35 @@ class FormHandler implements FormHandlerInterface
         }
 
         return $forms;
+    }
+
+    /**
+     * Get the limit.
+     *
+     * @param int|null $limit The limit
+     *
+     * @return int|null Returns null for unlimited row or a integer greater than 1
+     */
+    protected function getLimit($limit = null)
+    {
+        if (null === $limit) {
+            $limit = $this->getDefaultLimit();
+        }
+
+        return $this->validateLimit($limit);
+    }
+
+    /**
+     * Validate the limit with a integer greater than 1.
+     *
+     * @param int|null $limit The limit
+     *
+     * @return int|null
+     */
+    protected function validateLimit($limit)
+    {
+        return null === $limit
+            ? null
+            : max(1, $limit);
     }
 }

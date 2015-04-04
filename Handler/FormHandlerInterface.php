@@ -35,8 +35,16 @@ interface FormHandlerInterface
      *
      * @param FormConfigInterface $config  The form config
      * @param object[]            $objects The list of object instance
+     * @param int|null            $limit   The limit of max row
      *
      * @return FormInterface[]
      */
-    public function processForms(FormConfigInterface $config, array $objects);
+    public function processForms(FormConfigInterface $config, array $objects, $limit = null);
+
+    /**
+     * Get the default limit. If the value is null, then there is not limit of quantity of rows.
+     *
+     * @return int|null
+     */
+    public function getDefaultLimit();
 }
