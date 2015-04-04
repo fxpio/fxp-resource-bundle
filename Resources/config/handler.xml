@@ -12,6 +12,8 @@
         <!-- Form Handler -->
         <service id="sonatra_resource.form_handler" class="%sonatra_resource.form_handler.class%">
             <argument type="service" id="sonatra_resource.converter_registry" />
+            <argument type="service" id="form.factory" />
+            <argument type="service" id="request_stack" />
         </service>
     </services>
 </container>
