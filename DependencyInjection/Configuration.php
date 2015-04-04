@@ -31,7 +31,7 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->addDefaultsIfNotSet()
             ->children()
-                ->booleanNode('form_handler_default_limit')->defaultNull()
+                ->integerNode('form_handler_default_limit')->defaultNull()
             ->end()
         ;
 
