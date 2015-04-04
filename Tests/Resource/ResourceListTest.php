@@ -11,9 +11,11 @@
 
 namespace Sonatra\Bundle\ResourceBundle\Tests\Resource;
 
+use Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface;
 use Sonatra\Bundle\ResourceBundle\Resource\ResourceList;
 use Sonatra\Bundle\ResourceBundle\ResourceListStatutes;
 use Sonatra\Bundle\ResourceBundle\ResourceStatutes;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
  * Tests case for resource list.
@@ -64,5 +66,159 @@ class ResourceListTest extends \PHPUnit_Framework_TestCase
         $list = new ResourceList($resources);
 
         $this->assertSame($valid, $list->getStatus());
+    }
+
+    public function testGetResources()
+    {
+        $resources = array(
+            $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface'),
+            $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface'),
+        );
+
+        $list = new ResourceList($resources);
+        $this->assertSame($resources, $list->getResources());
+
+        $resources2 = array(
+            $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface'),
+            $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface'),
+        );
+
+        $list2 = new ResourceList($resources2);
+        $this->assertSame($resources, $list->getResources());
+
+        $all = array_merge($resources, $resources2);
+        $list->addAll($list2);
+        $this->assertSame($all, $list->getResources());
+
+        $this->assertTrue($list->has(0));
+        $this->assertTrue($list->offsetExists(0));
+        $this->assertSame($all[0], $list->get(0));
+        $this->assertSame($all[0], $list->offsetGet(0));
+        $this->assertTrue($list->has(1));
+        $this->assertTrue($list->offsetExists(1));
+        $this->assertSame($all[1], $list->get(1));
+        $this->assertSame($all[1], $list->offsetGet(1));
+        $this->assertTrue($list->has(2));
+        $this->assertTrue($list->offsetExists(2));
+        $this->assertSame($all[2], $list->get(2));
+        $this->assertSame($all[2], $list->offsetGet(2));
+        $this->assertTrue($list->has(3));
+        $this->assertTrue($list->offsetExists(3));
+        $this->assertSame($all[3], $list->get(3));
+        $this->assertSame($all[3], $list->offsetGet(3));
+    }
+
+    public function testGetOUtOfBoundsException()
+    {
+        $msg = 'The offset "0" does not exist.';
+        $this->setExpectedException('Sonatra\Bundle\ResourceBundle\Exception\OutOfBoundsException', $msg);
+
+        $list = new ResourceList(array());
+        $list->get(0);
+    }
+
+    public function testSet()
+    {
+        $resources = array(
+            $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface'),
+            $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface'),
+        );
+        $list = new ResourceList($resources);
+
+        /* @var ResourceInterface $new */
+        $new = $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface');
+
+        $this->assertNotSame($new, $list->get(0));
+        $list->set(0, $new);
+        $this->assertNotSame($resources[0], $list->get(0));
+        $this->assertSame($new, $list->get(0));
+
+        /* @var ResourceInterface $new2 */
+        $new2 = $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface');
+
+        $this->assertNotSame($new2, $list->offsetGet(1));
+        $list->offsetSet(1, $new2);
+        $this->assertNotSame($resources[1], $list->offsetGet(1));
+        $this->assertSame($new2, $list->offsetGet(1));
+
+        /* @var ResourceInterface $new3 */
+        $new3 = $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface');
+
+        $this->assertCount(2, $list);
+
+        $list->offsetSet(null, $new3);
+        $this->assertCount(3, $list);
+        $this->assertSame($new3, $list->offsetGet(2));
+    }
+
+    public function testRemove()
+    {
+        $resources = array(
+            $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface'),
+            $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface'),
+        );
+        $list = new ResourceList($resources);
+
+        $this->assertCount(2, $list);
+
+        $list->remove(0);
+        $this->assertCount(1, $list);
+        $this->assertFalse($list->has(0));
+        $this->assertSame($resources[1], $list->get(1));
+
+        $list->offsetUnset(1);
+        $this->assertCount(0, $list);
+    }
+
+    public function testGetEmptyErrorsAndEmptyChildrenErrors()
+    {
+        $resources = array(
+            $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface'),
+            $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface'),
+        );
+        $list = new ResourceList($resources);
+
+        $this->assertInstanceOf('Symfony\Component\Validator\ConstraintViolationListInterface', $list->getErrors());
+        $this->assertCount(0, $list->getErrors());
+        $this->assertFalse($list->hasErrors());
+    }
+
+    public function testGetErrorsAndEmptyChildrenErrors()
+    {
+        $resources = array(
+            $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface'),
+            $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface'),
+        );
+        $list = new ResourceList($resources);
+
+        $this->assertInstanceOf('Symfony\Component\Validator\ConstraintViolationListInterface', $list->getErrors());
+
+        /* @var ConstraintViolationInterface $error */
+        $error = $this->getMock('Symfony\Component\Validator\ConstraintViolationInterface');
+        $list->getErrors()->add($error);
+        $this->assertCount(1, $list->getErrors());
+        $this->assertTrue($list->hasErrors());
+    }
+
+    public function testGetEmptyErrorsAndChildrenErrors()
+    {
+        /* @var ResourceInterface|\PHPUnit_Framework_MockObject_MockObject $errorResource */
+        $errorResource = $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface');
+        $errorResource->expects($this->any())
+            ->method('getStatus')
+            ->will($this->returnValue(ResourceStatutes::ERROR));
+        $errorResource->expects($this->any())
+            ->method('isValid')
+            ->will($this->returnValue(false));
+
+        $resources = array(
+            $errorResource,
+            $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface'),
+        );
+        $list = new ResourceList($resources);
+
+        $this->assertInstanceOf('Symfony\Component\Validator\ConstraintViolationListInterface', $list->getErrors());
+        $this->assertCount(0, $list->getErrors());
+        $this->assertTrue($list->hasErrors());
     }
 }
