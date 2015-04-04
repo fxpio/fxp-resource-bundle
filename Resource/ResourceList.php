@@ -11,6 +11,7 @@
 
 namespace Sonatra\Bundle\ResourceBundle\Resource;
 
+use Sonatra\Bundle\ResourceBundle\Exception\OutOfBoundsException;
 use Sonatra\Bundle\ResourceBundle\ResourceStatutes;
 use Sonatra\Bundle\ResourceBundle\ResourceListStatutes;
 use Symfony\Component\Form\FormErrorIterator;
@@ -107,7 +108,7 @@ class ResourceList implements \IteratorAggregate, ResourceListInterface
     public function get($offset)
     {
         if (!isset($this->resources[$offset])) {
-            throw new \OutOfBoundsException(sprintf('The offset "%s" does not exist.', $offset));
+            throw new OutOfBoundsException(sprintf('The offset "%s" does not exist.', $offset));
         }
 
         return $this->resources[$offset];
