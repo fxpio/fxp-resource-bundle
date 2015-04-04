@@ -36,10 +36,11 @@ abstract class AbstractFormHandlerTest extends WebTestCase
      * Create form handler.
      *
      * @param Request|null $request The request for request stack
+     * @param int|null     $limit   The limit
      *
      * @return FormHandlerInterface
      */
-    protected function createFormHandler(Request $request = null)
+    protected function createFormHandler(Request $request = null, $limit = null)
     {
         $container = $this->getContainer();
 
@@ -54,6 +55,6 @@ abstract class AbstractFormHandlerTest extends WebTestCase
             $requestStack->push($request);
         }
 
-        return new FormHandler($converterRegistry, $formFactory, $requestStack);
+        return new FormHandler($converterRegistry, $formFactory, $requestStack, $limit);
     }
 }

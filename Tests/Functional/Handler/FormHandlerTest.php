@@ -112,4 +112,53 @@ class FormHandlerTest extends AbstractFormHandlerTest
 
         $handler->processForms($config, $objects);
     }
+
+    public function getLimits()
+    {
+        return array(
+            array(10, null, 5,    5),
+            array(10, 5,    null, 5),
+
+            array(10, null, 0,    1),
+            array(10, 0,    null, 1),
+        );
+    }
+
+    /**
+     * @dataProvider getLimits
+     *
+     * @param int      $size
+     * @param int|null $defaultLimit
+     * @param int|null $methodLimit
+     * @param int|null $validLimit
+     */
+    public function testLimitMethod($size, $defaultLimit, $methodLimit, $validLimit)
+    {
+        $exceptionLimit = null === $defaultLimit ? $methodLimit : $defaultLimit;
+
+        if ($exceptionLimit !== $validLimit) {
+            $exceptionLimit = $validLimit;
+        }
+
+        $msg = 'The list of resource sent exceeds the permitted limit ('.$exceptionLimit.')';
+        $this->setExpectedException('Sonatra\Bundle\ResourceBundle\Exception\InvalidResourceException', $msg);
+
+        $data = array();
+        $objects = array();
+
+        for ($i = 0; $i < $size; $i++) {
+            $data[] = array(
+                'name' => 'Bar '.($i+1),
+                'detail' => 'Detail '.($i+1),
+            );
+            $objects[] = new Foo();
+        }
+
+        $request = Request::create('test', Request::METHOD_POST, array(), array(), array(), array(), json_encode($data));
+        $handler = $this->createFormHandler($request, $defaultLimit);
+
+        $config = new FormConfig(new FooType());
+
+        $handler->processForms($config, $objects, $methodLimit);
+    }
 }
