@@ -18,14 +18,18 @@ use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\ORM\EntityManagerInterface;
 use Sonatra\Bundle\DefaultValueBundle\DefaultValue\ObjectFactoryInterface;
 use Sonatra\Bundle\ResourceBundle\Event\ResourceEvent;
+use Sonatra\Bundle\ResourceBundle\Resource\ResourceList;
 use Sonatra\Bundle\ResourceBundle\Resource\ResourceUtil;
 use Sonatra\Bundle\ResourceBundle\ResourceEvents;
 use Sonatra\Bundle\ResourceBundle\Exception\InvalidConfigurationException;
 use Sonatra\Bundle\ResourceBundle\ResourceStatutes;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
@@ -38,6 +42,12 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class Domain implements DomainInterface
 {
+    const TYPE_CREATE = 0;
+
+    const TYPE_UPDATE = 1;
+
+    const TYPE_UPSERT = 2;
+
     /**
      * @var string
      */
@@ -74,6 +84,11 @@ class Domain implements DomainInterface
     protected $eventPrefix;
 
     /**
+     * @var PropertyAccessor
+     */
+    protected $propertyAccess;
+
+    /**
      * Constructor.
      *
      * @param string $class The class name
@@ -82,6 +97,7 @@ class Domain implements DomainInterface
     {
         $this->class = $class;
         $this->eventPrefix = $this->formatEventPrefix($class);
+        $this->propertyAccess = PropertyAccess::createPropertyAccessor();
     }
 
     /**
@@ -180,56 +196,7 @@ class Domain implements DomainInterface
      */
     public function creates(array $resources, $autoCommit = false)
     {
-        $resources = array_values($resources);
-        $hasError = false;
-        $list = ResourceUtil::convertObjectsToResourceList($resources, $this->getClass());
-
-        $this->dispatchEvent(ResourceEvents::PRE_CREATES, new ResourceEvent($this, $list));
-        $this->beginTransaction($autoCommit);
-
-        foreach ($resources as $i => $resource) {
-            if (!$autoCommit && $hasError) {
-                $list[$i]->setStatus(ResourceStatutes::CANCELED);
-                continue;
-            }
-
-            $rErrors = $this->validateResource($resource);
-
-            if (0 === count($rErrors)) {
-                $resource = $this->getResourceData($resource);
-                $this->om->persist($resource);
-
-                if ($autoCommit) {
-                    $rErrors = $this->flushTransaction($resource);
-                }
-            }
-
-            if (0 !== count($rErrors)) {
-                $hasError = true;
-                $list[$i]->setStatus(ResourceStatutes::ERROR);
-
-                if ($rErrors instanceof ConstraintViolationListInterface) {
-                    $list[$i]->getErrors()->addAll($rErrors);
-                }
-            } else {
-                $list[$i]->setStatus(ResourceStatutes::CREATED);
-            }
-        }
-
-        if (!$autoCommit) {
-            $errors = $this->flushTransaction();
-
-            if (count($errors) > 0) {
-                $list->getErrors()->addAll($errors);
-                foreach ($list as $resource) {
-                    $resource->setStatus(ResourceStatutes::ERROR);
-                }
-            }
-        }
-
-        $this->dispatchEvent(ResourceEvents::POST_CREATES, new ResourceEvent($this, $list));
-
-        return $list;
+        return $this->persist($resources, $autoCommit, Domain::TYPE_CREATE);
     }
 
     /**
@@ -245,10 +212,7 @@ class Domain implements DomainInterface
      */
     public function updates(array $resources, $autoCommit = false)
     {
-        $list = ResourceUtil::convertObjectsToResourceList($resources, $this->getClass());
-        //TODO
-
-        return $list;
+        return $this->persist($resources, $autoCommit, Domain::TYPE_UPDATE);
     }
 
     /**
@@ -264,10 +228,7 @@ class Domain implements DomainInterface
      */
     public function upserts(array $resources, $autoCommit = false)
     {
-        $list = ResourceUtil::convertObjectsToResourceList($resources, $this->getClass());
-        //TODO
-
-        return $list;
+        return $this->persist($resources, $autoCommit, Domain::TYPE_UPSERT);
     }
 
     /**
@@ -306,6 +267,99 @@ class Domain implements DomainInterface
         //TODO
 
         return $list;
+    }
+
+    /**
+     * Persist the resources.
+     *
+     * Warning: It's recommended to limit the number of resources.
+     *
+     * @param object[]|FormInterface[] $resources  The list of object resource instance
+     * @param bool                     $autoCommit Commit transaction for each resource or all
+     *                                             (continue the action even if there is an error on a resource)
+     * @param int                      $type       The type of persist action
+     *
+     * @return ResourceList
+     */
+    protected function persist(array $resources, $autoCommit = false, $type)
+    {
+        list($preEvent, $postEvent) = $this->getEventNames($type);
+        $resources = array_values($resources);
+        $hasError = false;
+        $list = ResourceUtil::convertObjectsToResourceList($resources, $this->getClass());
+
+        $this->dispatchEvent($preEvent, new ResourceEvent($this, $list));
+        $this->beginTransaction($autoCommit);
+
+        foreach ($resources as $i => $resource) {
+            if (!$autoCommit && $hasError) {
+                $list[$i]->setStatus(ResourceStatutes::CANCELED);
+                continue;
+            }
+
+            $rErrors = $this->validateResource($resource, $type);
+            $successStatus = $this->getSuccessStatus($type, $resource);
+            $resourceData = $this->getResourceData($resource);
+
+            if (0 === count($rErrors)) {
+                $this->om->persist($resourceData);
+
+                if ($autoCommit) {
+                    $rErrors = $this->flushTransaction($resourceData);
+                }
+            }
+
+            if (0 !== count($rErrors)) {
+                $hasError = true;
+                $list[$i]->setStatus(ResourceStatutes::ERROR);
+                $this->om->detach($resourceData);
+
+                if ($rErrors instanceof ConstraintViolationListInterface) {
+                    $list[$i]->getErrors()->addAll($rErrors);
+                }
+            } else {
+                $list[$i]->setStatus($successStatus);
+            }
+        }
+
+        if (!$autoCommit) {
+            if ($hasError) {
+                $this->cancelTransaction();
+            } else {
+                $errors = $this->flushTransaction();
+
+                if (count($errors) > 0) {
+                    $list->getErrors()->addAll($errors);
+                    foreach ($list as $resource) {
+                        $resource->setStatus(ResourceStatutes::ERROR);
+                    }
+                }
+            }
+        }
+
+        $this->dispatchEvent($postEvent, new ResourceEvent($this, $list));
+
+        return $list;
+    }
+
+    /**
+     * Get the event names of persist action.
+     *
+     * @param int $type The type of persist
+     *
+     * @return array The list of pre event name and post event name
+     */
+    protected function getEventNames($type)
+    {
+        $names = array(ResourceEvents::PRE_UPSERTS, ResourceEvents::POST_UPSERTS);
+
+        if (Domain::TYPE_CREATE === $type) {
+            $names = array(ResourceEvents::PRE_CREATES, ResourceEvents::POST_CREATES);
+        } elseif (Domain::TYPE_UPDATE === $type) {
+            $names = array(ResourceEvents::PRE_UPDATES, ResourceEvents::POST_UPDATES);
+        }
+
+        return $names;
     }
 
     /**
@@ -372,6 +426,16 @@ class Domain implements DomainInterface
     }
 
     /**
+     * Cancel transaction.
+     */
+    protected function cancelTransaction()
+    {
+        if (null !== $this->connection) {
+            $this->connection->rollBack();
+        }
+    }
+
+    /**
      * Flush the data in database.
      *
      * @param object|null $resource The resource for auto commit or null for flush at the end
@@ -391,20 +455,106 @@ class Domain implements DomainInterface
      * Validate the resource and get the error list.
      *
      * @param object|FormInterface $resource The resource
+     * @param int                  $type     The type of persist
      *
      * @return ConstraintViolationListInterface|FormErrorIterator
      */
-    protected function validateResource($resource)
+    protected function validateResource($resource, $type)
     {
+        $idError = $this->getErrorIdentifier($resource, $type);
+
         if ($resource instanceof FormInterface) {
             if (!$resource->isSubmitted()) {
                 $resource->submit(array());
             }
 
-            return $resource->getErrors(true);
+            $errors = $resource->getErrors(true);
+            if (null !== $idError) {
+                $errors[] = new FormError($idError);
+            }
+
+            return $errors;
         }
 
-        return $this->validator->validate($resource);
+        $errors = $this->validator->validate($resource);
+        if (null !== $idError) {
+            $errors->add(new ConstraintViolation($idError, $idError, array(), '', '', ''));
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Get the error of identifier.
+     *
+     * @param object|FormInterface $resource The resource
+     * @param int                  $type     The type of persist
+     *
+     * @return string|null
+     */
+    protected function getErrorIdentifier($resource, $type)
+    {
+        $idValue = $this->getIdentifier($resource);
+        $idError = null;
+
+        if (Domain::TYPE_CREATE === $type && null !== $idValue) {
+            $idError = 'The resource cannot be created because it has an identifier';
+        } elseif (Domain::TYPE_UPDATE === $type && null === $idValue) {
+            $idError = 'The resource cannot be updated because it has not an identifier';
+        }
+
+        return $idError;
+    }
+
+    /**
+     * Get the success status.
+     *
+     * @param int    $type     The type of persist
+     * @param object $resource The resource instance
+     *
+     * @return string
+     */
+    protected function getSuccessStatus($type, $resource)
+    {
+        if (Domain::TYPE_CREATE === $type) {
+            return ResourceStatutes::CREATED;
+        }
+        if (Domain::TYPE_UPDATE === $type) {
+            return ResourceStatutes::UPDATED;
+        }
+
+        return null === $this->getIdentifier($resource)
+            ? ResourceStatutes::CREATED
+            : ResourceStatutes::UPDATED;
+    }
+
+    /**
+     * Get the value of resource identifier.
+     *
+     * @param object $resource The resource object
+     *
+     * @return int|string|null
+     */
+    protected function getIdentifier($resource)
+    {
+        if ($resource instanceof FormInterface) {
+            $resource = $resource->getData();
+        }
+
+        $meta = $this->om->getClassMetadata(get_class($resource));
+        $ids = $meta->getIdentifier();
+        $value = null;
+
+        foreach ($ids as $id) {
+            $idVal = $this->propertyAccess->getValue($resource, $id);
+
+            if (null !== $idVal) {
+                $value = $idVal;
+                break;
+            }
+        }
+
+        return $value;
     }
 
     /**
