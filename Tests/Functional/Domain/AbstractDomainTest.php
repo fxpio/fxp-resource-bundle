@@ -12,9 +12,12 @@
 namespace Sonatra\Bundle\ResourceBundle\Tests\Functional\Domain;
 
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
 use Sonatra\Bundle\DefaultValueBundle\DefaultValue\ObjectFactoryInterface;
 use Sonatra\Bundle\ResourceBundle\Domain\Domain;
+use Sonatra\Bundle\ResourceBundle\Domain\DomainInterface;
+use Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\Bundle\TestBundle\Entity\Foo;
 use Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\TestAppKernel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -57,5 +60,47 @@ abstract class AbstractDomainTest extends WebTestCase
         $domain->setValidator($val);
 
         return $domain;
+    }
+
+    /**
+     * Insert object in database.
+     *
+     * @param DomainInterface $domain
+     *
+     * @return Foo
+     */
+    protected function insertResource(DomainInterface $domain)
+    {
+        return current($this->insertResources($domain, 1));
+    }
+
+    /**
+     * Insert objects in database.
+     *
+     * @param DomainInterface $domain
+     * @param int             $size
+     *
+     * @return Foo[]
+     */
+    protected function insertResources(DomainInterface $domain, $size)
+    {
+        $this->loadFixtures(array());
+
+        /* @var EntityManagerInterface $em */
+        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $objects = array();
+
+        for ($i = 0; $i < $size; $i++) {
+            /* @var Foo $foo */
+            $foo = $domain->newInstance();
+            $foo->setName('Bar '.($i+1));
+            $foo->setDetail('Detail '.($i+1));
+            $em->persist($foo);
+            $objects[] = $foo;
+        }
+
+        $em->flush();
+
+        return $objects;
     }
 }
