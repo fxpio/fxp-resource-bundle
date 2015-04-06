@@ -367,4 +367,15 @@ class DomainCreateTest extends AbstractDomainTest
 
         $domain->create($object);
     }
+
+    public function testErrorIdentifier()
+    {
+        $domain = $this->createDomain();
+        $object = $this->insertResource($domain);
+
+        $resource = $domain->create($object);
+        $this->assertFalse($resource->isValid());
+        $this->assertSame(ResourceStatutes::ERROR, $resource->getStatus());
+        $this->assertRegExp('/The resource cannot be created because it has an identifier/', $resource->getErrors()->get(0)->getMessage());
+    }
 }

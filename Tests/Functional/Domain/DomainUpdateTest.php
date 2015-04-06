@@ -16,6 +16,7 @@ use Sonatra\Bundle\ResourceBundle\Event\ResourceEvent;
 use Sonatra\Bundle\ResourceBundle\ResourceEvents;
 use Sonatra\Bundle\ResourceBundle\ResourceListStatutes;
 use Sonatra\Bundle\ResourceBundle\ResourceStatutes;
+use Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\Bundle\TestBundle\Entity\Foo;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
@@ -335,5 +336,21 @@ class DomainUpdateTest extends AbstractDomainTest
         $object = 42;
 
         $domain->update($object);
+    }
+
+    public function testErrorIdentifier()
+    {
+        $domain = $this->createDomain();
+        /* @var Foo $object */
+        $object = $domain->newInstance();
+        $object->setName('Bar');
+        $object->setDetail('Detail');
+
+        $this->loadFixtures(array());
+
+        $resource = $domain->update($object);
+        $this->assertFalse($resource->isValid());
+        $this->assertSame(ResourceStatutes::ERROR, $resource->getStatus());
+        $this->assertRegExp('/The resource cannot be updated because it has not an identifier/', $resource->getErrors()->get(0)->getMessage());
     }
 }

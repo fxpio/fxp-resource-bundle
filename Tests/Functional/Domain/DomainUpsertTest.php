@@ -498,4 +498,26 @@ class DomainUpsertTest extends AbstractDomainTest
 
         $domain->upsert($object);
     }
+
+    /**
+     * @dataProvider getUpsertType
+     *
+     * @param bool $isUpdate
+     */
+    public function testErrorIdentifier($isUpdate)
+    {
+        $domain = $this->createDomain();
+
+        if ($isUpdate) {
+            /* @var Foo $object */
+            $object = $domain->newInstance();
+            $object->setName('Bar');
+            $object->setDetail('Detail');
+        } else {
+            $object = $this->insertResource($domain);
+        }
+
+        $resource = $domain->upsert($object);
+        $this->assertTrue($resource->isValid());
+    }
 }

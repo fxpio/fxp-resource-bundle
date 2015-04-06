@@ -467,6 +467,22 @@ class DomainCreateFormTest extends AbstractDomainTest
         $this->assertCount(1, $resource->getFormErrors());
     }
 
+    public function testErrorIdentifier()
+    {
+        $domain = $this->createDomain();
+        $foo = $this->insertResource($domain);
+        $foo->setDetail(null);
+        $form = $this->buildForm($foo, array(
+            'name' => 'New Bar',
+            'detail' => 'New Detail',
+        ));
+
+        $resource = $domain->create($form);
+        $this->assertFalse($resource->isValid());
+        $this->assertSame(ResourceStatutes::ERROR, $resource->getStatus());
+        $this->assertRegExp('/The resource cannot be created because it has an identifier/', $resource->getErrors()->get(0)->getMessage());
+    }
+
     /**
      * @param object $object
      * @param array  $data

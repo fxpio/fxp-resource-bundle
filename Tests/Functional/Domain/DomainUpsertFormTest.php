@@ -663,6 +663,35 @@ class DomainUpsertFormTest extends AbstractDomainTest
     }
 
     /**
+     * @dataProvider getUpsertType
+     *
+     * @param bool $isUpdate
+     */
+    public function testErrorIdentifier($isUpdate)
+    {
+        $domain = $this->createDomain();
+
+        if ($isUpdate) {
+            /* @var Foo $object */
+            $object = $domain->newInstance();
+            $form = $this->buildForm($object, array(
+                'name' => 'Bar',
+                'detail' => 'Detail',
+            ));
+        } else {
+            $object = $this->insertResource($domain);
+            $object->setDetail(null);
+            $form = $this->buildForm($object, array(
+                'name' => 'New Bar',
+                'detail' => 'New Detail',
+            ));
+        }
+
+        $resource = $domain->upsert($form);
+        $this->assertTrue($resource->isValid());
+    }
+
+    /**
      * @param object $object
      * @param array  $data
      *

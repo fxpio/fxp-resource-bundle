@@ -16,6 +16,7 @@ use Sonatra\Bundle\ResourceBundle\Event\ResourceEvent;
 use Sonatra\Bundle\ResourceBundle\ResourceEvents;
 use Sonatra\Bundle\ResourceBundle\ResourceListStatutes;
 use Sonatra\Bundle\ResourceBundle\ResourceStatutes;
+use Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\Bundle\TestBundle\Entity\Foo;
 use Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\Bundle\TestBundle\Form\FooType;
 use Symfony\Component\Form\FormInterface;
 
@@ -446,6 +447,24 @@ class DomainUpdateFormTest extends AbstractDomainTest
         $resource = $domain->update($form);
         $this->assertCount(0, $resource->getErrors());
         $this->assertCount(1, $resource->getFormErrors());
+    }
+
+    public function testErrorIdentifier()
+    {
+        $domain = $this->createDomain();
+        /* @var Foo $object */
+        $object = $domain->newInstance();
+        $form = $this->buildForm($object, array(
+            'name' => 'Bar',
+            'detail' => 'Detail',
+        ));
+
+        $this->loadFixtures(array());
+
+        $resource = $domain->update($form);
+        $this->assertFalse($resource->isValid());
+        $this->assertSame(ResourceStatutes::ERROR, $resource->getStatus());
+        $this->assertRegExp('/The resource cannot be updated because it has not an identifier/', $resource->getErrors()->get(0)->getMessage());
     }
 
     /**
