@@ -343,8 +343,6 @@ class DomainUpsertFormTest extends AbstractDomainTest
     }
 
     /**
-     * @group fxp2
-     *
      * @dataProvider getUpsertType
      *
      * @param bool $isUpdate
@@ -373,7 +371,9 @@ class DomainUpsertFormTest extends AbstractDomainTest
             /* @var Foo $foo2 */
             $foo2 = $domain->newInstance();
 
-            $form1 = $this->buildForm($foo1, array());
+            $form1 = $this->buildForm($foo1, array(
+                'name' => null,
+            ));
             $form2 = $this->buildForm($foo2, array(
                 'name' => 'Bar',
             ));
@@ -402,8 +402,7 @@ class DomainUpsertFormTest extends AbstractDomainTest
 
         $this->assertCount($isUpdate ? 2 : 0, $domain->getRepository()->findAll());
 
-        //TODO
-        /*$resources = $domain->upserts($forms, true);
+        $resources = $domain->upserts($forms, true);
         $this->assertInstanceOf('Sonatra\Bundle\ResourceBundle\Resource\ResourceListInterface', $resources);
 
         $this->assertTrue($resources->hasErrors());
@@ -414,7 +413,7 @@ class DomainUpsertFormTest extends AbstractDomainTest
         $this->assertTrue($preEvent);
         $this->assertTrue($postEvent);
 
-        $this->assertCount($isUpdate ? 2 : 0, $domain->getRepository()->findAll());*/
+        $this->assertCount($isUpdate ? 2 : 0, $domain->getRepository()->findAll());
     }
 
     /**
@@ -446,7 +445,9 @@ class DomainUpsertFormTest extends AbstractDomainTest
             /* @var Foo $foo2 */
             $foo2 = $domain->newInstance();
 
-            $form1 = $this->buildForm($foo1, array());
+            $form1 = $this->buildForm($foo1, array(
+                'name' => null,
+            ));
             $form2 = $this->buildForm($foo2, array(
                 'name' => 'Bar',
                 'detail' => 'Detail',
@@ -456,8 +457,7 @@ class DomainUpsertFormTest extends AbstractDomainTest
         }
 
         $this->assertCount($isUpdate ? 2 : 0, $domain->getRepository()->findAll());
-        //TODO
-        /*$resources = $domain->upserts($forms, true);
+        $resources = $domain->upserts($forms, true);
         $this->assertCount($isUpdate ? 2 : 1, $domain->getRepository()->findAll());
 
         $this->assertCount(2, $resources);
@@ -467,7 +467,7 @@ class DomainUpsertFormTest extends AbstractDomainTest
         $this->assertSame(ResourceListStatutes::MIXED, $resources->getStatus());
         $this->assertSame(ResourceStatutes::ERROR, $resources->get(0)->getStatus());
         $this->assertSame($isUpdate ? ResourceStatutes::UPDATED
-            : ResourceStatutes::CREATED, $resources->get(1)->getStatus());*/
+            : ResourceStatutes::CREATED, $resources->get(1)->getStatus());
     }
 
     /**
