@@ -20,6 +20,7 @@ use Sonatra\Bundle\DefaultValueBundle\DefaultValue\ObjectFactoryInterface;
 use Sonatra\Bundle\ResourceBundle\Event\ResourceEvent;
 use Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface;
 use Sonatra\Bundle\ResourceBundle\Resource\ResourceList;
+use Sonatra\Bundle\ResourceBundle\Resource\ResourceListInterface;
 use Sonatra\Bundle\ResourceBundle\Resource\ResourceUtil;
 use Sonatra\Bundle\ResourceBundle\ResourceEvents;
 use Sonatra\Bundle\ResourceBundle\Exception\InvalidConfigurationException;
@@ -282,15 +283,49 @@ class Domain implements DomainInterface
     protected function persist(array $resources, $autoCommit = false, $type)
     {
         list($preEvent, $postEvent) = $this->getEventNames($type);
-        $resources = array_values($resources);
-        $hasError = false;
-        $hasFlushError = false;
-        $list = ResourceUtil::convertObjectsToResourceList($resources, $this->getClass());
+        $list = ResourceUtil::convertObjectsToResourceList(array_values($resources), $this->getClass());
 
         $this->dispatchEvent($preEvent, new ResourceEvent($this, $list));
         $this->beginTransaction($autoCommit);
 
-        foreach ($list as $i => $resource) {
+        $hasError = $this->doPersistList($list, $autoCommit, $type);
+
+        if (!$autoCommit) {
+            if ($hasError) {
+                $this->cancelTransaction();
+            } else {
+                $errors = $this->flushTransaction();
+
+                if (count($errors) > 0) {
+                    $list->getErrors()->addAll($errors);
+                    foreach ($list as $resource) {
+                        $resource->setStatus(ResourceStatutes::ERROR);
+                    }
+                }
+            }
+        }
+
+        $this->dispatchEvent($postEvent, new ResourceEvent($this, $list));
+
+        return $list;
+    }
+
+    /**
+     * Do persist the resources.
+     *
+     * @param ResourceListInterface $resources  The list of object resource instance
+     * @param bool                  $autoCommit Commit transaction for each resource or all
+     *                                          (continue the action even if there is an error on a resource)
+     * @param int                   $type       The type of persist action
+     *
+     * @return bool Check if there is an error in list
+     */
+    protected function doPersistList(ResourceListInterface $resources, $autoCommit, $type)
+    {
+        $hasError = false;
+        $hasFlushError = false;
+
+        foreach ($resources as $i => $resource) {
             if (!$autoCommit && $hasError) {
                 $resource->setStatus(ResourceStatutes::CANCELED);
                 continue;
@@ -324,24 +359,7 @@ class Domain implements DomainInterface
             }
         }
 
-        if (!$autoCommit) {
-            if ($hasError) {
-                $this->cancelTransaction();
-            } else {
-                $errors = $this->flushTransaction();
-
-                if (count($errors) > 0) {
-                    $list->getErrors()->addAll($errors);
-                    foreach ($list as $resource) {
-                        $resource->setStatus(ResourceStatutes::ERROR);
-                    }
-                }
-            }
-        }
-
-        $this->dispatchEvent($postEvent, new ResourceEvent($this, $list));
-
-        return $list;
+        return $hasError;
     }
 
     /**
