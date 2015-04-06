@@ -45,6 +45,13 @@ interface ResourceInterface
     public function getData();
 
     /**
+     * Get the real resource data.
+     *
+     * @return object
+     */
+    public function getRealData();
+
+    /**
      * Get the list of errors.
      *
      * @return ConstraintViolationListInterface

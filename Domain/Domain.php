@@ -18,6 +18,7 @@ use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\ORM\EntityManagerInterface;
 use Sonatra\Bundle\DefaultValueBundle\DefaultValue\ObjectFactoryInterface;
 use Sonatra\Bundle\ResourceBundle\Event\ResourceEvent;
+use Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface;
 use Sonatra\Bundle\ResourceBundle\Resource\ResourceList;
 use Sonatra\Bundle\ResourceBundle\Resource\ResourceUtil;
 use Sonatra\Bundle\ResourceBundle\ResourceEvents;
@@ -25,14 +26,11 @@ use Sonatra\Bundle\ResourceBundle\Exception\InvalidConfigurationException;
 use Sonatra\Bundle\ResourceBundle\ResourceStatutes;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -292,41 +290,37 @@ class Domain implements DomainInterface
         $this->dispatchEvent($preEvent, new ResourceEvent($this, $list));
         $this->beginTransaction($autoCommit);
 
-        foreach ($resources as $i => $resource) {
+        foreach ($list as $i => $resource) {
             if (!$autoCommit && $hasError) {
-                $list[$i]->setStatus(ResourceStatutes::CANCELED);
+                $resource->setStatus(ResourceStatutes::CANCELED);
                 continue;
             } elseif ($autoCommit && $hasFlushError && $hasError) {
-                $list[$i]->setStatus(ResourceStatutes::ERROR);
+                $resource->setStatus(ResourceStatutes::ERROR);
                 $message = 'Caused by previous internal database error';
-                $list[$i]->getErrors()->add(new ConstraintViolation($message, $message, array(), null, null, null));
-
+                $resource->getErrors()->add(new ConstraintViolation($message, $message, array(), null, null, null));
                 continue;
             }
 
-            $rErrors = $this->validateResource($resource, $type);
-            $successStatus = $this->getSuccessStatus($type, $resource);
-            $resourceData = $this->getResourceData($resource);
+            $this->validateResource($resource, $type);
+            $object = $resource->getRealData();
+            $successStatus = $this->getSuccessStatus($type, $object);
 
-            if (0 === count($rErrors)) {
-                $this->om->persist($resourceData);
+            if ($resource->isValid()) {
+                $this->om->persist($object);
 
                 if ($autoCommit) {
-                    $rErrors = $this->flushTransaction($resourceData);
+                    $rErrors = $this->flushTransaction($object);
+                    $resource->getErrors()->addAll($rErrors);
                     $hasFlushError = $rErrors->count() > 0;
                 }
             }
 
-            if (0 !== count($rErrors)) {
-                $hasError = true;
-                $list[$i]->setStatus(ResourceStatutes::ERROR);
-                $this->om->detach($resourceData);
-
-                if ($rErrors instanceof ConstraintViolationListInterface) {
-                    $list[$i]->getErrors()->addAll($rErrors);
-                }
+            if ($resource->isValid()) {
+                $resource->setStatus($successStatus);
             } else {
-                $list[$i]->setStatus($successStatus);
+                $hasError = true;
+                $resource->setStatus(ResourceStatutes::ERROR);
+                $this->om->detach($object);
             }
         }
 
@@ -400,22 +394,22 @@ class Domain implements DomainInterface
     /**
      * Flush data in database with automatic declaration of the transaction for the collection.
      *
-     * @param object|null $resource The resource for auto commit or null for flush at the end
+     * @param object|null $object The resource for auto commit or null for flush at the end
      *
      * @return ConstraintViolationList
      */
-    protected function flushTransaction($resource = null)
+    protected function flushTransaction($object = null)
     {
         $violations = new ConstraintViolationList();
 
         try {
-            $this->flush($resource);
+            $this->flush($object);
 
-            if (null !== $this->connection && null === $resource) {
+            if (null !== $this->connection && null === $object) {
                 $this->connection->commit();
             }
         } catch (\Exception $e) {
-            if (null !== $this->connection && null === $resource) {
+            if (null !== $this->connection && null === $object) {
                 $this->connection->rollback();
             }
 
@@ -444,16 +438,16 @@ class Domain implements DomainInterface
     }
 
     /**
-     * Flush the data in database.
+     * Flush the object data in database.
      *
-     * @param object|null $resource The resource for auto commit or null for flush at the end
+     * @param object|null $object The resource data for auto commit or null for flush at the end
      */
-    protected function flush($resource = null)
+    protected function flush($object = null)
     {
         $this->om->flush();
 
-        if (null !== $resource) {
-            $this->om->detach($resource);
+        if (null !== $object) {
+            $this->om->detach($object);
         } else {
             $this->om->clear();
         }
@@ -462,47 +456,39 @@ class Domain implements DomainInterface
     /**
      * Validate the resource and get the error list.
      *
-     * @param object|FormInterface $resource The resource
-     * @param int                  $type     The type of persist
-     *
-     * @return ConstraintViolationListInterface|FormErrorIterator
+     * @param ResourceInterface $resource The resource
+     * @param int               $type     The type of persist
      */
     protected function validateResource($resource, $type)
     {
-        $idError = $this->getErrorIdentifier($resource, $type);
+        $idError = $this->getErrorIdentifier($resource->getRealData(), $type);
+        $data = $resource->getData();
 
-        if ($resource instanceof FormInterface) {
-            if (!$resource->isSubmitted()) {
-                $resource->submit(array());
+        if ($data instanceof FormInterface) {
+            if (!$data->isSubmitted()) {
+                $data->submit(array());
             }
-
-            $errors = $resource->getErrors(true);
-            if (null !== $idError) {
-                $errors[] = new FormError($idError);
-            }
-
-            return $errors;
+        } else {
+            $errors = $this->validator->validate($data);
+            $resource->getErrors()->addAll($errors);
         }
 
-        $errors = $this->validator->validate($resource);
         if (null !== $idError) {
-            $errors->add(new ConstraintViolation($idError, $idError, array(), '', '', ''));
+            $resource->getErrors()->add(new ConstraintViolation($idError, $idError, array(), '', '', ''));
         }
-
-        return $errors;
     }
 
     /**
      * Get the error of identifier.
      *
-     * @param object|FormInterface $resource The resource
-     * @param int                  $type     The type of persist
+     * @param object $object The object data
+     * @param int    $type   The type of persist
      *
      * @return string|null
      */
-    protected function getErrorIdentifier($resource, $type)
+    protected function getErrorIdentifier($object, $type)
     {
-        $idValue = $this->getIdentifier($resource);
+        $idValue = $this->getIdentifier($object);
         $idError = null;
 
         if (Domain::TYPE_CREATE === $type && null !== $idValue) {
@@ -517,12 +503,12 @@ class Domain implements DomainInterface
     /**
      * Get the success status.
      *
-     * @param int    $type     The type of persist
-     * @param object $resource The resource instance
+     * @param int    $type   The type of persist
+     * @param object $object The resource instance
      *
      * @return string
      */
-    protected function getSuccessStatus($type, $resource)
+    protected function getSuccessStatus($type, $object)
     {
         if (Domain::TYPE_CREATE === $type) {
             return ResourceStatutes::CREATED;
@@ -531,7 +517,7 @@ class Domain implements DomainInterface
             return ResourceStatutes::UPDATED;
         }
 
-        return null === $this->getIdentifier($resource)
+        return null === $this->getIdentifier($object)
             ? ResourceStatutes::CREATED
             : ResourceStatutes::UPDATED;
     }
@@ -539,22 +525,18 @@ class Domain implements DomainInterface
     /**
      * Get the value of resource identifier.
      *
-     * @param object $resource The resource object
+     * @param object $object The resource object
      *
      * @return int|string|null
      */
-    protected function getIdentifier($resource)
+    protected function getIdentifier($object)
     {
-        if ($resource instanceof FormInterface) {
-            $resource = $resource->getData();
-        }
-
-        $meta = $this->om->getClassMetadata(get_class($resource));
+        $meta = $this->om->getClassMetadata(get_class($object));
         $ids = $meta->getIdentifier();
         $value = null;
 
         foreach ($ids as $id) {
-            $idVal = $this->propertyAccess->getValue($resource, $id);
+            $idVal = $this->propertyAccess->getValue($object, $id);
 
             if (null !== $idVal) {
                 $value = $idVal;
@@ -563,18 +545,6 @@ class Domain implements DomainInterface
         }
 
         return $value;
-    }
-
-    /**
-     * Get the real resource data.
-     *
-     * @param object|FormInterface $resource The resource instance or form instance
-     *
-     * @return object
-     */
-    protected function getResourceData($resource)
-    {
-        return $resource instanceof FormInterface ? $resource->getData() : $resource;
     }
 
     /**

@@ -82,6 +82,16 @@ class Resource implements ResourceInterface
     /**
      * {@inheritdoc}
      */
+    public function getRealData()
+    {
+        return $this->data instanceof FormInterface
+            ? $this->data->getData()
+            : $this->data;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getErrors()
     {
         return $this->errors;
