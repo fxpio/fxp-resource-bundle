@@ -16,12 +16,12 @@ Features include:
 - Resource Domain Manager for get a resource domain for an doctrine resource
 - Resource Domain for each doctrine resource for easy management:
   - generate new instance of resource with default value configured by Sonatra DefaultValueBundle
-  - create one resource with validation
-  - create a list of resources with validation for each resource
-  - update one resource with validation
-  - update a list of resources with validation for each resource
-  - upsert one resource with validation (create or update)
-  - upsert a list of resources with validation for each resource (create or update)
+  - create one resource with validation (for object or Form instance)
+  - create a list of resources with validation for each resource (for object or Form instance)
+  - update one resource with validation (for object or Form instance)
+  - update a list of resources with validation for each resource (for object or Form instance)
+  - upsert one resource with validation (create or update for object or Form instance)
+  - upsert a list of resources with validation for each resource (create or update for object or Form instance)
   - delete one resource with soft delete or hard delete for compatible resources
   - delete a list of resources with soft delete or hard delete for compatible resources
   - undelete one resource for compatible resources with soft delete
