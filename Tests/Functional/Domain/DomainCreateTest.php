@@ -242,6 +242,59 @@ class DomainCreateTest extends AbstractDomainTest
         $this->assertCount(0, $domain->getRepository()->findAll());
     }
 
+    public function testCreatesAutoCommitWithErrorDatabase()
+    {
+        $domain = $this->createDomain();
+
+        $this->loadFixtures(array());
+        /* @var Foo $foo1 */
+        $foo1 = $domain->newInstance();
+        $foo1->setName('Bar');
+        /* @var Foo $foo2 */
+        $foo2 = $domain->newInstance();
+        $foo2->setName('Bar');
+        $foo2->setName('Detail');
+
+        $objects = array($foo1, $foo2);
+
+        $preEvent = false;
+        $postEvent = false;
+        $dispatcher = $this->getContainer()->get('event_dispatcher');
+
+        $dispatcher->addListener($domain->getEventPrefix().ResourceEvents::PRE_CREATES, function (ResourceEvent $e) use (&$preEvent, $domain) {
+            $preEvent = true;
+            $this->assertSame($domain, $e->getDomain());
+            foreach ($e->getResources() as $resource) {
+                $this->assertSame(ResourceStatutes::PENDING, $resource->getStatus());
+            }
+        });
+        $dispatcher->addListener($domain->getEventPrefix().ResourceEvents::POST_CREATES, function (ResourceEvent $e) use (&$postEvent, $domain) {
+            $postEvent = true;
+            $this->assertSame($domain, $e->getDomain());
+            foreach ($e->getResources() as $resource) {
+                $this->assertSame(ResourceStatutes::ERROR, $resource->getStatus());
+            }
+        });
+
+        $this->assertCount(0, $domain->getRepository()->findAll());
+
+        $resources = $domain->creates($objects, true);
+        $this->assertInstanceOf('Sonatra\Bundle\ResourceBundle\Resource\ResourceListInterface', $resources);
+
+        $this->assertTrue($resources->hasErrors());
+
+        $this->assertCount(1, $resources->get(0)->getErrors());
+        $this->assertCount(1, $resources->get(1)->getErrors());
+
+        $this->assertRegExp('/Database error code "(\d+)"/', $resources->get(0)->getErrors()->get(0)->getMessage());
+        $this->assertRegExp('/Caused by previous internal database error/', $resources->get(1)->getErrors()->get(0)->getMessage());
+
+        $this->assertTrue($preEvent);
+        $this->assertTrue($postEvent);
+
+        $this->assertCount(0, $domain->getRepository()->findAll());
+    }
+
     public function testCreatesAutoCommitWithErrorValidationAndSuccess()
     {
         $domain = $this->createDomain();

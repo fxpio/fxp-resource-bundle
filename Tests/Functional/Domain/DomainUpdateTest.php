@@ -228,6 +228,54 @@ class DomainUpdateTest extends AbstractDomainTest
         $this->assertCount(2, $domain->getRepository()->findAll());
     }
 
+    public function testUpsertsAutoCommitWithErrorDatabase()
+    {
+        $domain = $this->createDomain();
+
+        $objects = $this->insertResources($domain, 2);
+
+        $objects[0]->setDetail(null);
+        $objects[0]->setDescription('test 1');
+        $objects[1]->setDescription('test 2');
+
+        $preEvent = false;
+        $postEvent = false;
+        $dispatcher = $this->getContainer()->get('event_dispatcher');
+
+        $dispatcher->addListener($domain->getEventPrefix().ResourceEvents::PRE_UPDATES, function (ResourceEvent $e) use (&$preEvent, $domain) {
+            $preEvent = true;
+            $this->assertSame($domain, $e->getDomain());
+            foreach ($e->getResources() as $resource) {
+                $this->assertSame(ResourceStatutes::PENDING, $resource->getStatus());
+            }
+        });
+        $dispatcher->addListener($domain->getEventPrefix().ResourceEvents::POST_UPDATES, function (ResourceEvent $e) use (&$postEvent, $domain) {
+            $postEvent = true;
+            $this->assertSame($domain, $e->getDomain());
+            foreach ($e->getResources() as $resource) {
+                $this->assertSame(ResourceStatutes::ERROR, $resource->getStatus());
+            }
+        });
+
+        $this->assertCount(2, $domain->getRepository()->findAll());
+
+        $resources = $domain->updates($objects, true);
+        $this->assertInstanceOf('Sonatra\Bundle\ResourceBundle\Resource\ResourceListInterface', $resources);
+
+        $this->assertTrue($resources->hasErrors());
+
+        $this->assertCount(1, $resources->get(0)->getErrors());
+        $this->assertCount(1, $resources->get(1)->getErrors());
+
+        $this->assertRegExp('/Database error code "(\d+)"/', $resources->get(0)->getErrors()->get(0)->getMessage());
+        $this->assertRegExp('/Caused by previous internal database error/', $resources->get(1)->getErrors()->get(0)->getMessage());
+
+        $this->assertTrue($preEvent);
+        $this->assertTrue($postEvent);
+
+        $this->assertCount(2, $domain->getRepository()->findAll());
+    }
+
     public function testUpdatesAutoCommitWithErrorValidationAndSuccess()
     {
         $domain = $this->createDomain();

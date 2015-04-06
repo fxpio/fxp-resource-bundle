@@ -421,6 +421,84 @@ class DomainUpsertFormTest extends AbstractDomainTest
      *
      * @param bool $isUpdate
      */
+    public function testUpsertsAutoCommitWithErrorDatabase($isUpdate)
+    {
+        $domain = $this->createDomain();
+
+        if ($isUpdate) {
+            $objects = $this->insertResources($domain, 2);
+
+            $forms = array(
+                $this->buildForm($objects[0], array(
+                    'detail' => null,
+                    'description' => 'test 1',
+                )),
+                $this->buildForm($objects[1], array(
+                    'description' => 'test 2',
+                )),
+            );
+        } else {
+            $this->loadFixtures(array());
+            /* @var Foo $foo1 */
+            $foo1 = $domain->newInstance();
+            /* @var Foo $foo2 */
+            $foo2 = $domain->newInstance();
+
+            $form1 = $this->buildForm($foo1, array(
+                'name' => 'Bar',
+            ));
+            $form2 = $this->buildForm($foo2, array(
+                'name' => 'Bar',
+            ));
+
+            $forms = array($form1, $form2);
+        }
+
+        $preEvent = false;
+        $postEvent = false;
+        $dispatcher = $this->getContainer()->get('event_dispatcher');
+
+        $dispatcher->addListener($domain->getEventPrefix().ResourceEvents::PRE_UPSERTS, function (ResourceEvent $e) use (&$preEvent, $domain) {
+            $preEvent = true;
+            $this->assertSame($domain, $e->getDomain());
+            foreach ($e->getResources() as $resource) {
+                $this->assertSame(ResourceStatutes::PENDING, $resource->getStatus());
+            }
+        });
+        $dispatcher->addListener($domain->getEventPrefix().ResourceEvents::POST_UPSERTS, function (ResourceEvent $e) use (&$postEvent, $domain) {
+            $postEvent = true;
+            $this->assertSame($domain, $e->getDomain());
+            foreach ($e->getResources() as $resource) {
+                $this->assertSame(ResourceStatutes::ERROR, $resource->getStatus());
+            }
+        });
+
+        $this->assertCount($isUpdate ? 2 : 0, $domain->getRepository()->findAll());
+
+        $resources = $domain->upserts($forms, true);
+        $this->assertInstanceOf('Sonatra\Bundle\ResourceBundle\Resource\ResourceListInterface', $resources);
+
+        $this->assertTrue($resources->hasErrors());
+        $this->assertCount(0, $resources->get(0)->getFormErrors());
+        $this->assertCount(0, $resources->get(1)->getFormErrors());
+
+        $this->assertCount(1, $resources->get(0)->getErrors());
+        $this->assertCount(1, $resources->get(1)->getErrors());
+
+        $this->assertRegExp('/Database error code "(\d+)"/', $resources->get(0)->getErrors()->get(0)->getMessage());
+        $this->assertRegExp('/Caused by previous internal database error/', $resources->get(1)->getErrors()->get(0)->getMessage());
+
+        $this->assertTrue($preEvent);
+        $this->assertTrue($postEvent);
+
+        $this->assertCount($isUpdate ? 2 : 0, $domain->getRepository()->findAll());
+    }
+
+    /**
+     * @dataProvider getUpsertType
+     *
+     * @param bool $isUpdate
+     */
     public function testUpsertsAutoCommitWithErrorValidationAndSuccess($isUpdate)
     {
         $domain = $this->createDomain();

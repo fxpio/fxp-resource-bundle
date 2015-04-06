@@ -286,6 +286,7 @@ class Domain implements DomainInterface
         list($preEvent, $postEvent) = $this->getEventNames($type);
         $resources = array_values($resources);
         $hasError = false;
+        $hasFlushError = false;
         $list = ResourceUtil::convertObjectsToResourceList($resources, $this->getClass());
 
         $this->dispatchEvent($preEvent, new ResourceEvent($this, $list));
@@ -294,6 +295,12 @@ class Domain implements DomainInterface
         foreach ($resources as $i => $resource) {
             if (!$autoCommit && $hasError) {
                 $list[$i]->setStatus(ResourceStatutes::CANCELED);
+                continue;
+            } elseif ($autoCommit && $hasFlushError && $hasError) {
+                $list[$i]->setStatus(ResourceStatutes::ERROR);
+                $message = 'Caused by previous internal database error';
+                $list[$i]->getErrors()->add(new ConstraintViolation($message, $message, array(), null, null, null));
+
                 continue;
             }
 
@@ -306,6 +313,7 @@ class Domain implements DomainInterface
 
                 if ($autoCommit) {
                     $rErrors = $this->flushTransaction($resourceData);
+                    $hasFlushError = $rErrors->count() > 0;
                 }
             }
 
