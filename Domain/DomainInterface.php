@@ -29,6 +29,13 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 interface DomainInterface
 {
     /**
+     * Set the debug mode.
+     *
+     * @param bool $debug The debug mode
+     */
+    public function setDebug($debug);
+
+    /**
      * Set the doctrine object registry.
      *
      * @param ObjectManager $om

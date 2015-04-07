@@ -88,6 +88,11 @@ class Domain implements DomainInterface
     protected $propertyAccess;
 
     /**
+     * @var bool
+     */
+    protected $debug;
+
+    /**
      * Constructor.
      *
      * @param string $class The class name
@@ -97,6 +102,15 @@ class Domain implements DomainInterface
         $this->class = $class;
         $this->eventPrefix = $this->formatEventPrefix($class);
         $this->propertyAccess = PropertyAccess::createPropertyAccessor();
+        $this->debug = false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDebug($debug)
+    {
+        $this->debug = (bool) $debug;
     }
 
     /**
@@ -432,7 +446,7 @@ class Domain implements DomainInterface
             }
 
             $message = $e instanceof DriverException
-                ? DomainUtil::extractDriverExceptionMessage($e)
+                ? DomainUtil::extractDriverExceptionMessage($e, $this->debug)
                 : $e->getMessage();
 
             $violations->add(new ConstraintViolation($message, $message, array(), null, null, null));

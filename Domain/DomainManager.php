@@ -51,6 +51,11 @@ class DomainManager implements DomainManagerInterface
     protected $validator;
 
     /**
+     * @var bool
+     */
+    protected $debug;
+
+    /**
      * @var array
      */
     protected $cache;
@@ -63,16 +68,18 @@ class DomainManager implements DomainManagerInterface
      * @param EventDispatcherInterface $ed        The event dispatcher
      * @param ObjectFactoryInterface   $of        The object factory
      * @param ValidatorInterface       $validator The validator
+     * @param bool                     $debug     The debug mode
      */
     public function __construct(array $domains, ManagerRegistry $or,
                                 EventDispatcherInterface $ed, ObjectFactoryInterface $of,
-                                ValidatorInterface $validator)
+                                ValidatorInterface $validator, $debug = false)
     {
         $this->domains = array();
         $this->or = $or;
         $this->ed = $ed;
         $this->of = $of;
         $this->validator = $validator;
+        $this->debug = $debug;
         $this->cache = array();
 
         foreach ($domains as $domain) {
@@ -93,6 +100,7 @@ class DomainManager implements DomainManagerInterface
      */
     public function add(DomainInterface $domain)
     {
+        $domain->setDebug($this->debug);
         $domain->setObjectManager($this->or->getManagerForClass($domain->getClass()));
         $domain->setEventDispatcher($this->ed);
         $domain->setObjectFactory($this->of);

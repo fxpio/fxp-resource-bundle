@@ -24,19 +24,20 @@ abstract class DomainUtil
      * Format pdo driver exception.
      *
      * @param DriverException $exception The exception
+     * @param bool            $debug     The debug mode
      *
      * @return string
      */
-    public static function extractDriverExceptionMessage(DriverException $exception)
+    public static function extractDriverExceptionMessage(DriverException $exception, $debug = false)
     {
-        $message = 'Database invalid query';
+        $message = 'Database error';
 
-        if (null !== $exception->getPrevious()) {
+        if ($debug && null !== $exception->getPrevious()) {
             $prevMessage = static::getFirstException($exception)->getMessage();
             $pos = strpos($prevMessage, ':');
 
             if ($pos > 0 && 0 === strpos($prevMessage, 'SQLSTATE[')) {
-                $message = trim(substr($prevMessage, $pos + 1));
+                $message .= ': '.trim(substr($prevMessage, $pos + 1));
             }
         }
 

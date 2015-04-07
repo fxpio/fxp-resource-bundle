@@ -54,6 +54,7 @@ abstract class AbstractDomainTest extends WebTestCase
         $val = $container->get('validator');
 
         $domain = new Domain($class);
+        $domain->setDebug(true);
         $domain->setObjectManager($om);
         $domain->setEventDispatcher($ed);
         $domain->setObjectFactory($of);

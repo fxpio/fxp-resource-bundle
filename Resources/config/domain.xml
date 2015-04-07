@@ -16,6 +16,7 @@
             <argument type="service" id="event_dispatcher" />
             <argument type="service" id="sonatra_default_value.factory" />
             <argument type="service" id="validator" />
+            <argument>%kernel.debug%</argument>
         </service>
     </services>
 </container>
