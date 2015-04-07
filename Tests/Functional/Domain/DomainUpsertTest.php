@@ -74,7 +74,7 @@ class DomainUpsertTest extends AbstractDomainTest
             $foo->setName('Bar');
         }
 
-        $this->runTestUpsertException($domain, $foo, '/Database error code "(\d+)"/', $isUpdate);
+        $this->runTestUpsertException($domain, $foo, '/Integrity constraint violation: (\d+) NOT NULL constraint failed: foo.detail/', $isUpdate);
     }
 
     protected function runTestUpsertException(DomainInterface $domain, $object, $errorMessage, $isUpdate)
@@ -215,7 +215,7 @@ class DomainUpsertTest extends AbstractDomainTest
             $objects = array($foo1, $foo2);
         }
 
-        $this->runTestUpsertsException($domain, $objects, '/Database error code "(\d+)"/', false, $isUpdate);
+        $this->runTestUpsertsException($domain, $objects, '/Integrity constraint violation: (\d+) NOT NULL constraint failed: foo.detail/', false, $isUpdate);
     }
 
     protected function runTestUpsertsException(DomainInterface $domain, array $objects, $errorMessage, $autoCommit = false, $isUpdate = false)
@@ -323,7 +323,7 @@ class DomainUpsertTest extends AbstractDomainTest
 
         $this->assertTrue($resources->hasErrors());
         $this->assertRegExp('/This value should not be blank./', $resources->get(0)->getErrors()->get(0)->getMessage());
-        $this->assertRegExp('/Database error code "(\d+)"/', $resources->get(1)->getErrors()->get(0)->getMessage());
+        $this->assertRegExp('/Integrity constraint violation: (\d+) NOT NULL constraint failed: foo.detail/', $resources->get(1)->getErrors()->get(0)->getMessage());
 
         $this->assertTrue($preEvent);
         $this->assertTrue($postEvent);
@@ -388,7 +388,7 @@ class DomainUpsertTest extends AbstractDomainTest
         $this->assertCount(1, $resources->get(0)->getErrors());
         $this->assertCount(1, $resources->get(1)->getErrors());
 
-        $this->assertRegExp('/Database error code "(\d+)"/', $resources->get(0)->getErrors()->get(0)->getMessage());
+        $this->assertRegExp('/Integrity constraint violation: (\d+) NOT NULL constraint failed: foo.detail/', $resources->get(0)->getErrors()->get(0)->getMessage());
         $this->assertRegExp('/Caused by previous internal database error/', $resources->get(1)->getErrors()->get(0)->getMessage());
 
         $this->assertTrue($preEvent);

@@ -431,15 +431,11 @@ class Domain implements DomainInterface
                 $this->connection->rollback();
             }
 
-            $messageTpl = $e->getMessage();
-            $message = $messageTpl;
+            $message = $e instanceof DriverException
+                ? DomainUtil::extractDriverExceptionMessage($e)
+                : $e->getMessage();
 
-            if ($e instanceof DriverException) {
-                $messageTpl = 'Database error code "%s"';
-                $message = sprintf($messageTpl, $e->getSQLState());
-            }
-
-            $violations->add(new ConstraintViolation($message, $messageTpl, array(), null, null, null));
+            $violations->add(new ConstraintViolation($message, $message, array(), null, null, null));
         }
 
         return $violations;
