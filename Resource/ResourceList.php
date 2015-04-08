@@ -105,6 +105,14 @@ class ResourceList implements \IteratorAggregate, ResourceListInterface
     /**
      * {@inheritdoc}
      */
+    public function all()
+    {
+        return $this->resources;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function get($offset)
     {
         if (!isset($this->resources[$offset])) {
