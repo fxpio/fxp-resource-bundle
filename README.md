@@ -2,6 +2,7 @@ Sonatra Resource Bundle
 =======================
 
 [![Latest Version](https://img.shields.io/packagist/v/sonatra/resource-bundle.svg)](https://packagist.org/packages/sonatra/resource-bundle)
+[![Build Status](https://img.shields.io/travis/sonatra/SonatraResourceBundle/master.svg)](https://travis-ci.org/sonatra/SonatraResourceBundle)
 
 The Sonatra ResourceBundle is a resource management layer for doctrine. This bundle has been
 designed to facilitate the creation of a Batch API for processing a list of resources<sup>1</sup>
