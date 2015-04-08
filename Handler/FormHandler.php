@@ -110,7 +110,7 @@ class FormHandler implements FormHandlerInterface
         $limit = $this->getLimit($limit);
         $forms = array();
         $converter = $this->converterRegistry->get($config->getConverter());
-        $dataList = $converter->convert($this->request->getContent());
+        $dataList = $converter->convert((string) $this->request->getContent());
 
         if (!$isList) {
             $dataList = array($dataList);
