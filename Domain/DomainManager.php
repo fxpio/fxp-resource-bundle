@@ -101,7 +101,10 @@ class DomainManager implements DomainManagerInterface
     public function add(DomainInterface $domain)
     {
         $domain->setDebug($this->debug);
-        $domain->setObjectManager($this->or->getManagerForClass($domain->getClass()));
+        $om = $this->or->getManagerForClass($domain->getClass());
+        if (null !== $om) {
+            $domain->setObjectManager($om);
+        }
         $domain->setEventDispatcher($this->ed);
         $domain->setObjectFactory($this->of);
         $domain->setValidator($this->validator);
