@@ -55,9 +55,9 @@ class DomainPass implements CompilerPassInterface
 
         /* @var ObjectManager $manager */
         foreach ($dManagers as $name => $manager) {
-            /* @var ClassMetadataInfo[] $metadatas */
             $metadatas = $manager->getMetadataFactory()->getAllMetadata();
 
+            /* @var ClassMetadataInfo $meta */
             foreach ($metadatas as $meta) {
                 if (!$meta->isMappedSuperclass) {
                     $classes[] = $meta->getName();

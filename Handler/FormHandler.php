@@ -74,7 +74,9 @@ class FormHandler implements FormHandlerInterface
      */
     public function processForm(FormConfigInterface $config, $object)
     {
-        return current($this->process($config, array($object), false));
+        $forms = $this->process($config, array($object), false);
+
+        return $forms[0];
     }
 
     /**
