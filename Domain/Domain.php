@@ -338,9 +338,7 @@ class Domain implements DomainInterface
                 $resource->setStatus(ResourceStatutes::CANCELED);
                 continue;
             } elseif ($autoCommit && $hasFlushError && $hasError) {
-                $resource->setStatus(ResourceStatutes::ERROR);
-                $message = 'Caused by previous internal database error';
-                $resource->getErrors()->add(new ConstraintViolation($message, $message, array(), null, null, null));
+                $this->addResourceError($resource, 'Caused by previous internal database error');
                 continue;
             }
 
@@ -350,24 +348,35 @@ class Domain implements DomainInterface
 
             if ($resource->isValid()) {
                 $this->om->persist($object);
-
-                if ($autoCommit) {
-                    $rErrors = $this->flushTransaction($object);
-                    $resource->getErrors()->addAll($rErrors);
-                    $hasFlushError = $rErrors->count() > 0;
-                }
+                $hasFlushError = $this->doAutoCommitFlushTransaction($resource, $autoCommit);
             }
 
-            if ($resource->isValid()) {
-                $resource->setStatus($successStatus);
-            } else {
-                $hasError = true;
-                $resource->setStatus(ResourceStatutes::ERROR);
-                $this->om->detach($object);
-            }
+            $hasError = $this->finalizeResourceStatus($resource, $successStatus, $hasError);
         }
 
         return $hasError;
+    }
+
+    /**
+     * Do the flush transaction for auto commit.
+     *
+     * @param ResourceInterface $resource   The resource
+     * @param bool              $autoCommit The auto commit
+     * @param bool              $skipped    Check if the resource is skipped
+     *
+     * @return bool Returns if there is an flush error
+     */
+    protected function doAutoCommitFlushTransaction(ResourceInterface $resource, $autoCommit, $skipped = false)
+    {
+        $hasFlushError = false;
+
+        if ($autoCommit && !$skipped) {
+            $rErrors = $this->flushTransaction($resource->getRealData());
+            $resource->getErrors()->addAll($rErrors);
+            $hasFlushError = $rErrors->count() > 0;
+        }
+
+        return $hasFlushError;
     }
 
     /**
@@ -418,9 +427,7 @@ class Domain implements DomainInterface
                 $resource->setStatus(ResourceStatutes::CANCELED);
                 continue;
             } elseif ($autoCommit && $hasFlushError && $hasError) {
-                $resource->setStatus(ResourceStatutes::ERROR);
-                $message = 'Caused by previous internal database error';
-                $resource->getErrors()->add(new ConstraintViolation($message, $message, array(), null, null, null));
+                $this->addResourceError($resource, 'Caused by previous internal database error');
                 continue;
             } elseif (null !== $idError = $this->getErrorIdentifier($resource->getRealData(), static::TYPE_DELETE)) {
                 $hasError = true;
@@ -449,19 +456,42 @@ class Domain implements DomainInterface
                 $this->om->remove($object);
             }
 
-            if ($autoCommit && !$skipped) {
-                $rErrors = $this->flushTransaction($object);
-                $resource->getErrors()->addAll($rErrors);
-                $hasFlushError = $rErrors->count() > 0;
-            }
+            $hasFlushError = $this->doAutoCommitFlushTransaction($resource, $autoCommit, $skipped);
+            $hasError = $this->finalizeResourceStatus($resource, ResourceStatutes::DELETED, $hasError);
+        }
 
-            if ($resource->isValid()) {
-                $resource->setStatus(ResourceStatutes::DELETED);
-            } else {
-                $hasError = true;
-                $resource->setStatus(ResourceStatutes::ERROR);
-                $this->om->detach($object);
-            }
+        return $hasError;
+    }
+
+    /**
+     * Add the error in resource.
+     *
+     * @param ResourceInterface $resource The resource
+     * @param string            $message  The error message
+     */
+    public function addResourceError(ResourceInterface $resource, $message)
+    {
+        $resource->setStatus(ResourceStatutes::ERROR);
+        $resource->getErrors()->add(new ConstraintViolation($message, $message, array(), null, null, null));
+    }
+
+    /**
+     * Finalize the action for a resource.
+     *
+     * @param ResourceInterface $resource
+     * @param $status
+     * @param $hasError
+     *
+     * @return bool Returns the new hasError value
+     */
+    protected function finalizeResourceStatus(ResourceInterface $resource, $status, $hasError)
+    {
+        if ($resource->isValid()) {
+            $resource->setStatus($status);
+        } else {
+            $hasError = true;
+            $resource->setStatus(ResourceStatutes::ERROR);
+            $this->om->detach($resource->getRealData());
         }
 
         return $hasError;
