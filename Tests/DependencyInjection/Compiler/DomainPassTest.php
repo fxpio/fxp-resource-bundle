@@ -91,7 +91,7 @@ class DomainPassTest extends KernelTestCase
         $dmDef = $container->getDefinition('sonatra_resource.domain_manager');
         $args = $dmDef->getArguments();
         $this->assertCount(6, $args);
-        $this->assertCount(1, $args[0]);
+        $this->assertCount(2, $args[0]);
 
         $compiledDef = $args[0][0];
 
@@ -100,7 +100,7 @@ class DomainPassTest extends KernelTestCase
         $dmDef = $container->getDefinition('sonatra_resource.domain_manager');
         $args = $dmDef->getArguments();
         $this->assertCount(6, $args);
-        $this->assertCount(1, $args[0]);
+        $this->assertCount(2, $args[0]);
 
         $def = $args[0][0];
 
@@ -121,7 +121,7 @@ class DomainPassTest extends KernelTestCase
         $dmDef = $container->getDefinition('sonatra_resource.domain_manager');
         $args = $dmDef->getArguments();
         $this->assertCount(6, $args);
-        $this->assertCount(1, $args[0]);
+        $this->assertCount(2, $args[0]);
 
         /* @var Definition $compiledDef */
         $compiledDef = $args[0][0];
@@ -133,7 +133,7 @@ class DomainPassTest extends KernelTestCase
         $dmDef = $container->getDefinition('sonatra_resource.domain_manager');
         $args = $dmDef->getArguments();
         $this->assertCount(6, $args);
-        $this->assertCount(1, $args[0]);
+        $this->assertCount(2, $args[0]);
 
         /* @var Definition $def */
         $def = $args[0][0];

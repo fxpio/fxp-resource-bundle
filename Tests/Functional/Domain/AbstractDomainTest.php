@@ -17,6 +17,7 @@ use Liip\FunctionalTestBundle\Test\WebTestCase;
 use Sonatra\Bundle\DefaultValueBundle\DefaultValue\ObjectFactoryInterface;
 use Sonatra\Bundle\ResourceBundle\Domain\Domain;
 use Sonatra\Bundle\ResourceBundle\Domain\DomainInterface;
+use Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\Bundle\TestBundle\Entity\Bar;
 use Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\Bundle\TestBundle\Entity\Foo;
 use Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\TestAppKernel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -81,7 +82,7 @@ abstract class AbstractDomainTest extends WebTestCase
      * @param DomainInterface $domain
      * @param int             $size
      *
-     * @return Foo[]
+     * @return Foo[]|Bar[]
      */
     protected function insertResources(DomainInterface $domain, $size)
     {
@@ -92,12 +93,12 @@ abstract class AbstractDomainTest extends WebTestCase
         $objects = array();
 
         for ($i = 0; $i < $size; $i++) {
-            /* @var Foo $foo */
-            $foo = $domain->newInstance();
-            $foo->setName('Bar '.($i+1));
-            $foo->setDetail('Detail '.($i+1));
-            $em->persist($foo);
-            $objects[] = $foo;
+            /* @var Foo|Bar $object */
+            $object = $domain->newInstance();
+            $object->setName('Bar '.($i+1));
+            $object->setDetail('Detail '.($i+1));
+            $em->persist($object);
+            $objects[] = $object;
         }
 
         $em->flush();

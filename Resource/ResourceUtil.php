@@ -27,17 +27,18 @@ abstract class ResourceUtil
      *
      * @param object[]|FormInterface[] $objects      The resource object instance or form of object instance
      * @param string                   $requireClass The require class name
+     * @param bool                     $allowForm    Check if the form is allowed
      *
      * @return ResourceList
      *
      * @throws InvalidResourceException When the instance object in the list is not an instance of the required class
      */
-    public static function convertObjectsToResourceList(array $objects, $requireClass)
+    public static function convertObjectsToResourceList(array $objects, $requireClass, $allowForm = true)
     {
         $list = new ResourceList();
 
         foreach ($objects as $i => $object) {
-            static::validateObjectResource($object, $requireClass, $i);
+            static::validateObjectResource($object, $requireClass, $i, $allowForm);
             $list->add(new Resource((object) $object));
         }
 
@@ -50,14 +51,15 @@ abstract class ResourceUtil
      * @param mixed|FormInterface $object       The resource object or form of resource object
      * @param string              $requireClass The required class
      * @param int                 $i            The position of the object in the list
+     * @param bool                $allowForm    Check if the form is allowed
      *
      * @throws UnexpectedTypeException  When the object parameter is not an object or a form instance
      * @throws InvalidResourceException When the object in form is not an object
      * @throws InvalidResourceException When the object instance is not an instance of the required class
      */
-    public static function validateObjectResource($object, $requireClass, $i)
+    public static function validateObjectResource($object, $requireClass, $i, $allowForm = true)
     {
-        if ($object instanceof FormInterface) {
+        if ($allowForm && $object instanceof FormInterface) {
             $object = $object->getData();
         }
 

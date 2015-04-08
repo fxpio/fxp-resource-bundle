@@ -18,6 +18,7 @@ use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\ORM\EntityManagerInterface;
 use Sonatra\Bundle\DefaultValueBundle\DefaultValue\ObjectFactoryInterface;
 use Sonatra\Bundle\ResourceBundle\Event\ResourceEvent;
+use Sonatra\Bundle\ResourceBundle\Model\SoftDeletableInterface;
 use Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface;
 use Sonatra\Bundle\ResourceBundle\Resource\ResourceList;
 use Sonatra\Bundle\ResourceBundle\Resource\ResourceListInterface;
@@ -46,6 +47,8 @@ class Domain implements DomainInterface
     const TYPE_UPDATE = 1;
 
     const TYPE_UPSERT = 2;
+
+    const TYPE_DELETE = 3;
 
     /**
      * @var string
@@ -257,8 +260,14 @@ class Domain implements DomainInterface
      */
     public function deletes(array $resources, $soft = true, $autoCommit = false)
     {
-        $list = ResourceUtil::convertObjectsToResourceList($resources, $this->getClass());
-        //TODO
+        $list = ResourceUtil::convertObjectsToResourceList(array_values($resources), $this->getClass(), false);
+
+        $this->dispatchEvent(ResourceEvents::PRE_DELETES, new ResourceEvent($this, $list));
+        $this->beginTransaction($autoCommit);
+        $hasError = $this->doDeleteList($list, $autoCommit, $soft);
+        $this->doFlushFinalTransaction($list, $autoCommit, $hasError);
+
+        $this->dispatchEvent(ResourceEvents::POST_DELETES, new ResourceEvent($this, $list));
 
         return $list;
     }
@@ -301,23 +310,8 @@ class Domain implements DomainInterface
 
         $this->dispatchEvent($preEvent, new ResourceEvent($this, $list));
         $this->beginTransaction($autoCommit);
-
         $hasError = $this->doPersistList($list, $autoCommit, $type);
-
-        if (!$autoCommit) {
-            if ($hasError) {
-                $this->cancelTransaction();
-            } else {
-                $errors = $this->flushTransaction();
-
-                if (count($errors) > 0) {
-                    $list->getErrors()->addAll($errors);
-                    foreach ($list as $resource) {
-                        $resource->setStatus(ResourceStatutes::ERROR);
-                    }
-                }
-            }
-        }
+        $this->doFlushFinalTransaction($list, $autoCommit, $hasError);
 
         $this->dispatchEvent($postEvent, new ResourceEvent($this, $list));
 
@@ -366,6 +360,103 @@ class Domain implements DomainInterface
 
             if ($resource->isValid()) {
                 $resource->setStatus($successStatus);
+            } else {
+                $hasError = true;
+                $resource->setStatus(ResourceStatutes::ERROR);
+                $this->om->detach($object);
+            }
+        }
+
+        return $hasError;
+    }
+
+    /**
+     * Do flush the final transaction for non auto commit.
+     *
+     * @param ResourceListInterface $resources  The list of object resource instance
+     * @param bool                  $autoCommit Commit transaction for each resource or all
+     *                                          (continue the action even if there is an error on a resource)
+     * @param bool                  $hasError   Check if there is an error
+     *
+     * @return bool Check if there is an error in list
+     */
+    protected function doFlushFinalTransaction(ResourceListInterface $resources, $autoCommit, $hasError)
+    {
+        if (!$autoCommit) {
+            if ($hasError) {
+                $this->cancelTransaction();
+            } else {
+                $errors = $this->flushTransaction();
+
+                if (count($errors) > 0) {
+                    $resources->getErrors()->addAll($errors);
+                    foreach ($resources as $resource) {
+                        $resource->setStatus(ResourceStatutes::ERROR);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Do delete the resources.
+     *
+     * @param ResourceListInterface $resources  The list of object resource instance
+     * @param bool                  $autoCommit Commit transaction for each resource or all
+     *                                          (continue the action even if there is an error on a resource)
+     * @param bool                  $soft       The soft deletable
+     *
+     * @return bool Check if there is an error in list
+     */
+    protected function doDeleteList(ResourceListInterface $resources, $autoCommit, $soft = true)
+    {
+        $hasError = false;
+        $hasFlushError = false;
+
+        foreach ($resources as $i => $resource) {
+            if (!$autoCommit && $hasError) {
+                $resource->setStatus(ResourceStatutes::CANCELED);
+                continue;
+            } elseif ($autoCommit && $hasFlushError && $hasError) {
+                $resource->setStatus(ResourceStatutes::ERROR);
+                $message = 'Caused by previous internal database error';
+                $resource->getErrors()->add(new ConstraintViolation($message, $message, array(), null, null, null));
+                continue;
+            } elseif (null !== $idError = $this->getErrorIdentifier($resource->getRealData(), static::TYPE_DELETE)) {
+                $hasError = true;
+                $resource->setStatus(ResourceStatutes::ERROR);
+                $resource->getErrors()->add(new ConstraintViolation($idError, $idError, array(), null, null, null));
+                continue;
+            }
+
+            $skipped = false;
+            $object = $resource->getRealData();
+
+            if ($object instanceof SoftDeletableInterface) {
+                if ($soft) {
+                    if ($object->isDeleted()) {
+                        $skipped = true;
+                    } else {
+                        $this->om->remove($object);
+                    }
+                } else {
+                    if (!$object->isDeleted()) {
+                        $object->setDeletedAt(new \DateTime());
+                    }
+                    $this->om->remove($object);
+                }
+            } else {
+                $this->om->remove($object);
+            }
+
+            if ($autoCommit && !$skipped) {
+                $rErrors = $this->flushTransaction($object);
+                $resource->getErrors()->addAll($rErrors);
+                $hasFlushError = $rErrors->count() > 0;
+            }
+
+            if ($resource->isValid()) {
+                $resource->setStatus(ResourceStatutes::DELETED);
             } else {
                 $hasError = true;
                 $resource->setStatus(ResourceStatutes::ERROR);
@@ -523,6 +614,8 @@ class Domain implements DomainInterface
             $idError = 'The resource cannot be created because it has an identifier';
         } elseif (Domain::TYPE_UPDATE === $type && null === $idValue) {
             $idError = 'The resource cannot be updated because it has not an identifier';
+        } elseif (Domain::TYPE_DELETE === $type && null === $idValue) {
+            $idError = 'The resource cannot be deleted because it has not an identifier';
         }
 
         return $idError;

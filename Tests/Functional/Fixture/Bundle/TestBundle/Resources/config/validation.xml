@@ -8,4 +8,10 @@
             <constraint name="NotBlank" />
         </property>
     </class>
+
+    <class name="Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\Bundle\TestBundle\Entity\Bar">
+        <property name="name">
+            <constraint name="NotBlank" />
+        </property>
+    </class>
 </constraint-mapping>
