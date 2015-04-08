@@ -86,7 +86,7 @@ interface ResourceListInterface extends \Traversable, \Countable, \ArrayAccess
     /**
      * Get the errors defined for this list (not include the children error).
      *
-     * @return ConstraintViolationListInterface[]
+     * @return ConstraintViolationListInterface
      */
     public function getErrors();
 
