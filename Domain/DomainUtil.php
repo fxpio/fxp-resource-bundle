@@ -58,7 +58,7 @@ abstract class DomainUtil
      *
      * @return int|string|null
      */
-    public static function getIdentifier(ObjectManager $om,  $object)
+    public static function getIdentifier(ObjectManager $om, $object)
     {
         $propertyAccess = PropertyAccess::createPropertyAccessor();
         $meta = $om->getClassMetadata(get_class($object));
