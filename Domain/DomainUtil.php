@@ -11,7 +11,13 @@
 
 namespace Sonatra\Bundle\ResourceBundle\Domain;
 
+use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\DBAL\Exception\DriverException;
+use Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface;
+use Sonatra\Bundle\ResourceBundle\ResourceEvents;
+use Sonatra\Bundle\ResourceBundle\ResourceStatutes;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Validator\ConstraintViolation;
 
 /**
  * Util for domain.
@@ -42,6 +48,65 @@ abstract class DomainUtil
         }
 
         return $message;
+    }
+
+    /**
+     * Get the value of resource identifier.
+     *
+     * @param ObjectManager $om     The doctrine object manager
+     * @param object        $object The resource object
+     *
+     * @return int|string|null
+     */
+    public static function getIdentifier(ObjectManager $om,  $object)
+    {
+        $propertyAccess = PropertyAccess::createPropertyAccessor();
+        $meta = $om->getClassMetadata(get_class($object));
+        $ids = $meta->getIdentifier();
+        $value = null;
+
+        foreach ($ids as $id) {
+            $idVal = $propertyAccess->getValue($object, $id);
+
+            if (null !== $idVal) {
+                $value = $idVal;
+                break;
+            }
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get the event names of persist action.
+     *
+     * @param int $type The type of persist
+     *
+     * @return array The list of pre event name and post event name
+     */
+    public static function getEventNames($type)
+    {
+        $names = array(ResourceEvents::PRE_UPSERTS, ResourceEvents::POST_UPSERTS);
+
+        if (Domain::TYPE_CREATE === $type) {
+            $names = array(ResourceEvents::PRE_CREATES, ResourceEvents::POST_CREATES);
+        } elseif (Domain::TYPE_UPDATE === $type) {
+            $names = array(ResourceEvents::PRE_UPDATES, ResourceEvents::POST_UPDATES);
+        }
+
+        return $names;
+    }
+
+    /**
+     * Add the error in resource.
+     *
+     * @param ResourceInterface $resource The resource
+     * @param string            $message  The error message
+     */
+    public static function addResourceError(ResourceInterface $resource, $message)
+    {
+        $resource->setStatus(ResourceStatutes::ERROR);
+        $resource->getErrors()->add(new ConstraintViolation($message, $message, array(), null, null, null));
     }
 
     /**
