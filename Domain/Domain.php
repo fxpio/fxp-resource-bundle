@@ -33,6 +33,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -342,19 +343,36 @@ class Domain implements DomainInterface
                 continue;
             }
 
-            $this->validateResource($resource, $type);
-            $object = $resource->getRealData();
-            $successStatus = $this->getSuccessStatus($type, $object);
-
-            if ($resource->isValid()) {
-                $this->om->persist($object);
-                $hasFlushError = $this->doAutoCommitFlushTransaction($resource, $autoCommit);
-            }
-
+            list($successStatus, $hasFlushError) = $this->doPersist($resource, $autoCommit, $type);
             $hasError = $this->finalizeResourceStatus($resource, $successStatus, $hasError);
         }
 
         return $hasError;
+    }
+
+    /**
+     * Do persist a resource.
+     *
+     * @param ResourceInterface $resource   The resource
+     * @param bool              $autoCommit Commit transaction for each resource or all
+     *                                      (continue the action even if there is an error on a resource)
+     * @param int               $type       The type of persist action
+     *
+     * @return array The successStatus and hasFlushError value
+     */
+    protected function doPersist(ResourceInterface $resource, $autoCommit, $type)
+    {
+        $this->validateResource($resource, $type);
+        $object = $resource->getRealData();
+        $successStatus = $this->getSuccessStatus($type, $object);
+        $hasFlushError = false;
+
+        if ($resource->isValid()) {
+            $this->om->persist($object);
+            $hasFlushError = $this->doAutoCommitFlushTransaction($resource, $autoCommit);
+        }
+
+        return array($successStatus, $hasFlushError);
     }
 
     /**
@@ -436,31 +454,45 @@ class Domain implements DomainInterface
                 continue;
             }
 
-            $skipped = false;
-            $object = $resource->getRealData();
-
-            if ($object instanceof SoftDeletableInterface) {
-                if ($soft) {
-                    if ($object->isDeleted()) {
-                        $skipped = true;
-                    } else {
-                        $this->om->remove($object);
-                    }
-                } else {
-                    if (!$object->isDeleted()) {
-                        $object->setDeletedAt(new \DateTime());
-                    }
-                    $this->om->remove($object);
-                }
-            } else {
-                $this->om->remove($object);
-            }
-
+            $skipped = $this->doDelete($resource, $soft);
             $hasFlushError = $this->doAutoCommitFlushTransaction($resource, $autoCommit, $skipped);
             $hasError = $this->finalizeResourceStatus($resource, ResourceStatutes::DELETED, $hasError);
         }
 
         return $hasError;
+    }
+
+    /**
+     * Do delete a resource.
+     *
+     * @param ResourceInterface $resource The resource
+     * @param bool              $soft     The soft deletable
+     *
+     * @return bool Check if the resource is skipped or deleted
+     */
+    protected function doDelete(ResourceInterface $resource, $soft)
+    {
+        $skipped = false;
+        $object = $resource->getRealData();
+
+        if ($object instanceof SoftDeletableInterface) {
+            if ($soft) {
+                if ($object->isDeleted()) {
+                    $skipped = true;
+                } else {
+                    $this->om->remove($object);
+                }
+            } else {
+                if (!$object->isDeleted()) {
+                    $object->setDeletedAt(new \DateTime());
+                }
+                $this->om->remove($object);
+            }
+        } else {
+            $this->om->remove($object);
+        }
+
+        return $skipped;
     }
 
     /**
@@ -562,18 +594,30 @@ class Domain implements DomainInterface
                 $this->connection->commit();
             }
         } catch (\Exception $e) {
-            if (null !== $this->connection && null === $object) {
-                $this->connection->rollback();
-            }
-
-            $message = $e instanceof DriverException
-                ? DomainUtil::extractDriverExceptionMessage($e, $this->debug)
-                : $e->getMessage();
-
-            $violations->add(new ConstraintViolation($message, $message, array(), null, null, null));
+            $this->flushTransactionException($e, $violations, $object);
         }
 
         return $violations;
+    }
+
+    /**
+     * Do the action when there is an exception on flush transaction.
+     *
+     * @param \Exception                       $e          The exception on flush transaction
+     * @param ConstraintViolationListInterface $violations The constraint violation list
+     * @param object|null                      $object     The resource for auto commit or null for flush at the end
+     */
+    protected function flushTransactionException(\Exception $e, ConstraintViolationListInterface $violations, $object = null)
+    {
+        if (null !== $this->connection && null === $object) {
+            $this->connection->rollback();
+        }
+
+        $message = $e instanceof DriverException
+            ? DomainUtil::extractDriverExceptionMessage($e, $this->debug)
+            : $e->getMessage();
+
+        $violations->add(new ConstraintViolation($message, $message, array(), null, null, null));
     }
 
     /**
