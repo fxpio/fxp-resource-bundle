@@ -19,7 +19,7 @@ use Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\Bundle\TestBundle\Lis
 use Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\Bundle\TestBundle\Listener\SoftDeletableSubscriber;
 
 /**
- * Functional tests for create methods of Domain.
+ * Functional tests for delete methods of Domain.
  *
  * @author François Pluchino <francois.pluchino@sonatra.com>
  */
