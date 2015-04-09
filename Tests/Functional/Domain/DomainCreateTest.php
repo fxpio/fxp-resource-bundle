@@ -42,7 +42,7 @@ class DomainCreateTest extends AbstractDomainTest
         $foo = $domain->newInstance();
         $foo->setName('Bar');
 
-        $this->runTestCreateException($domain, $foo, '/Integrity constraint violation: (\d+) NOT NULL constraint failed: foo.detail/');
+        $this->runTestCreateException($domain, $foo, $this->getIntegrityViolationMessage());
     }
 
     protected function runTestCreateException(DomainInterface $domain, $object, $errorMessage)
@@ -141,7 +141,7 @@ class DomainCreateTest extends AbstractDomainTest
         $foo2 = $domain->newInstance();
         $foo2->setName('Bar');
 
-        $this->runTestCreatesException($domain, array($foo1, $foo2), '/Integrity constraint violation: (\d+) NOT NULL constraint failed: foo.detail/', false);
+        $this->runTestCreatesException($domain, array($foo1, $foo2), $this->getIntegrityViolationMessage(), false);
     }
 
     protected function runTestCreatesException(DomainInterface $domain, array $objects, $errorMessage, $autoCommit = false)
@@ -234,7 +234,7 @@ class DomainCreateTest extends AbstractDomainTest
 
         $this->assertTrue($resources->hasErrors());
         $this->assertRegExp('/This value should not be blank./', $resources->get(0)->getErrors()->get(0)->getMessage());
-        $this->assertRegExp('/Integrity constraint violation: (\d+) NOT NULL constraint failed: foo.detail/', $resources->get(1)->getErrors()->get(0)->getMessage());
+        $this->assertRegExp($this->getIntegrityViolationMessage(), $resources->get(1)->getErrors()->get(0)->getMessage());
 
         $this->assertTrue($preEvent);
         $this->assertTrue($postEvent);
@@ -286,7 +286,7 @@ class DomainCreateTest extends AbstractDomainTest
         $this->assertCount(1, $resources->get(0)->getErrors());
         $this->assertCount(1, $resources->get(1)->getErrors());
 
-        $this->assertRegExp('/Integrity constraint violation: (\d+) NOT NULL constraint failed: foo.detail/', $resources->get(0)->getErrors()->get(0)->getMessage());
+        $this->assertRegExp($this->getIntegrityViolationMessage(), $resources->get(0)->getErrors()->get(0)->getMessage());
         $this->assertRegExp('/Caused by previous internal database error/', $resources->get(1)->getErrors()->get(0)->getMessage());
 
         $this->assertTrue($preEvent);

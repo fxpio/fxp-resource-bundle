@@ -105,4 +105,13 @@ abstract class AbstractDomainTest extends WebTestCase
 
         return $objects;
     }
+
+    protected function getIntegrityViolationMessage()
+    {
+        if (PHP_VERSION_ID < 50500) {
+            return '/Integrity constraint violation: (\d+) foo.detail may not be NULL/';
+        }
+
+        return '/Integrity constraint violation: (\d+) NOT NULL constraint failed: foo.detail/';
+    }
 }
