@@ -441,25 +441,47 @@ class Domain implements DomainInterface
         $hasFlushError = false;
 
         foreach ($resources as $i => $resource) {
-            if (!$autoCommit && $hasError) {
-                $resource->setStatus(ResourceStatutes::CANCELED);
-                continue;
-            } elseif ($autoCommit && $hasFlushError && $hasError) {
-                $this->addResourceError($resource, 'Caused by previous internal database error');
-                continue;
-            } elseif (null !== $idError = $this->getErrorIdentifier($resource->getRealData(), static::TYPE_DELETE)) {
-                $hasError = true;
-                $resource->setStatus(ResourceStatutes::ERROR);
-                $resource->getErrors()->add(new ConstraintViolation($idError, $idError, array(), null, null, null));
-                continue;
-            }
+            list($continue, $hasError) = $this->prepareDelete($resource, $autoCommit, $hasError, $hasFlushError);
 
-            $skipped = $this->doDelete($resource, $soft);
-            $hasFlushError = $this->doAutoCommitFlushTransaction($resource, $autoCommit, $skipped);
-            $hasError = $this->finalizeResourceStatus($resource, ResourceStatutes::DELETED, $hasError);
+            if (!$continue) {
+                $skipped = $this->doDelete($resource, $soft);
+                $hasFlushError = $this->doAutoCommitFlushTransaction($resource, $autoCommit, $skipped);
+                $hasError = $this->finalizeResourceStatus($resource, ResourceStatutes::DELETED, $hasError);
+            }
         }
 
         return $hasError;
+    }
+
+    /**
+     * Prepare the deletion of resource.
+     *
+     * @param ResourceInterface $resource      The resource
+     * @param bool              $autoCommit    Commit transaction for each resource or all
+     *                                         (continue the action even if there is an error on a resource)
+     * @param bool              $hasError      Check if there is an previous error
+     * @param bool              $hasFlushError Check if there is an previous flush error
+     *
+     * @return array The check if the delete action must be continued and check if there is an error
+     */
+    protected function prepareDelete(ResourceInterface $resource, $autoCommit, $hasError, $hasFlushError)
+    {
+        $continue = false;
+
+        if (!$autoCommit && $hasError) {
+            $resource->setStatus(ResourceStatutes::CANCELED);
+            $continue = true;
+        } elseif ($autoCommit && $hasFlushError && $hasError) {
+            $this->addResourceError($resource, 'Caused by previous internal database error');
+            $continue = true;
+        } elseif (null !== $idError = $this->getErrorIdentifier($resource->getRealData(), static::TYPE_DELETE)) {
+            $hasError = true;
+            $resource->setStatus(ResourceStatutes::ERROR);
+            $resource->getErrors()->add(new ConstraintViolation($idError, $idError, array(), null, null, null));
+            $continue = true;
+        }
+
+        return array($continue, $hasError);
     }
 
     /**
