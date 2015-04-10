@@ -200,9 +200,9 @@ interface DomainInterface
      *
      * Warning: It's recommended to limit the number of resources.
      *
-     * @param object|int[]|string[] $identifiers The list of objects or object identifiers
-     * @param bool                  $autoCommit  Commit transaction for each resource or all
-     *                                           (continue the action even if there is an error on a resource)
+     * @param object[]|int[]|string[] $identifiers The list of objects or object identifiers
+     * @param bool                    $autoCommit  Commit transaction for each resource or all
+     *                                             (continue the action even if there is an error on a resource)
      *
      * @return ResourceListInterface
      */
