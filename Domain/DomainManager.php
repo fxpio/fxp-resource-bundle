@@ -51,6 +51,11 @@ class DomainManager implements DomainManagerInterface
     protected $validator;
 
     /**
+     * @var array
+     */
+    protected $disableFilters;
+
+    /**
      * @var bool
      */
     protected $debug;
@@ -63,22 +68,24 @@ class DomainManager implements DomainManagerInterface
     /**
      * Constructor.
      *
-     * @param DomainInterface[]        $domains   The resource domains
-     * @param ManagerRegistry          $or        The doctrine object manager
-     * @param EventDispatcherInterface $ed        The event dispatcher
-     * @param ObjectFactoryInterface   $of        The object factory
-     * @param ValidatorInterface       $validator The validator
-     * @param bool                     $debug     The debug mode
+     * @param DomainInterface[]        $domains        The resource domains
+     * @param ManagerRegistry          $or             The doctrine object manager
+     * @param EventDispatcherInterface $ed             The event dispatcher
+     * @param ObjectFactoryInterface   $of             The object factory
+     * @param ValidatorInterface       $validator      The validator
+     * @param array                    $disableFilters The list of doctrine filters must be disabled for undelete resources
+     * @param bool                     $debug          The debug mode
      */
     public function __construct(array $domains, ManagerRegistry $or,
                                 EventDispatcherInterface $ed, ObjectFactoryInterface $of,
-                                ValidatorInterface $validator, $debug = false)
+                                ValidatorInterface $validator, $disableFilters = array(), $debug = false)
     {
         $this->domains = array();
         $this->or = $or;
         $this->ed = $ed;
         $this->of = $of;
         $this->validator = $validator;
+        $this->disableFilters = $disableFilters;
         $this->debug = $debug;
         $this->cache = array();
 
@@ -103,7 +110,7 @@ class DomainManager implements DomainManagerInterface
         $domain->setDebug($this->debug);
         $om = $this->or->getManagerForClass($domain->getClass());
         if (null !== $om) {
-            $domain->setObjectManager($om);
+            $domain->setObjectManager($om, $this->disableFilters);
         }
         $domain->setEventDispatcher($this->ed);
         $domain->setObjectFactory($this->of);

@@ -36,6 +36,7 @@ class SonatraResourceExtension extends Extension
         $loader->load('converter.xml');
         $loader->load('handler.xml');
 
+        $container->setParameter('sonatra_resource.domain.undelete_disable_filters', $config['undelete_disable_filters']);
         $container->setParameter('sonatra_resource.form_handler_default_limit', $config['form_handler_default_limit']);
     }
 }

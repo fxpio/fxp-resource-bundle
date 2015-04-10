@@ -38,11 +38,12 @@ interface DomainInterface
     /**
      * Set the doctrine object registry.
      *
-     * @param ObjectManager $om
+     * @param ObjectManager $om             The object manager
+     * @param array         $disableFilters The list of doctrine filters must be disabled for undelete resources
      *
      * @throws InvalidConfigurationException When this resource domain class is not managed by doctrine.
      */
-    public function setObjectManager(ObjectManager $om);
+    public function setObjectManager(ObjectManager $om, $disableFilters = array());
 
     /**
      * Set the event dispatcher.
@@ -188,7 +189,7 @@ interface DomainInterface
     /**
      * Undelete a resource.
      *
-     * @param int|string $identifier The object identifier
+     * @param object|int|string $identifier The object or object identifier
      *
      * @return ResourceInterface
      */
@@ -199,9 +200,9 @@ interface DomainInterface
      *
      * Warning: It's recommended to limit the number of resources.
      *
-     * @param int[]|string[] $identifiers The list of object identifier
-     * @param bool           $autoCommit  Commit transaction for each resource or all
-     *                                    (continue the action even if there is an error on a resource)
+     * @param object|int[]|string[] $identifiers The list of objects or object identifiers
+     * @param bool                  $autoCommit  Commit transaction for each resource or all
+     *                                           (continue the action even if there is an error on a resource)
      *
      * @return ResourceListInterface
      */

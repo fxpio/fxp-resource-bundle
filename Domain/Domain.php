@@ -13,6 +13,7 @@ namespace Sonatra\Bundle\ResourceBundle\Domain;
 
 use Sonatra\Bundle\ResourceBundle\Event\ResourceEvent;
 use Sonatra\Bundle\ResourceBundle\Model\SoftDeletableInterface;
+use Sonatra\Bundle\ResourceBundle\Resource\Resource;
 use Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface;
 use Sonatra\Bundle\ResourceBundle\Resource\ResourceListInterface;
 use Sonatra\Bundle\ResourceBundle\Resource\ResourceUtil;
@@ -49,19 +50,90 @@ class Domain extends BaseDomain
      */
     public function undeletes(array $identifiers, $autoCommit = false)
     {
-        $list = ResourceUtil::convertObjectsToResourceList($identifiers, $this->getClass());
-        //TODO
+        list($objects, $missingIds) = $this->convertIdentifierToObjects($identifiers);
+        $errorResources = array();
 
-        return $list;
+        foreach ($missingIds as $id) {
+            $sdt = new \stdClass();
+            $sdt->{DomainUtil::getIdentifierName($this->om, $this->getClass())} = $id;
+            $resource = new Resource($sdt);
+            DomainUtil::addResourceError($resource, sprintf('The object with the identifier "%s" does not exist', $id));
+            $errorResources[] = $resource;
+        }
+
+        return $this->persist($objects, $autoCommit, static::TYPE_UNDELETE, $errorResources);
+    }
+
+    /**
+     * Convert the list containing the identifier and/or object, to the list of objects.
+     *
+     * @param array $identifiers The list containing identifier or object
+     *
+     * @return array The list of objects and the list of identifiers that have no object
+     */
+    protected function convertIdentifierToObjects(array $identifiers)
+    {
+        $idName = DomainUtil::getIdentifierName($this->om, $this->getClass());
+        $objects = array();
+        $missingIds = array();
+        $searchIds = $this->extractIdentifierInObjectList($identifiers, $objects);
+
+        if (count($searchIds) > 0) {
+            $previousFilters = $this->disableFilters();
+            $searchObjects = $this->getRepository()->findBy(array($idName => $searchIds));
+            $this->enableFilters($previousFilters);
+            $objects = array_merge($objects, $searchObjects);
+
+            if (count($searchIds) !== count($searchObjects)) {
+                $missingIds = $searchIds;
+
+                foreach ($objects as $object) {
+                    $pos = array_search(DomainUtil::getIdentifier($this->om, $object), $missingIds);
+
+                    if (false !== $pos) {
+                        array_splice($missingIds, $pos, 1);
+                    }
+                }
+            }
+        }
+
+        return array($objects, $missingIds);
+    }
+
+    /**
+     * Extract the identifier that are not a object.
+     *
+     * @param array $identifiers The list containing identifier or object
+     * @param array $objects     The real objects (by reference)
+     *
+     * @return array The identifiers that are not a object
+     */
+    protected function extractIdentifierInObjectList(array $identifiers, array &$objects)
+    {
+        $searchIds = array();
+
+        foreach ($identifiers as $identifier) {
+            if (is_object($identifier)) {
+                $objects[] = $identifier;
+                continue;
+            }
+            $searchIds[] = $identifier;
+        }
+
+        return $searchIds;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function persist(array $resources, $autoCommit = false, $type)
+    protected function persist(array $resources, $autoCommit, $type, array $errorResources = array())
     {
         list($preEvent, $postEvent) = DomainUtil::getEventNames($type);
         $list = ResourceUtil::convertObjectsToResourceList(array_values($resources), $this->getClass());
+
+        foreach ($errorResources as $errorResource) {
+            $list->add($errorResource);
+        }
 
         $this->dispatchEvent($preEvent, new ResourceEvent($this, $list));
         $this->beginTransaction($autoCommit);
@@ -116,8 +188,9 @@ class Domain extends BaseDomain
      */
     protected function doPersistResource(ResourceInterface $resource, $autoCommit, $type)
     {
-        $this->validateResource($resource, $type);
         $object = $resource->getRealData();
+        $this->validateUndeleteResource($resource, $type);
+        $this->validateResource($resource, $type);
         $successStatus = $this->getSuccessStatus($type, $object);
         $hasFlushError = false;
 
@@ -127,6 +200,25 @@ class Domain extends BaseDomain
         }
 
         return array($successStatus, $hasFlushError);
+    }
+
+    /**
+     * Validate the resource only when type is undelete.
+     *
+     * @param ResourceInterface $resource The resource
+     * @param int               $type     The type of persist action
+     */
+    protected function validateUndeleteResource(ResourceInterface $resource, $type)
+    {
+        if (static::TYPE_UNDELETE === $type) {
+            $object = $resource->getRealData();
+
+            if ($object instanceof SoftDeletableInterface) {
+                $object->setDeletedAt(null);
+            } else {
+                DomainUtil::addResourceError($resource, 'The resource type can not be undeleted');
+            }
+        }
     }
 
     /**

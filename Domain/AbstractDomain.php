@@ -14,9 +14,11 @@ namespace Sonatra\Bundle\ResourceBundle\Domain;
 use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Sonatra\Bundle\DefaultValueBundle\DefaultValue\ObjectFactoryInterface;
 use Sonatra\Bundle\ResourceBundle\Event\ResourceEvent;
+use Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface;
 use Sonatra\Bundle\ResourceBundle\Resource\ResourceList;
 use Sonatra\Bundle\ResourceBundle\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Container;
@@ -31,10 +33,11 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 abstract class AbstractDomain implements DomainInterface
 {
-    const TYPE_CREATE = 0;
-    const TYPE_UPDATE = 1;
-    const TYPE_UPSERT = 2;
-    const TYPE_DELETE = 3;
+    const TYPE_CREATE   = 0;
+    const TYPE_UPDATE   = 1;
+    const TYPE_UPSERT   = 2;
+    const TYPE_DELETE   = 3;
+    const TYPE_UNDELETE = 4;
 
     /**
      * @var string
@@ -77,6 +80,11 @@ abstract class AbstractDomain implements DomainInterface
     protected $debug;
 
     /**
+     * @var array
+     */
+    protected $disableFilters;
+
+    /**
      * Constructor.
      *
      * @param string $class The class name
@@ -86,6 +94,7 @@ abstract class AbstractDomain implements DomainInterface
         $this->class = $class;
         $this->eventPrefix = $this->formatEventPrefix($class);
         $this->debug = false;
+        $this->disableFilters = array();
     }
 
     /**
@@ -99,7 +108,7 @@ abstract class AbstractDomain implements DomainInterface
     /**
      * {@inheritdoc}
      */
-    public function setObjectManager(ObjectManager $om)
+    public function setObjectManager(ObjectManager $om, $disableFilters = array())
     {
         $this->om = $om;
 
@@ -111,6 +120,7 @@ abstract class AbstractDomain implements DomainInterface
         }
 
         if ($om instanceof EntityManagerInterface) {
+            $this->disableFilters = $disableFilters;
             $this->connection = $om->getConnection();
         }
     }
@@ -259,6 +269,48 @@ abstract class AbstractDomain implements DomainInterface
     }
 
     /**
+     * Disable the doctrine filters.
+     *
+     * @return array The previous values of filters
+     */
+    protected function disableFilters()
+    {
+        $previous = array();
+
+        if ($this->om instanceof EntityManager) {
+            $oFilters = $this->om->getFilters();
+
+            foreach ($this->disableFilters as $filterName) {
+                if ($oFilters->has($filterName)) {
+                    $previous[$filterName] = $oFilters->isEnabled($filterName);
+                    $oFilters->disable($filterName);
+                }
+            }
+        }
+
+        return $previous;
+    }
+
+    /**
+     * Enable the doctrine filters.
+     *
+     * @param array $previousValues the previous values of filters
+     */
+    protected function enableFilters(array $previousValues = array())
+    {
+        if ($this->om instanceof EntityManager) {
+            $oFilters = $this->om->getFilters();
+
+            foreach ($this->disableFilters as $filterName) {
+                if ($oFilters->has($filterName) && !$oFilters->isEnabled($filterName)
+                        && isset($previousValues[$filterName]) && $previousValues[$filterName]) {
+                    $oFilters->enable($filterName);
+                }
+            }
+        }
+    }
+
+    /**
      * Format the prefix event.
      *
      * @param string $class The class name
@@ -277,12 +329,13 @@ abstract class AbstractDomain implements DomainInterface
      *
      * Warning: It's recommended to limit the number of resources.
      *
-     * @param FormInterface[]|object[] $resources  The list of object resource instance
-     * @param bool                     $autoCommit Commit transaction for each resource or all
-     *                                             (continue the action even if there is an error on a resource)
-     * @param int                      $type       The type of persist action
+     * @param FormInterface[]|object[] $resources      The list of object resource instance
+     * @param bool                     $autoCommit     Commit transaction for each resource or all
+     *                                                 (continue the action even if there is an error on a resource)
+     * @param int                      $type           The type of persist action
+     * @param ResourceInterface[]      $errorResources The error resources
      *
      * @return ResourceList
      */
-    abstract protected function persist(array $resources, $autoCommit = false, $type);
+    abstract protected function persist(array $resources, $autoCommit, $type, array $errorResources = array());
 }

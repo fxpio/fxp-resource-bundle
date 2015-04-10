@@ -78,6 +78,22 @@ abstract class DomainUtil
     }
 
     /**
+     * Get the name of identifier.
+     *
+     * @param ObjectManager $om        The doctrine object manager
+     * @param string        $className The class name
+     *
+     * @return string
+     */
+    public static function getIdentifierName(ObjectManager $om, $className)
+    {
+        $meta = $om->getClassMetadata($className);
+        $ids = $meta->getIdentifier();
+
+        return implode('', $ids);
+    }
+
+    /**
      * Get the event names of persist action.
      *
      * @param int $type The type of persist
@@ -92,6 +108,8 @@ abstract class DomainUtil
             $names = array(ResourceEvents::PRE_CREATES, ResourceEvents::POST_CREATES);
         } elseif (Domain::TYPE_UPDATE === $type) {
             $names = array(ResourceEvents::PRE_UPDATES, ResourceEvents::POST_UPDATES);
+        } elseif (Domain::TYPE_UNDELETE === $type) {
+            $names = array(ResourceEvents::PRE_UNDELETES, ResourceEvents::POST_UNDELETES);
         }
 
         return $names;

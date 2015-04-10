@@ -189,6 +189,10 @@ abstract class BaseDomain extends AbstractDomain
      */
     protected function validateResource($resource, $type)
     {
+        if (!$resource->isValid()) {
+            return;
+        }
+
         $idError = $this->getErrorIdentifier($resource->getRealData(), $type);
         $data = $resource->getData();
 
@@ -225,6 +229,8 @@ abstract class BaseDomain extends AbstractDomain
             $idError = 'The resource cannot be updated because it has not an identifier';
         } elseif (Domain::TYPE_DELETE === $type && null === $idValue) {
             $idError = 'The resource cannot be deleted because it has not an identifier';
+        } elseif (Domain::TYPE_UNDELETE === $type && null === $idValue) {
+            $idError = 'The resource cannot be undeleted because it has not an identifier';
         }
 
         return $idError;
@@ -245,6 +251,9 @@ abstract class BaseDomain extends AbstractDomain
         }
         if (Domain::TYPE_UPDATE === $type) {
             return ResourceStatutes::UPDATED;
+        }
+        if (Domain::TYPE_UNDELETE === $type) {
+            return ResourceStatutes::UNDELETED;
         }
 
         return null === DomainUtil::getIdentifier($this->om, $object)

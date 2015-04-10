@@ -31,7 +31,11 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->addDefaultsIfNotSet()
             ->children()
-                ->integerNode('form_handler_default_limit')->defaultNull()
+                ->integerNode('form_handler_default_limit')->defaultNull()->end()
+                ->arrayNode('undelete_disable_filters')
+                    ->defaultValue(array('soft_deletable'))
+                    ->prototype('scalar')->end()
+                ->end()
             ->end()
         ;
 

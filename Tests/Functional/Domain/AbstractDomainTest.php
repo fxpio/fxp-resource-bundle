@@ -56,7 +56,7 @@ abstract class AbstractDomainTest extends WebTestCase
 
         $domain = new Domain($class);
         $domain->setDebug(true);
-        $domain->setObjectManager($om);
+        $domain->setObjectManager($om, array('soft_deletable'));
         $domain->setEventDispatcher($ed);
         $domain->setObjectFactory($of);
         $domain->setValidator($val);
