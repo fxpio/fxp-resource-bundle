@@ -76,7 +76,7 @@ class Domain extends BaseDomain
         $idName = DomainUtil::getIdentifierName($this->om, $this->getClass());
         $objects = array();
         $missingIds = array();
-        $searchIds = $this->extractIdentifierInObjectList($identifiers, $objects);
+        $searchIds = DomainUtil::extractIdentifierInObjectList($identifiers, $objects);
 
         if (count($searchIds) > 0) {
             $previousFilters = $this->disableFilters();
@@ -98,29 +98,6 @@ class Domain extends BaseDomain
         }
 
         return array($objects, $missingIds);
-    }
-
-    /**
-     * Extract the identifier that are not a object.
-     *
-     * @param array $identifiers The list containing identifier or object
-     * @param array $objects     The real objects (by reference)
-     *
-     * @return array The identifiers that are not a object
-     */
-    protected function extractIdentifierInObjectList(array $identifiers, array &$objects)
-    {
-        $searchIds = array();
-
-        foreach ($identifiers as $identifier) {
-            if (is_object($identifier)) {
-                $objects[] = $identifier;
-                continue;
-            }
-            $searchIds[] = $identifier;
-        }
-
-        return $searchIds;
     }
 
     /**

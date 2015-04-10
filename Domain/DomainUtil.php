@@ -128,6 +128,29 @@ abstract class DomainUtil
     }
 
     /**
+     * Extract the identifier that are not a object.
+     *
+     * @param array $identifiers The list containing identifier or object
+     * @param array $objects     The real objects (by reference)
+     *
+     * @return array The identifiers that are not a object
+     */
+    public static function extractIdentifierInObjectList(array $identifiers, array &$objects)
+    {
+        $searchIds = array();
+
+        foreach ($identifiers as $identifier) {
+            if (is_object($identifier)) {
+                $objects[] = $identifier;
+                continue;
+            }
+            $searchIds[] = $identifier;
+        }
+
+        return $searchIds;
+    }
+
+    /**
      * Get the initial exception.
      *
      * @param \Exception $exception
