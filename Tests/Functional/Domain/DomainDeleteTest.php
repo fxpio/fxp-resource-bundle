@@ -394,7 +394,36 @@ class DomainDeleteTest extends AbstractDomainTest
         $this->assertTrue($resources->hasErrors());
         $this->assertFalse($resources->get(0)->isValid());
         $this->assertSame(ResourceStatutes::ERROR, $resources->get(0)->getStatus());
-        $this->assertSame('The entity does not deleted', $resources->get(0)->getErrors()->get(0)->getMessage());
+        $this->assertSame('The entity does not deleted (exception)', $resources->get(0)->getErrors()->get(0)->getMessage());
+
+        $this->assertFalse($resources->get(1)->isValid());
+        $this->assertSame(ResourceStatutes::ERROR, $resources->get(1)->getStatus());
+        $this->assertSame('Caused by previous internal database error', $resources->get(1)->getErrors()->get(0)->getMessage());
+    }
+
+    /**
+     * @dataProvider getSoftDelete
+     *
+     * @param bool $withSoftObject
+     * @param bool $softDelete
+     */
+    public function testDeleteAutoCommitErrorAndSuccessObjectsWithViolationException($withSoftObject, $softDelete)
+    {
+        $domain = $withSoftObject ? $this->createDomain($this->softClass) : $this->createDomain();
+        $objects = $this->insertResources($domain, 2);
+        $errorListener = new ErrorDeleteListener(true);
+
+        /* @var EntityManager $em */
+        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $em->getEventManager()->addEventListener(Events::onFlush, $errorListener);
+
+        $this->assertCount(2, $domain->getRepository()->findAll());
+
+        $resources = $domain->deletes($objects, $softDelete, true);
+        $this->assertTrue($resources->hasErrors());
+        $this->assertFalse($resources->get(0)->isValid());
+        $this->assertSame(ResourceStatutes::ERROR, $resources->get(0)->getStatus());
+        $this->assertSame('The entity does not deleted (violation exception)', $resources->get(0)->getErrors()->get(0)->getMessage());
 
         $this->assertFalse($resources->get(1)->isValid());
         $this->assertSame(ResourceStatutes::ERROR, $resources->get(1)->getStatus());

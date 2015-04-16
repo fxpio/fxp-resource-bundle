@@ -11,6 +11,10 @@
 
 namespace Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\Bundle\TestBundle\Listener;
 
+use Symfony\Component\Validator\ConstraintViolation;
+use Sonatra\Bundle\ResourceBundle\Exception\ConstraintViolationException;
+use Symfony\Component\Validator\ConstraintViolationList;
+
 /**
  * Doctrine ORM error delete listener.
  *
@@ -19,10 +23,28 @@ namespace Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\Bundle\TestBund
 class ErrorDeleteListener
 {
     /**
+     * @var bool
+     */
+    protected $useConstraint;
+
+    public function __construct($useConstraint = false)
+    {
+        $this->useConstraint = $useConstraint;
+    }
+
+    /**
      * @throws \Exception When the entity does not deleted
      */
     public function onFlush()
     {
-        throw new \Exception('The entity does not deleted');
+        if ($this->useConstraint) {
+            $message = 'The entity does not deleted (violation exception)';
+            $violation = new ConstraintViolation($message, $message, array(), null, null, null);
+            $list = new ConstraintViolationList(array($violation));
+
+            throw new ConstraintViolationException($list);
+        }
+
+        throw new \Exception('The entity does not deleted (exception)');
     }
 }
