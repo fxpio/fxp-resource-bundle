@@ -124,7 +124,7 @@ abstract class BaseDomain extends AbstractDomain
         $violations = new ConstraintViolationList();
 
         try {
-            $this->flush($object);
+            $this->om->flush();
 
             if (null !== $this->connection && null === $object) {
                 $this->connection->commit();
@@ -168,17 +168,6 @@ abstract class BaseDomain extends AbstractDomain
         if (null !== $this->connection) {
             $this->connection->rollBack();
         }
-    }
-
-    /**
-     * Flush the object data in database.
-     *
-     * @param object|null $object The resource data for auto commit or null for flush at the end
-     */
-    protected function flush($object = null)
-    {
-        $this->om->flush();
-        $this->om->clear($object);
     }
 
     /**
