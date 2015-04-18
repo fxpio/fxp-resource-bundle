@@ -57,8 +57,6 @@ abstract class BaseDomain extends AbstractDomain
      * @param bool                  $autoCommit Commit transaction for each resource or all
      *                                          (continue the action even if there is an error on a resource)
      * @param bool                  $hasError   Check if there is an error
-     *
-     * @return bool Check if there is an error in list
      */
     protected function doFlushFinalTransaction(ResourceListInterface $resources, $autoCommit, $hasError)
     {
@@ -82,8 +80,8 @@ abstract class BaseDomain extends AbstractDomain
      * Finalize the action for a resource.
      *
      * @param ResourceInterface $resource
-     * @param $status
-     * @param $hasError
+     * @param string            $status
+     * @param bool              $hasError
      *
      * @return bool Returns the new hasError value
      */
