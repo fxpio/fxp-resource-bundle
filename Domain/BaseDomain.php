@@ -178,12 +178,7 @@ abstract class BaseDomain extends AbstractDomain
     protected function flush($object = null)
     {
         $this->om->flush();
-
-        if (null !== $object) {
-            $this->om->detach($object);
-        } else {
-            $this->om->clear();
-        }
+        $this->om->clear($object);
     }
 
     /**
