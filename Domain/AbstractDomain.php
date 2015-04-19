@@ -92,8 +92,8 @@ abstract class AbstractDomain implements DomainInterface
     /**
      * Constructor.
      *
-     * @param string $class          The class name
-     * @param string $shortName|null The short name
+     * @param string      $class     The class name
+     * @param string|null $shortName The short name
      */
     public function __construct($class, $shortName = null)
     {
