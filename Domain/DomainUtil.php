@@ -161,7 +161,7 @@ abstract class DomainUtil
     {
         $pos = strrpos($class, '\\');
 
-        return substr($class, $pos + 1);
+        return substr($class, $pos+1);
     }
 
     /**
