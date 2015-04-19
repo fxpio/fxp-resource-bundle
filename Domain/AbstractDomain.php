@@ -45,6 +45,11 @@ abstract class AbstractDomain implements DomainInterface
     protected $class;
 
     /**
+     * @var string
+     */
+    protected $shortName;
+
+    /**
      * @var Connection
      */
     protected $connection;
@@ -87,11 +92,13 @@ abstract class AbstractDomain implements DomainInterface
     /**
      * Constructor.
      *
-     * @param string $class The class name
+     * @param string $class          The class name
+     * @param string $shortName|null The short name
      */
-    public function __construct($class)
+    public function __construct($class, $shortName = null)
     {
         $this->class = $class;
+        $this->shortName = null === $shortName ? DomainUtil::generateShortName($class) : $shortName;
         $this->eventPrefix = $this->formatEventPrefix($class);
         $this->debug = false;
         $this->disableFilters = array();
@@ -155,6 +162,14 @@ abstract class AbstractDomain implements DomainInterface
     public function getClass()
     {
         return $this->class;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getShortName()
+    {
+        return $this->shortName;
     }
 
     /**

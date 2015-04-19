@@ -74,6 +74,13 @@ interface DomainInterface
     public function getClass();
 
     /**
+     * Get the short name of this resource domain.
+     *
+     * @return string
+     */
+    public function getShortName();
+
+    /**
      * Get the doctrine repository for this resource domain.
      *
      * @return ObjectRepository

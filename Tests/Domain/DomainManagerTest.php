@@ -85,6 +85,9 @@ class DomainManagerTest extends \PHPUnit_Framework_TestCase
         $domain->expects($this->any())
             ->method('getClass')
             ->will($this->returnValue('Foo'));
+        $domain->expects($this->any())
+            ->method('getShortName')
+            ->will($this->returnValue('ShortFoo'));
 
         $this->manager = new DomainManager(array($domain), $or, $ed, $of, $val);
     }
@@ -97,6 +100,7 @@ class DomainManagerTest extends \PHPUnit_Framework_TestCase
     public function testHasDomainClass()
     {
         $this->assertTrue($this->manager->has('Foo'));
+        $this->assertTrue($this->manager->has('ShortFoo'));
         $this->assertFalse($this->manager->has('Bar'));
     }
 
@@ -118,11 +122,56 @@ class DomainManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->manager->has('Bar'));
     }
 
-    public function testRemove()
+    public function testAddWithExistingClass()
+    {
+        $msg = 'The resource domain for the class "Foo" already exist';
+        $this->setExpectedException('Sonatra\Bundle\ResourceBundle\Exception\InvalidArgumentException', $msg);
+
+        $this->assertCount(1, $this->manager->all());
+
+        /* @var DomainInterface|\PHPUnit_Framework_MockObject_MockObject $domain */
+        $domain = $this->getMock('Sonatra\Bundle\ResourceBundle\Domain\DomainInterface');
+        $domain->expects($this->any())
+            ->method('getClass')
+            ->will($this->returnValue('Foo'));
+
+        $this->manager->add($domain);
+    }
+
+    public function testAddWithExistingShortName()
+    {
+        $msg = 'The resource domain for the short name "ShortFoo" already exist';
+        $this->setExpectedException('Sonatra\Bundle\ResourceBundle\Exception\InvalidArgumentException', $msg);
+
+        $this->assertCount(1, $this->manager->all());
+
+        /* @var DomainInterface|\PHPUnit_Framework_MockObject_MockObject $domain */
+        $domain = $this->getMock('Sonatra\Bundle\ResourceBundle\Domain\DomainInterface');
+        $domain->expects($this->any())
+            ->method('getShortName')
+            ->will($this->returnValue('ShortFoo'));
+
+        $this->manager->add($domain);
+    }
+
+    public function getRemoveTestConfig()
+    {
+        return array(
+            array('Foo'),
+            array('ShortFoo'),
+        );
+    }
+
+    /**
+     * @dataProvider getRemoveTestConfig
+     *
+     * @param string $classOrShortName
+     */
+    public function testRemove($classOrShortName)
     {
         $this->assertCount(1, $this->manager->all());
 
-        $this->manager->remove('Foo');
+        $this->manager->remove($classOrShortName);
 
         $this->assertCount(0, $this->manager->all());
     }
@@ -147,9 +196,18 @@ class DomainManagerTest extends \PHPUnit_Framework_TestCase
         $dom1 = $this->manager->get('Foo');
         $this->assertInstanceOf('Sonatra\Bundle\ResourceBundle\Domain\DomainInterface', $dom1);
 
-        $dom2 = $this->manager->get('Foo');
+        $dom2 = $this->manager->get('ShortFoo');
         $this->assertInstanceOf('Sonatra\Bundle\ResourceBundle\Domain\DomainInterface', $dom2);
 
         $this->assertSame($dom1, $dom2);
+    }
+
+    public function testGetShortNames()
+    {
+        $valid = array(
+            'ShortFoo' => 'Foo',
+        );
+
+        $this->assertEquals($valid, $this->manager->getShortNames());
     }
 }

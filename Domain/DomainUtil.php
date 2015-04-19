@@ -151,6 +151,20 @@ abstract class DomainUtil
     }
 
     /**
+     * Generate the short name of domain with the class name.
+     *
+     * @param string $class
+     *
+     * @return string
+     */
+    public static function generateShortName($class)
+    {
+        $pos = strrpos($class, '\\');
+
+        return substr($class, $pos + 1);
+    }
+
+    /**
      * Get the initial exception.
      *
      * @param \Exception $exception

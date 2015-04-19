@@ -86,25 +86,29 @@ class DomainPassTest extends KernelTestCase
 
     public function testProcessWithDefaultDomainManager()
     {
-        $container = $this->buildAndValidateContainerBuilder();
-
-        $dmDef = $container->getDefinition('sonatra_resource.domain_manager');
-        $args = $dmDef->getArguments();
-        $this->assertCount(7, $args);
-        $this->assertCount(2, $args[0]);
-
-        $compiledDef = $args[0][0];
-
+        $container = $this->buildAndValidateContainerBuilder(array(), false);
         $this->pass->process($container);
+        $container->compile();
 
         $dmDef = $container->getDefinition('sonatra_resource.domain_manager');
         $args = $dmDef->getArguments();
         $this->assertCount(7, $args);
         $this->assertCount(2, $args[0]);
 
-        $def = $args[0][0];
+        $serviceId = (string) $args[0][0];
+        /* @var Definition $compiledDef */
+        $compiledDef = $container->getDefinition($serviceId);
 
-        $this->assertNotSame($compiledDef, $def);
+        $dmDef = $container->getDefinition('sonatra_resource.domain_manager');
+        $args = $dmDef->getArguments();
+        $this->assertCount(7, $args);
+        $this->assertCount(2, $args[0]);
+
+        $serviceId = (string) $args[0][0];
+        /* @var Definition $def */
+        $def = $container->getDefinition($serviceId);
+
+        $this->assertSame($compiledDef, $def);
     }
 
     public function testProcessWithCustomDomainManager()
@@ -116,27 +120,32 @@ class DomainPassTest extends KernelTestCase
             'test.custom_domain' => $def,
         );
 
-        $container = $this->buildAndValidateContainerBuilder($definitions);
+        $container = $this->buildAndValidateContainerBuilder($definitions, false);
+        $this->pass->process($container);
+        $container->compile();
 
         $dmDef = $container->getDefinition('sonatra_resource.domain_manager');
         $args = $dmDef->getArguments();
         $this->assertCount(7, $args);
         $this->assertCount(2, $args[0]);
 
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $args[0][0]);
+        $serviceId = (string) $args[0][0];
+
         /* @var Definition $compiledDef */
-        $compiledDef = $args[0][0];
+        $compiledDef = $container->getDefinition($serviceId);
 
         $this->assertNotSame('Sonatra\Bundle\ResourceBundle\Domain\Domain', $compiledDef->getClass());
 
-        $this->pass->process($container);
-
         $dmDef = $container->getDefinition('sonatra_resource.domain_manager');
         $args = $dmDef->getArguments();
         $this->assertCount(7, $args);
         $this->assertCount(2, $args[0]);
 
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $args[0][0]);
+        $serviceId = (string) $args[0][0];
         /* @var Definition $def */
-        $def = $args[0][0];
+        $def = $container->getDefinition($serviceId);
 
         $this->assertSame('Sonatra\Bundle\ResourceBundle\Tests\Fixtures\Domain\CustomDomain', $def->getClass());
     }
@@ -158,16 +167,19 @@ class DomainPassTest extends KernelTestCase
 
     /**
      * @param Definition[] $definitions The definitions
+     * @param bool         $compile     Compile the container
      *
      * @return ContainerBuilder
      */
-    protected function buildAndValidateContainerBuilder(array $definitions = array())
+    protected function buildAndValidateContainerBuilder(array $definitions = array(), $compile = true)
     {
         static::$kernel = static::createKernel(array());
-        $container = static::$kernel->getContainerBuilderForCompilerPass($definitions);
+        $container = static::$kernel->getContainerBuilderForCompilerPass($definitions, $compile);
 
-        $this->assertTrue($container->has('sonatra_resource.domain_manager'));
-        $this->assertTrue($container->has('doctrine'));
+        if ($compile) {
+            $this->assertTrue($container->has('sonatra_resource.domain_manager'));
+            $this->assertTrue($container->has('doctrine'));
+        }
 
         return $container;
     }

@@ -31,6 +31,11 @@ class DomainManager implements DomainManagerInterface
     protected $domains;
 
     /**
+     * @var array
+     */
+    protected $shortNames;
+
+    /**
      * @var ManagerRegistry
      */
     protected $or;
@@ -81,6 +86,7 @@ class DomainManager implements DomainManagerInterface
                                 ValidatorInterface $validator, $disableFilters = array(), $debug = false)
     {
         $this->domains = array();
+        $this->shortNames = array();
         $this->or = $or;
         $this->ed = $ed;
         $this->of = $of;
@@ -99,7 +105,7 @@ class DomainManager implements DomainManagerInterface
      */
     public function has($class)
     {
-        return isset($this->domains[$class]);
+        return isset($this->domains[$this->findClassName($class)]);
     }
 
     /**
@@ -115,7 +121,7 @@ class DomainManager implements DomainManagerInterface
         $domain->setEventDispatcher($this->ed);
         $domain->setObjectFactory($this->of);
         $domain->setValidator($this->validator);
-        $this->domains[$domain->getClass()] = $domain;
+        $this->doAddDomain($domain);
     }
 
     /**
@@ -123,7 +129,7 @@ class DomainManager implements DomainManagerInterface
      */
     public function remove($class)
     {
-        unset($this->domains[$class]);
+        unset($this->domains[$this->findClassName($class)]);
     }
 
     /**
@@ -137,8 +143,18 @@ class DomainManager implements DomainManagerInterface
     /**
      * {@inheritdoc}
      */
+    public function getShortNames()
+    {
+        return $this->shortNames;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function get($class)
     {
+        $class = $this->findClassName($class);
+
         if (isset($this->cache[$class])) {
             return $this->domains[$this->cache[$class]];
         }
@@ -174,5 +190,38 @@ class DomainManager implements DomainManagerInterface
         }
 
         throw new InvalidArgumentException(sprintf('The "%s" class is not registered in doctrine', $class));
+    }
+
+    /**
+     * Validate and add the domain.
+     *
+     * @param DomainInterface $domain
+     */
+    protected function doAddDomain(DomainInterface $domain)
+    {
+        if (isset($this->domains[$domain->getClass()])) {
+            throw new InvalidArgumentException(sprintf('The resource domain for the class "%s" already exist', $domain->getClass()));
+        }
+
+        if (isset($this->shortNames[$domain->getShortName()])) {
+            throw new InvalidArgumentException(sprintf('The resource domain for the short name "%s" already exist', $domain->getShortName()));
+        }
+
+        $this->domains[$domain->getClass()] = $domain;
+        $this->shortNames[$domain->getShortName()] = $domain->getClass();
+    }
+
+    /**
+     * Find the real class name of short name.
+     *
+     * @param string $shortName The short name or class name
+     *
+     * @return string The real class of short name
+     */
+    protected function findClassName($shortName)
+    {
+        return isset($this->shortNames[$shortName])
+            ? $this->shortNames[$shortName]
+            : $shortName;
     }
 }

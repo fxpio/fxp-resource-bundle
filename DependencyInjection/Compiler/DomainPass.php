@@ -13,10 +13,13 @@ namespace Sonatra\Bundle\ResourceBundle\DependencyInjection\Compiler;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Sonatra\Bundle\ResourceBundle\Domain\DomainUtil;
 use Sonatra\Bundle\ResourceBundle\Exception\InvalidConfigurationException;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * @author François Pluchino <francois.pluchino@sonatra.com>
@@ -35,7 +38,7 @@ class DomainPass implements CompilerPassInterface
 
         $classes = $this->getObjectClasses($container);
         $managers = $this->findCustomDomains($container, $classes);
-        $managers = $this->generateDefaultDomains($managers, $classes);
+        $managers = $this->generateDefaultDomains($container, $managers, $classes);
 
         $container->getDefinition('sonatra_resource.domain_manager')->replaceArgument(0, $managers);
     }
@@ -93,7 +96,7 @@ class DomainPass implements CompilerPassInterface
                 unset($classes[$pos]);
             }
 
-            $managers[] = $container->getDefinition($serviceId);
+            $managers[] = new Reference($serviceId);
         }
 
         return $managers;
@@ -102,15 +105,19 @@ class DomainPass implements CompilerPassInterface
     /**
      * Generate and add the default domains in the existing manager list.
      *
-     * @param array $managers The list of definition domain manager
-     * @param array $classes  The list class managed by doctrine but without custom domain
+     * @param ContainerBuilder $container The container service
+     * @param array            $managers  The list of definition domain manager
+     * @param array            $classes   The list class managed by doctrine but without custom domain
      *
      * @return array
      */
-    private function generateDefaultDomains(array $managers, array $classes)
+    private function generateDefaultDomains(ContainerBuilder $container, array $managers, array $classes)
     {
         foreach ($classes as $class) {
-            $managers[] = new Definition('Sonatra\Bundle\ResourceBundle\Domain\Domain', array($class));
+            $id = 'sonatra_resource.domain.'.Container::underscore(DomainUtil::generateShortName($class));
+            $def = new Definition('Sonatra\Bundle\ResourceBundle\Domain\Domain', array($class));
+            $container->setDefinition($id, $def);
+            $managers[] = new Reference($id);
         }
 
         return $managers;

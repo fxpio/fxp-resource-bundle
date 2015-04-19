@@ -82,10 +82,11 @@ class TestAppKernel extends Kernel
      * Get the container builder for the compiler pass tests.
      *
      * @param Definition[] $definitions The definitions
+     * @param bool         $compile     Compile the container
      *
      * @return ContainerBuilder
      */
-    public function getContainerBuilderForCompilerPass(array $definitions = array())
+    public function getContainerBuilderForCompilerPass(array $definitions = array(), $compile = true)
     {
         $this->initializeBundles();
         $containerBuilder = $this->buildContainer();
@@ -94,7 +95,9 @@ class TestAppKernel extends Kernel
             $containerBuilder->setDefinition($id, $definition);
         }
 
-        $containerBuilder->compile();
+        if ($compile) {
+            $containerBuilder->compile();
+        }
 
         return $containerBuilder;
     }
