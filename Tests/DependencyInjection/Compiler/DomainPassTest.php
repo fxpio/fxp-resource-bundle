@@ -92,7 +92,7 @@ class DomainPassTest extends KernelTestCase
 
         $dmDef = $container->getDefinition('sonatra_resource.domain_manager');
         $args = $dmDef->getArguments();
-        $this->assertCount(7, $args);
+        $this->assertCount(2, $args);
         $this->assertCount(2, $args[0]);
 
         $serviceId = (string) $args[0][0];
@@ -101,7 +101,7 @@ class DomainPassTest extends KernelTestCase
 
         $dmDef = $container->getDefinition('sonatra_resource.domain_manager');
         $args = $dmDef->getArguments();
-        $this->assertCount(7, $args);
+        $this->assertCount(2, $args);
         $this->assertCount(2, $args[0]);
 
         $serviceId = (string) $args[0][0];
@@ -126,7 +126,7 @@ class DomainPassTest extends KernelTestCase
 
         $dmDef = $container->getDefinition('sonatra_resource.domain_manager');
         $args = $dmDef->getArguments();
-        $this->assertCount(7, $args);
+        $this->assertCount(2, $args);
         $this->assertCount(2, $args[0]);
 
         $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $args[0][0]);
@@ -139,7 +139,7 @@ class DomainPassTest extends KernelTestCase
 
         $dmDef = $container->getDefinition('sonatra_resource.domain_manager');
         $args = $dmDef->getArguments();
-        $this->assertCount(7, $args);
+        $this->assertCount(2, $args);
         $this->assertCount(2, $args[0]);
 
         $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $args[0][0]);

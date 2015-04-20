@@ -13,11 +13,6 @@
         <service id="sonatra_resource.domain_manager" class="%sonatra_resource.domain_manager.class%">
             <argument type="collection" />
             <argument type="service" id="doctrine" />
-            <argument type="service" id="event_dispatcher" />
-            <argument type="service" id="sonatra_default_value.factory" />
-            <argument type="service" id="validator" />
-            <argument>%sonatra_resource.domain.undelete_disable_filters%</argument>
-            <argument>%kernel.debug%</argument>
         </service>
     </services>
 </container>

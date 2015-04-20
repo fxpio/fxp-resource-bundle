@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
  * @author François Pluchino <francois.pluchino@sonatra.com>
@@ -41,6 +42,7 @@ class DomainPass implements CompilerPassInterface
         $managers = $this->generateDefaultDomains($container, $managers, $classes);
 
         $container->getDefinition('sonatra_resource.domain_manager')->replaceArgument(0, $managers);
+        $this->injectDependencies($container, $managers);
     }
 
     /**
@@ -121,5 +123,24 @@ class DomainPass implements CompilerPassInterface
         }
 
         return $managers;
+    }
+
+    /**
+     * Inject the dependencies of domain in each domain.
+     *
+     * @param ContainerBuilder $container The container service
+     * @param array            $managers  The list of definition domain manager
+     */
+    private function injectDependencies(ContainerBuilder $container, array $managers)
+    {
+        foreach ($managers as $manager) {
+            $def = $container->getDefinition((string) $manager);
+            $def->addMethodCall('setDebug', array('%kernel.debug%'));
+            $om = new Expression('service("doctrine").getManagerForClass("'.str_replace('\\', '\\\\', $def->getArgument(0)).'")');
+            $def->addMethodCall('setObjectManager', array($om, '%sonatra_resource.domain.undelete_disable_filters%'));
+            $def->addMethodCall('setEventDispatcher', array(new Reference('event_dispatcher')));
+            $def->addMethodCall('setObjectFactory', array(new Reference('sonatra_default_value.factory')));
+            $def->addMethodCall('setValidator', array(new Reference('validator')));
+        }
     }
 }

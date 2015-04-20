@@ -13,10 +13,7 @@ namespace Sonatra\Bundle\ResourceBundle\Domain;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
-use Sonatra\Bundle\DefaultValueBundle\DefaultValue\ObjectFactoryInterface;
 use Sonatra\Bundle\ResourceBundle\Exception\InvalidArgumentException;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Domain manager.
@@ -41,31 +38,6 @@ class DomainManager implements DomainManagerInterface
     protected $or;
 
     /**
-     * @var EventDispatcherInterface
-     */
-    protected $ed;
-
-    /**
-     * @var ObjectFactoryInterface
-     */
-    protected $of;
-
-    /**
-     * @var ValidatorInterface
-     */
-    protected $validator;
-
-    /**
-     * @var array
-     */
-    protected $disableFilters;
-
-    /**
-     * @var bool
-     */
-    protected $debug;
-
-    /**
      * @var array
      */
     protected $cache;
@@ -73,26 +45,14 @@ class DomainManager implements DomainManagerInterface
     /**
      * Constructor.
      *
-     * @param DomainInterface[]        $domains        The resource domains
-     * @param ManagerRegistry          $or             The doctrine object manager
-     * @param EventDispatcherInterface $ed             The event dispatcher
-     * @param ObjectFactoryInterface   $of             The object factory
-     * @param ValidatorInterface       $validator      The validator
-     * @param array                    $disableFilters The list of doctrine filters must be disabled for undelete resources
-     * @param bool                     $debug          The debug mode
+     * @param DomainInterface[] $domains The resource domains
+     * @param ManagerRegistry   $or      The doctrine object manager
      */
-    public function __construct(array $domains, ManagerRegistry $or,
-                                EventDispatcherInterface $ed, ObjectFactoryInterface $of,
-                                ValidatorInterface $validator, $disableFilters = array(), $debug = false)
+    public function __construct(array $domains, ManagerRegistry $or)
     {
         $this->domains = array();
         $this->shortNames = array();
         $this->or = $or;
-        $this->ed = $ed;
-        $this->of = $of;
-        $this->validator = $validator;
-        $this->disableFilters = $disableFilters;
-        $this->debug = $debug;
         $this->cache = array();
 
         foreach ($domains as $domain) {
@@ -113,15 +73,16 @@ class DomainManager implements DomainManagerInterface
      */
     public function add(DomainInterface $domain)
     {
-        $domain->setDebug($this->debug);
-        $om = $this->or->getManagerForClass($domain->getClass());
-        if (null !== $om) {
-            $domain->setObjectManager($om, $this->disableFilters);
+        if (isset($this->domains[$domain->getClass()])) {
+            throw new InvalidArgumentException(sprintf('The resource domain for the class "%s" already exist', $domain->getClass()));
         }
-        $domain->setEventDispatcher($this->ed);
-        $domain->setObjectFactory($this->of);
-        $domain->setValidator($this->validator);
-        $this->doAddDomain($domain);
+
+        if (isset($this->shortNames[$domain->getShortName()])) {
+            throw new InvalidArgumentException(sprintf('The resource domain for the short name "%s" already exist', $domain->getShortName()));
+        }
+
+        $this->domains[$domain->getClass()] = $domain;
+        $this->shortNames[$domain->getShortName()] = $domain->getClass();
     }
 
     /**
@@ -190,25 +151,6 @@ class DomainManager implements DomainManagerInterface
         }
 
         throw new InvalidArgumentException(sprintf('The "%s" class is not registered in doctrine', $class));
-    }
-
-    /**
-     * Validate and add the domain.
-     *
-     * @param DomainInterface $domain
-     */
-    protected function doAddDomain(DomainInterface $domain)
-    {
-        if (isset($this->domains[$domain->getClass()])) {
-            throw new InvalidArgumentException(sprintf('The resource domain for the class "%s" already exist', $domain->getClass()));
-        }
-
-        if (isset($this->shortNames[$domain->getShortName()])) {
-            throw new InvalidArgumentException(sprintf('The resource domain for the short name "%s" already exist', $domain->getShortName()));
-        }
-
-        $this->domains[$domain->getClass()] = $domain;
-        $this->shortNames[$domain->getShortName()] = $domain->getClass();
     }
 
     /**
