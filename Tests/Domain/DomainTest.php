@@ -11,6 +11,7 @@
 
 namespace Sonatra\Bundle\ResourceBundle\Tests\Domain;
 
+use Doctrine\ORM\EntityManager;
 use Sonatra\Bundle\ResourceBundle\Domain\Domain;
 
 /**
@@ -39,5 +40,25 @@ class DomainTest extends \PHPUnit_Framework_TestCase
         $domain = new Domain('Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\Bundle\TestBundle\Entity\Foo', $shortName);
 
         $this->assertSame($validShortName, $domain->getShortName());
+    }
+
+    public function testCreateQueryBuilder()
+    {
+        $domain = new Domain('Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\Bundle\TestBundle\Entity\Foo');
+        $om = $this->getMockBuilder('Doctrine\ORM\EntityManager')->disableOriginalConstructor()->getMock();
+        /* @var EntityManager $om */
+        $domain->setObjectManager($om);
+        $qb = $domain->createQueryBuilder('f');
+
+        $this->assertInstanceOf('Doctrine\ORM\QueryBuilder', $qb);
+    }
+
+    public function testCreateQueryBuilderInvalidObjectManager()
+    {
+        $msg = 'The "Domain::createQueryBuilder()" method can only be called for a domain with Doctrine ORM Entity Manager';
+        $this->setExpectedException('Sonatra\Bundle\ResourceBundle\Exception\BadMethodCallException', $msg);
+
+        $domain = new Domain('Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\Bundle\TestBundle\Entity\Foo');
+        $domain->createQueryBuilder();
     }
 }

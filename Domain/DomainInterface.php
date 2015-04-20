@@ -13,6 +13,7 @@ namespace Sonatra\Bundle\ResourceBundle\Domain;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\ORM\QueryBuilder;
 use Sonatra\Bundle\DefaultValueBundle\DefaultValue\ObjectFactoryInterface;
 use Sonatra\Bundle\ResourceBundle\Exception\InvalidConfigurationException;
 use Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface;
@@ -86,6 +87,15 @@ interface DomainInterface
      * @return ObjectRepository
      */
     public function getRepository();
+
+    /**
+     * Create the query builder for this domain.
+     *
+     * @param string $alias The alias of class in query
+     *
+     * @return QueryBuilder
+     */
+    public function createQueryBuilder($alias = 'o');
 
     /**
      * Get the prefix event of this domain.

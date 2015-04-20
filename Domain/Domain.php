@@ -11,7 +11,10 @@
 
 namespace Sonatra\Bundle\ResourceBundle\Domain;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\QueryBuilder;
 use Sonatra\Bundle\ResourceBundle\Event\ResourceEvent;
+use Sonatra\Bundle\ResourceBundle\Exception\BadMethodCallException;
 use Sonatra\Bundle\ResourceBundle\Model\SoftDeletableInterface;
 use Sonatra\Bundle\ResourceBundle\Resource\Resource;
 use Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface;
@@ -28,6 +31,21 @@ use Symfony\Component\Validator\ConstraintViolation;
  */
 class Domain extends BaseDomain
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function createQueryBuilder($alias = 'o')
+    {
+        if ($this->om instanceof EntityManager) {
+            $qb = new QueryBuilder($this->om);
+            $qb->select($alias)->from($this->getClass(), $alias);
+
+            return $qb;
+        }
+
+        throw new BadMethodCallException('The "Domain::createQueryBuilder()" method can only be called for a domain with Doctrine ORM Entity Manager');
+    }
+
     /**
      * {@inheritdoc}
      */
