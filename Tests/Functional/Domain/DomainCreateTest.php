@@ -195,6 +195,40 @@ class DomainCreateTest extends AbstractDomainTest
         $this->runTestCreates(false);
     }
 
+    public function testCreatesAutoCommit()
+    {
+        $this->runTestCreates(true);
+    }
+
+    public function runTestCreates($autoCommit)
+    {
+        $domain = $this->createDomain();
+        /* @var Foo $foo1 */
+        $foo1 = $domain->newInstance();
+        $foo1->setName('Bar 1');
+        $foo1->setDetail('Detail 1');
+        /* @var Foo $foo2 */
+        $foo2 = $domain->newInstance();
+        $foo2->setName('Bar 2');
+        $foo2->setDetail('Detail 2');
+
+        $objects = array($foo1, $foo2);
+
+        $this->loadFixtures(array());
+
+        $this->assertCount(0, $domain->getRepository()->findAll());
+        $resources = $domain->creates($objects, $autoCommit);
+        $this->assertCount(2, $domain->getRepository()->findAll());
+
+        $this->assertCount(2, $resources);
+        $this->assertInstanceOf('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface', $resources->get(0));
+        $this->assertInstanceOf('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface', $resources->get(1));
+
+        $this->assertSame(ResourceListStatutes::SUCCESSFULLY, $resources->getStatus());
+        $this->assertSame(ResourceStatutes::CREATED, $resources->get(0)->getStatus());
+        $this->assertSame(ResourceStatutes::CREATED, $resources->get(1)->getStatus());
+    }
+
     public function testCreatesAutoCommitWithErrorValidationAndErrorDatabase()
     {
         $domain = $this->createDomain();
@@ -319,40 +353,6 @@ class DomainCreateTest extends AbstractDomainTest
 
         $this->assertSame(ResourceListStatutes::MIXED, $resources->getStatus());
         $this->assertSame(ResourceStatutes::ERROR, $resources->get(0)->getStatus());
-        $this->assertSame(ResourceStatutes::CREATED, $resources->get(1)->getStatus());
-    }
-
-    public function testCreatesAutoCommit()
-    {
-        $this->runTestCreates(true);
-    }
-
-    public function runTestCreates($autoCommit)
-    {
-        $domain = $this->createDomain();
-        /* @var Foo $foo1 */
-        $foo1 = $domain->newInstance();
-        $foo1->setName('Bar 1');
-        $foo1->setDetail('Detail 1');
-        /* @var Foo $foo2 */
-        $foo2 = $domain->newInstance();
-        $foo2->setName('Bar 2');
-        $foo2->setDetail('Detail 2');
-
-        $objects = array($foo1, $foo2);
-
-        $this->loadFixtures(array());
-
-        $this->assertCount(0, $domain->getRepository()->findAll());
-        $resources = $domain->creates($objects, $autoCommit);
-        $this->assertCount(2, $domain->getRepository()->findAll());
-
-        $this->assertCount(2, $resources);
-        $this->assertInstanceOf('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface', $resources->get(0));
-        $this->assertInstanceOf('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface', $resources->get(1));
-
-        $this->assertSame(ResourceListStatutes::SUCCESSFULLY, $resources->getStatus());
-        $this->assertSame(ResourceStatutes::CREATED, $resources->get(0)->getStatus());
         $this->assertSame(ResourceStatutes::CREATED, $resources->get(1)->getStatus());
     }
 
