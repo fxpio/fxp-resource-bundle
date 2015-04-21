@@ -13,6 +13,7 @@ namespace Sonatra\Bundle\ResourceBundle\Domain;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\DBAL\Exception\DriverException;
+use Sonatra\Bundle\ResourceBundle\Exception\ConstraintViolationException;
 use Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface;
 use Sonatra\Bundle\ResourceBundle\ResourceEvents;
 use Sonatra\Bundle\ResourceBundle\ResourceStatutes;
@@ -162,6 +163,26 @@ abstract class DomainUtil
         $pos = strrpos($class, '\\');
 
         return substr($class, $pos+1);
+    }
+
+    /**
+     * Inject the exception message in resource error list.
+     *
+     * @param ResourceInterface $resource The resource
+     * @param \Exception        $e        The exception on persist action
+     *
+     * @return bool
+     */
+    public static function injectErrorMessage(ResourceInterface $resource, \Exception $e)
+    {
+        if ($e instanceof ConstraintViolationException) {
+            $resource->setStatus(ResourceStatutes::ERROR);
+            $resource->getErrors()->addAll($e->getConstraintViolations());
+        } else {
+            static::addResourceError($resource, $e->getMessage());
+        }
+
+        return true;
     }
 
     /**

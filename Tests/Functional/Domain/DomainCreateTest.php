@@ -11,12 +11,15 @@
 
 namespace Sonatra\Bundle\ResourceBundle\Tests\Functional\Domain;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Events;
 use Sonatra\Bundle\ResourceBundle\Domain\DomainInterface;
 use Sonatra\Bundle\ResourceBundle\Event\ResourceEvent;
 use Sonatra\Bundle\ResourceBundle\ResourceEvents;
 use Sonatra\Bundle\ResourceBundle\ResourceListStatutes;
 use Sonatra\Bundle\ResourceBundle\ResourceStatutes;
 use Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\Bundle\TestBundle\Entity\Foo;
+use Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\Bundle\TestBundle\Listener\ErrorListener;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
@@ -377,5 +380,73 @@ class DomainCreateTest extends AbstractDomainTest
         $this->assertFalse($resource->isValid());
         $this->assertSame(ResourceStatutes::ERROR, $resource->getStatus());
         $this->assertRegExp('/The resource cannot be created because it has an identifier/', $resource->getErrors()->get(0)->getMessage());
+    }
+
+    public function testCreateAutoCommitErrorOnPrePersistAndSuccessObjectsWithViolationException()
+    {
+        $domain = $this->createDomain();
+        /* @var Foo $foo1 */
+        $foo1 = $domain->newInstance();
+        $foo1->setName('Bar 1');
+        $foo1->setDetail('Detail 1');
+        /* @var Foo $foo2 */
+        $foo2 = $domain->newInstance();
+        $foo2->setName('Bar 2');
+        $foo2->setDetail('Detail 2');
+
+        $objects = array($foo1, $foo2);
+        $errorListener = new ErrorListener('created', true);
+
+        $this->loadFixtures(array());
+
+        /* @var EntityManager $em */
+        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $em->getEventManager()->addEventListener(Events::prePersist, $errorListener);
+
+        $this->assertCount(0, $domain->getRepository()->findAll());
+
+        $resources = $domain->creates($objects, true);
+        $this->assertTrue($resources->hasErrors());
+        $this->assertFalse($resources->get(0)->isValid());
+        $this->assertSame(ResourceStatutes::ERROR, $resources->get(0)->getStatus());
+        $this->assertSame('The entity does not created (violation exception)', $resources->get(0)->getErrors()->get(0)->getMessage());
+
+        $this->assertFalse($resources->get(1)->isValid());
+        $this->assertSame(ResourceStatutes::ERROR, $resources->get(1)->getStatus());
+        $this->assertSame('Caused by previous internal database error', $resources->get(1)->getErrors()->get(0)->getMessage());
+    }
+
+    public function testCreateAutoCommitErrorOnPrePersistAndSuccessObjects()
+    {
+        $domain = $this->createDomain();
+        /* @var Foo $foo1 */
+        $foo1 = $domain->newInstance();
+        $foo1->setName('Bar 1');
+        $foo1->setDetail('Detail 1');
+        /* @var Foo $foo2 */
+        $foo2 = $domain->newInstance();
+        $foo2->setName('Bar 2');
+        $foo2->setDetail('Detail 2');
+
+        $objects = array($foo1, $foo2);
+        $errorListener = new ErrorListener('created', false);
+
+        $this->loadFixtures(array());
+
+        /* @var EntityManager $em */
+        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $em->getEventManager()->addEventListener(Events::prePersist, $errorListener);
+
+        $this->assertCount(0, $domain->getRepository()->findAll());
+
+        $resources = $domain->creates($objects, true);
+        $this->assertTrue($resources->hasErrors());
+        $this->assertFalse($resources->get(0)->isValid());
+        $this->assertSame(ResourceStatutes::ERROR, $resources->get(0)->getStatus());
+        $this->assertSame('The entity does not created (exception)', $resources->get(0)->getErrors()->get(0)->getMessage());
+
+        $this->assertFalse($resources->get(1)->isValid());
+        $this->assertSame(ResourceStatutes::ERROR, $resources->get(1)->getStatus());
+        $this->assertSame('Caused by previous internal database error', $resources->get(1)->getErrors()->get(0)->getMessage());
     }
 }

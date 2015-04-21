@@ -190,8 +190,12 @@ class Domain extends BaseDomain
         $hasFlushError = false;
 
         if ($resource->isValid()) {
-            $this->om->persist($object);
-            $hasFlushError = $this->doAutoCommitFlushTransaction($resource, $autoCommit);
+            try {
+                $this->om->persist($object);
+                $hasFlushError = $this->doAutoCommitFlushTransaction($resource, $autoCommit);
+            } catch (\Exception $e) {
+                $hasFlushError = DomainUtil::injectErrorMessage($resource, $e);
+            }
         }
 
         return array($successStatus, $hasFlushError);
@@ -293,18 +297,32 @@ class Domain extends BaseDomain
                 if ($object->isDeleted()) {
                     $skipped = true;
                 } else {
-                    $this->om->remove($object);
+                    $this->doDeleteResourceAction($resource);
                 }
             } else {
                 if (!$object->isDeleted()) {
                     $object->setDeletedAt(new \DateTime());
                 }
-                $this->om->remove($object);
+                $this->doDeleteResourceAction($resource);
             }
         } else {
-            $this->om->remove($object);
+            $this->doDeleteResourceAction($resource);
         }
 
         return $skipped;
+    }
+
+    /**
+     * Real delete a entity in object manager.
+     *
+     * @param ResourceInterface $resource The resource
+     */
+    protected function doDeleteResourceAction(ResourceInterface $resource)
+    {
+        try {
+            $this->om->remove($resource->getRealData());
+        } catch (\Exception $e) {
+            DomainUtil::injectErrorMessage($resource, $e);
+        }
     }
 }

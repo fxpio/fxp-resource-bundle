@@ -15,7 +15,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Events;
 use Sonatra\Bundle\ResourceBundle\ResourceStatutes;
 use Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\Bundle\TestBundle\Entity\Bar;
-use Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\Bundle\TestBundle\Listener\ErrorDeleteListener;
+use Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\Bundle\TestBundle\Listener\ErrorListener;
 use Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\Bundle\TestBundle\Listener\SoftDeletableSubscriber;
 
 /**
@@ -382,7 +382,7 @@ class DomainDeleteTest extends AbstractDomainTest
     {
         $domain = $withSoftObject ? $this->createDomain($this->softClass) : $this->createDomain();
         $objects = $this->insertResources($domain, 2);
-        $errorListener = new ErrorDeleteListener();
+        $errorListener = new ErrorListener('deleted');
 
         /* @var EntityManager $em */
         $em = $this->getContainer()->get('doctrine.orm.entity_manager');
@@ -411,11 +411,69 @@ class DomainDeleteTest extends AbstractDomainTest
     {
         $domain = $withSoftObject ? $this->createDomain($this->softClass) : $this->createDomain();
         $objects = $this->insertResources($domain, 2);
-        $errorListener = new ErrorDeleteListener(true);
+        $errorListener = new ErrorListener('deleted', true);
 
         /* @var EntityManager $em */
         $em = $this->getContainer()->get('doctrine.orm.entity_manager');
         $em->getEventManager()->addEventListener(Events::onFlush, $errorListener);
+
+        $this->assertCount(2, $domain->getRepository()->findAll());
+
+        $resources = $domain->deletes($objects, $softDelete, true);
+        $this->assertTrue($resources->hasErrors());
+        $this->assertFalse($resources->get(0)->isValid());
+        $this->assertSame(ResourceStatutes::ERROR, $resources->get(0)->getStatus());
+        $this->assertSame('The entity does not deleted (violation exception)', $resources->get(0)->getErrors()->get(0)->getMessage());
+
+        $this->assertFalse($resources->get(1)->isValid());
+        $this->assertSame(ResourceStatutes::ERROR, $resources->get(1)->getStatus());
+        $this->assertSame('Caused by previous internal database error', $resources->get(1)->getErrors()->get(0)->getMessage());
+    }
+
+    /**
+     * @dataProvider getSoftDelete
+     *
+     * @param bool $withSoftObject
+     * @param bool $softDelete
+     */
+    public function testDeleteAutoCommitErrorOnPreRemoveAndSuccessObjects($withSoftObject, $softDelete)
+    {
+        $domain = $withSoftObject ? $this->createDomain($this->softClass) : $this->createDomain();
+        $objects = $this->insertResources($domain, 2);
+        $errorListener = new ErrorListener('deleted', false);
+
+        /* @var EntityManager $em */
+        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $em->getEventManager()->addEventListener(Events::preRemove, $errorListener);
+
+        $this->assertCount(2, $domain->getRepository()->findAll());
+
+        $resources = $domain->deletes($objects, $softDelete, true);
+        $this->assertTrue($resources->hasErrors());
+        $this->assertFalse($resources->get(0)->isValid());
+        $this->assertSame(ResourceStatutes::ERROR, $resources->get(0)->getStatus());
+        $this->assertSame('The entity does not deleted (exception)', $resources->get(0)->getErrors()->get(0)->getMessage());
+
+        $this->assertFalse($resources->get(1)->isValid());
+        $this->assertSame(ResourceStatutes::ERROR, $resources->get(1)->getStatus());
+        $this->assertSame('Caused by previous internal database error', $resources->get(1)->getErrors()->get(0)->getMessage());
+    }
+
+    /**
+     * @dataProvider getSoftDelete
+     *
+     * @param bool $withSoftObject
+     * @param bool $softDelete
+     */
+    public function testDeleteAutoCommitErrorOnPreRemoveAndSuccessObjectsWithViolationException($withSoftObject, $softDelete)
+    {
+        $domain = $withSoftObject ? $this->createDomain($this->softClass) : $this->createDomain();
+        $objects = $this->insertResources($domain, 2);
+        $errorListener = new ErrorListener('deleted', true);
+
+        /* @var EntityManager $em */
+        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $em->getEventManager()->addEventListener(Events::preRemove, $errorListener);
 
         $this->assertCount(2, $domain->getRepository()->findAll());
 

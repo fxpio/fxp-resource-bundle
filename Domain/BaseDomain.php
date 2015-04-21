@@ -39,9 +39,9 @@ abstract class BaseDomain extends AbstractDomain
      */
     protected function doAutoCommitFlushTransaction(ResourceInterface $resource, $autoCommit, $skipped = false)
     {
-        $hasFlushError = false;
+        $hasFlushError = $resource->getErrors()->count() > 0;
 
-        if ($autoCommit && !$skipped) {
+        if ($autoCommit && !$skipped && !$hasFlushError) {
             $rErrors = $this->flushTransaction($resource->getRealData());
             $resource->getErrors()->addAll($rErrors);
             $hasFlushError = $rErrors->count() > 0;
