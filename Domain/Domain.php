@@ -272,7 +272,7 @@ class Domain extends BaseDomain
         } elseif (null !== $idError = $this->getErrorIdentifier($resource->getRealData(), static::TYPE_DELETE)) {
             $hasError = true;
             $resource->setStatus(ResourceStatutes::ERROR);
-            $resource->getErrors()->add(new ConstraintViolation($idError, $idError, array(), null, null, null));
+            $resource->getErrors()->add(new ConstraintViolation($idError, $idError, array(), $resource->getRealData(), null, null));
             $continue = true;
         }
 

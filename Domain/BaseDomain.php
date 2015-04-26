@@ -65,13 +65,7 @@ abstract class BaseDomain extends AbstractDomain
                 $this->cancelTransaction();
             } else {
                 $errors = $this->flushTransaction();
-
-                if (count($errors) > 0) {
-                    $resources->getErrors()->addAll($errors);
-                    foreach ($resources as $resource) {
-                        $resource->setStatus(ResourceStatutes::ERROR);
-                    }
-                }
+                DomainUtil::moveFlushErrorsInResource($resources, $errors);
             }
         }
     }
@@ -154,7 +148,7 @@ abstract class BaseDomain extends AbstractDomain
                 ? DomainUtil::extractDriverExceptionMessage($e, $this->debug)
                 : $e->getMessage();
 
-            $violations->add(new ConstraintViolation($message, $message, array(), null, null, null));
+            $violations->add(new ConstraintViolation($message, $message, array(), $object, null, null));
         }
     }
 
@@ -193,7 +187,7 @@ abstract class BaseDomain extends AbstractDomain
         }
 
         if (null !== $idError) {
-            $resource->getErrors()->add(new ConstraintViolation($idError, $idError, array(), '', '', ''));
+            $resource->getErrors()->add(new ConstraintViolation($idError, $idError, array(), $resource->getRealData(), null, null));
         }
     }
 

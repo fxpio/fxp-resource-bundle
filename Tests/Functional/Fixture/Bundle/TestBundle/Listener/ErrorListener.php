@@ -11,6 +11,8 @@
 
 namespace Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\Bundle\TestBundle\Listener;
 
+use Doctrine\Common\Persistence\Event\LifecycleEventArgs;
+use Doctrine\ORM\Event\PreFlushEventArgs;
 use Symfony\Component\Validator\ConstraintViolation;
 use Sonatra\Bundle\ResourceBundle\Exception\ConstraintViolationException;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -38,29 +40,36 @@ class ErrorListener
         $this->useConstraint = $useConstraint;
     }
 
-    public function prePersist()
+    public function prePersist(LifecycleEventArgs $args)
     {
-        $this->doException();
+        $this->doException($args->getObject());
     }
 
-    public function preRemove()
+    public function preRemove(LifecycleEventArgs $args)
     {
-        $this->doException();
+        $this->doException($args->getObject());
     }
 
-    public function onFlush()
+    public function preFlush(PreFlushEventArgs $args)
     {
-        $this->doException();
+        $em = $args->getEntityManager();
+        $uow = $em->getUnitOfWork();
+
+        foreach ($uow->getScheduledEntityDeletions() as $entity) {
+            $this->doException($entity);
+        }
     }
 
     /**
+     * @param object $entity The entity
+     *
      * @throws \Exception When the entity does not deleted
      */
-    public function doException()
+    public function doException($entity)
     {
         if ($this->useConstraint) {
             $message = 'The entity does not '.$this->action.' (violation exception)';
-            $violation = new ConstraintViolation($message, $message, array(), null, null, null);
+            $violation = new ConstraintViolation($message, $message, array(), $entity, null, null);
             $list = new ConstraintViolationList(array($violation));
 
             throw new ConstraintViolationException($list);

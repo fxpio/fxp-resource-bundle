@@ -378,6 +378,35 @@ class DomainDeleteTest extends AbstractDomainTest
      * @param bool $withSoftObject
      * @param bool $softDelete
      */
+    public function testDeleteErrorAndSuccessObjectsWithViolationException($withSoftObject, $softDelete)
+    {
+        $domain = $withSoftObject ? $this->createDomain($this->softClass) : $this->createDomain();
+        $objects = $this->insertResources($domain, 2);
+        $errorListener = new ErrorListener('deleted', true);
+
+        /* @var EntityManager $em */
+        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $em->getEventManager()->addEventListener(Events::preFlush, $errorListener);
+
+        $this->assertCount(2, $domain->getRepository()->findAll());
+
+        $resources = $domain->deletes($objects, $softDelete);
+        $this->assertTrue($resources->hasErrors());
+        $this->assertFalse($resources->get(0)->isValid());
+        $this->assertSame(ResourceStatutes::ERROR, $resources->get(0)->getStatus());
+        $this->assertSame('The entity does not deleted (violation exception)', $resources->get(0)->getErrors()->get(0)->getMessage());
+
+        $this->assertTrue($resources->get(1)->isValid());
+        $this->assertSame(ResourceStatutes::ERROR, $resources->get(1)->getStatus());
+        $this->assertCount(0, $resources->get(1)->getErrors());
+    }
+
+    /**
+     * @dataProvider getSoftDelete
+     *
+     * @param bool $withSoftObject
+     * @param bool $softDelete
+     */
     public function testDeleteAutoCommitErrorAndSuccessObjects($withSoftObject, $softDelete)
     {
         $domain = $withSoftObject ? $this->createDomain($this->softClass) : $this->createDomain();
@@ -386,7 +415,7 @@ class DomainDeleteTest extends AbstractDomainTest
 
         /* @var EntityManager $em */
         $em = $this->getContainer()->get('doctrine.orm.entity_manager');
-        $em->getEventManager()->addEventListener(Events::onFlush, $errorListener);
+        $em->getEventManager()->addEventListener(Events::preFlush, $errorListener);
 
         $this->assertCount(2, $domain->getRepository()->findAll());
 
@@ -415,7 +444,7 @@ class DomainDeleteTest extends AbstractDomainTest
 
         /* @var EntityManager $em */
         $em = $this->getContainer()->get('doctrine.orm.entity_manager');
-        $em->getEventManager()->addEventListener(Events::onFlush, $errorListener);
+        $em->getEventManager()->addEventListener(Events::preFlush, $errorListener);
 
         $this->assertCount(2, $domain->getRepository()->findAll());
 

@@ -20,6 +20,7 @@ use Sonatra\Bundle\ResourceBundle\ResourceEvents;
 use Sonatra\Bundle\ResourceBundle\ResourceStatutes;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
  * Util for domain.
@@ -126,7 +127,7 @@ abstract class DomainUtil
     public static function addResourceError(ResourceInterface $resource, $message)
     {
         $resource->setStatus(ResourceStatutes::ERROR);
-        $resource->getErrors()->add(new ConstraintViolation($message, $message, array(), null, null, null));
+        $resource->getErrors()->add(new ConstraintViolation($message, $message, array(), $resource->getRealData(), null, null));
     }
 
     /**
@@ -198,6 +199,56 @@ abstract class DomainUtil
         $resources->get(0)->getErrors()->addAll($resources->getErrors());
 
         return $resources->get(0);
+    }
+
+    /**
+     * Move the flush errors in each resource if the root object is present in constraint violation.
+     *
+     * @param ResourceListInterface            $resources The list of resources
+     * @param ConstraintViolationListInterface $errors    The list of flush errors
+     */
+    public static function moveFlushErrorsInResource(ResourceListInterface $resources, ConstraintViolationListInterface $errors)
+    {
+        if ($errors->count() > 0) {
+            $maps = static::getMapErrors($errors);
+
+            foreach ($resources->all() as $resource) {
+                $resource->setStatus(ResourceStatutes::ERROR);
+                $hash = spl_object_hash($resource->getRealData());
+                if (isset($maps[$hash])) {
+                    $resource->getErrors()->add($maps[$hash]);
+                    unset($maps[$hash]);
+                }
+            }
+
+            foreach ($maps as $error) {
+                $resources->getErrors()->add($error);
+            }
+        }
+    }
+
+    /**
+     * Get the map of object hash and constraint violation list.
+     *
+     * @param ConstraintViolationListInterface $errors
+     *
+     * @return array The map of object hash and constraint violation list
+     */
+    protected static function getMapErrors(ConstraintViolationListInterface $errors)
+    {
+        $maps = array();
+
+        for ($i = 0; $i < $errors->count(); $i++) {
+            $root = $errors->get($i)->getRoot();
+
+            if (is_object($root)) {
+                $maps[spl_object_hash($errors->get($i)->getRoot())] = $errors->get($i);
+            } else {
+                $maps[] = $errors->get($i);
+            }
+        }
+
+        return $maps;
     }
 
     /**
