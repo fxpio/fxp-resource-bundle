@@ -189,15 +189,15 @@ abstract class DomainUtil
     /**
      * Inject the list errors in the first resource, and return the this first resource.
      *
-     * @param ResourceListInterface $resourceList The resource list
+     * @param ResourceListInterface $resources The resource list
      *
      * @return ResourceInterface The first resource
      */
-    public static function oneAction(ResourceListInterface $resourceList)
+    public static function oneAction(ResourceListInterface $resources)
     {
-        $resourceList->get(0)->getErrors()->addAll($resourceList->getErrors());
+        $resources->get(0)->getErrors()->addAll($resources->getErrors());
 
-        return $resourceList->get(0);
+        return $resources->get(0);
     }
 
     /**
