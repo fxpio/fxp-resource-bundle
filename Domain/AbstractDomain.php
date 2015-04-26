@@ -209,7 +209,7 @@ abstract class AbstractDomain implements DomainInterface
      */
     public function create($resource)
     {
-        return $this->creates(array($resource), true)->get(0);
+        return DomainUtil::oneAction($this->creates(array($resource), true));
     }
 
     /**
@@ -225,7 +225,7 @@ abstract class AbstractDomain implements DomainInterface
      */
     public function update($resource)
     {
-        return $this->updates(array($resource), true)->get(0);
+        return DomainUtil::oneAction($this->updates(array($resource), true));
     }
 
     /**
@@ -241,7 +241,7 @@ abstract class AbstractDomain implements DomainInterface
      */
     public function upsert($resource)
     {
-        return $this->upserts(array($resource), true)->get(0);
+        return DomainUtil::oneAction($this->upserts(array($resource), true));
     }
 
     /**
@@ -257,7 +257,7 @@ abstract class AbstractDomain implements DomainInterface
      */
     public function delete($resource, $soft = true)
     {
-        return $this->deletes(array($resource), true)->get(0);
+        return DomainUtil::oneAction($this->deletes(array($resource), true));
     }
 
     /**
@@ -265,7 +265,7 @@ abstract class AbstractDomain implements DomainInterface
      */
     public function undelete($identifier)
     {
-        return $this->undeletes(array($identifier), true)->get(0);
+        return DomainUtil::oneAction($this->undeletes(array($identifier), true));
     }
 
     /**

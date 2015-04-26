@@ -15,6 +15,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\DBAL\Exception\DriverException;
 use Sonatra\Bundle\ResourceBundle\Exception\ConstraintViolationException;
 use Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface;
+use Sonatra\Bundle\ResourceBundle\Resource\ResourceListInterface;
 use Sonatra\Bundle\ResourceBundle\ResourceEvents;
 use Sonatra\Bundle\ResourceBundle\ResourceStatutes;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -183,6 +184,20 @@ abstract class DomainUtil
         }
 
         return true;
+    }
+
+    /**
+     * Inject the list errors in the first resource, and return the this first resource.
+     *
+     * @param ResourceListInterface $resourceList The resource list
+     *
+     * @return ResourceInterface The first resource
+     */
+    public static function oneAction(ResourceListInterface $resourceList)
+    {
+        $resourceList->get(0)->getErrors()->addAll($resourceList->getErrors());
+
+        return $resourceList->get(0);
     }
 
     /**
