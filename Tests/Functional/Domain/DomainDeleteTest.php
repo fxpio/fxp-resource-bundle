@@ -96,7 +96,7 @@ class DomainDeleteTest extends AbstractDomainTest
         } else {
             /* @var Bar[] $objects */
             $objects = $domain->getRepository()->findAll();
-            $this->assertCount(1, $objects);
+            $this->assertCount($softDelete ? 1 : 0, $objects);
         }
     }
 

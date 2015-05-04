@@ -257,7 +257,7 @@ abstract class AbstractDomain implements DomainInterface
      */
     public function delete($resource, $soft = true)
     {
-        return DomainUtil::oneAction($this->deletes(array($resource), true));
+        return DomainUtil::oneAction($this->deletes(array($resource), $soft, true));
     }
 
     /**
