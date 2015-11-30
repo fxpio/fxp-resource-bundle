@@ -135,12 +135,29 @@ class DomainPass implements CompilerPassInterface
     {
         foreach ($managers as $manager) {
             $def = $container->getDefinition((string) $manager);
+            $pos = $this->getClassPosition($def);
             $def->addMethodCall('setDebug', array('%kernel.debug%'));
-            $om = new Expression('service("doctrine").getManagerForClass("'.str_replace('\\', '\\\\', $def->getArgument(0)).'")');
+            $om = new Expression('service("doctrine").getManagerForClass("'.str_replace('\\', '\\\\', $def->getArgument($pos)).'")');
             $def->addMethodCall('setObjectManager', array($om, '%sonatra_resource.domain.undelete_disable_filters%'));
             $def->addMethodCall('setEventDispatcher', array(new Reference('event_dispatcher')));
             $def->addMethodCall('setObjectFactory', array(new Reference('sonatra_default_value.factory')));
             $def->addMethodCall('setValidator', array(new Reference('validator')));
         }
+    }
+
+    /**
+     * Get the position of argument of entity class name.
+     *
+     * @param Definition $def The service definition
+     *
+     * @return int
+     */
+    protected function getClassPosition(Definition $def)
+    {
+        $tag = $def->getTag('sonatra_resource.domain');
+
+        return count($tag) > 0 && isset($tag[0]['class-position'])
+            ? $tag[0]['class-position']
+            : 0;
     }
 }
