@@ -24,7 +24,7 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
 {
     public function testWithStringType()
     {
-        $type = 'form_type_name';
+        $type = FooType::class;
         $config = new FormConfig($type);
         $this->assertSame('json', $config->getConverter());
         $this->assertSame(Request::METHOD_POST, $config->getMethod());
@@ -35,7 +35,7 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
 
     public function testWithStringTypeAndPatchMethod()
     {
-        $type = 'form_type_name';
+        $type = FooType::class;
         $config = new FormConfig($type, array(), Request::METHOD_PATCH);
         $this->assertSame('json', $config->getConverter());
         $this->assertSame(Request::METHOD_PATCH, $config->getMethod());
@@ -46,18 +46,17 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
 
     public function testSetType()
     {
-        $config = new FormConfig('form_type_name');
+        $config = new FormConfig(FooType::class);
 
-        $this->assertSame('form_type_name', $config->getType());
+        $this->assertSame(FooType::class, $config->getType());
 
-        $type = new FooType();
-        $config->setType($type);
-        $this->assertSame($type, $config->getType());
+        $config->setType(FooType::class);
+        $this->assertSame(FooType::class, $config->getType());
     }
 
     public function testSetInvalidType()
     {
-        $msg = 'The form type of domain form config must be an string or instance of "Symfony\Component\Form\FormTypeInterface"';
+        $msg = 'The form type of domain form config must be an string of an existing class name';
         $this->setExpectedException('Sonatra\Bundle\ResourceBundle\Exception\InvalidArgumentException', $msg);
 
         $config = new FormConfig('form_type_name');
@@ -66,7 +65,7 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
 
     public function testSetOptions()
     {
-        $config = new FormConfig('form_type_name');
+        $config = new FormConfig(FooType::class);
 
         $this->assertSame(Request::METHOD_POST, $config->getMethod());
         $this->assertEquals(array(
@@ -87,7 +86,7 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
 
     public function testSetMethod()
     {
-        $config = new FormConfig('form_type_name');
+        $config = new FormConfig(FooType::class);
 
         $this->assertSame(Request::METHOD_POST, $config->getMethod());
         $this->assertEquals(array(
@@ -150,7 +149,7 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetSubmitClearMissing($submitClearMissing, $method, $validSubmitClearMissing)
     {
-        $config = new FormConfig('form_type_name');
+        $config = new FormConfig(FooType::class);
         $config->setMethod($method);
         $config->setSubmitClearMissing($submitClearMissing);
 

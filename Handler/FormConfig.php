@@ -12,7 +12,6 @@
 namespace Sonatra\Bundle\ResourceBundle\Handler;
 
 use Sonatra\Bundle\ResourceBundle\Exception\InvalidArgumentException;
-use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -23,7 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
 class FormConfig implements FormConfigInterface
 {
     /**
-     * @var string|FormTypeInterface
+     * @var string
      */
     protected $type;
 
@@ -50,10 +49,10 @@ class FormConfig implements FormConfigInterface
     /**
      * Constructor.
      *
-     * @param string|FormTypeInterface $type      The form type
-     * @param array                    $options   The form options for create the form type
-     * @param string                   $method    The request method
-     * @param string                   $converter The data converter for request content
+     * @param string $type      The class name of form type
+     * @param array  $options   The form options for create the form type
+     * @param string $method    The request method
+     * @param string $converter The data converter for request content
      */
     public function __construct($type, array $options = array(), $method = Request::METHOD_POST, $converter = 'json')
     {
@@ -68,8 +67,8 @@ class FormConfig implements FormConfigInterface
      */
     public function setType($type)
     {
-        if (!is_string($type) && !$type instanceof FormTypeInterface) {
-            throw new InvalidArgumentException('The form type of domain form config must be an string or instance of "Symfony\Component\Form\FormTypeInterface"');
+        if (!is_string($type) || !class_exists($type)) {
+            throw new InvalidArgumentException('The form type of domain form config must be an string of an existing class name');
         }
 
         $this->type = $type;

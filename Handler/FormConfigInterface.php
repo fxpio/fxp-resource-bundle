@@ -24,16 +24,16 @@ interface FormConfigInterface
     /**
      * Set the form type.
      *
-     * @param string|FormTypeInterface $type The form type
+     * @param string $type The class name of form type
      *
-     * @throws InvalidArgumentException When the type is not a string or instance of "Symfony\Component\Form\FormTypeInterface"
+     * @throws InvalidArgumentException When the type is not a string of class name
      */
     public function setType($type);
 
     /**
-     * Get the form type.
+     * Get the class name of form type.
      *
-     * @return string|FormTypeInterface
+     * @return string
      */
     public function getType();
 
