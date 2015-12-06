@@ -476,7 +476,7 @@ class DomainUpdateFormTest extends AbstractDomainTest
     protected function buildForm($object, array $data)
     {
         /* @var FormInterface $form */
-        $form = $this->getContainer()->get('form.factory')->create(new FooType(), $object, array());
+        $form = $this->getContainer()->get('form.factory')->create(FooType::class, $object, array());
         $form->submit($data, false);
 
         return $form;

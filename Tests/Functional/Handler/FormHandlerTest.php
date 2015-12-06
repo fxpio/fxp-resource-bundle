@@ -41,7 +41,7 @@ class FormHandlerTest extends AbstractFormHandlerTest
         $handler = $this->createFormHandler($request);
 
         $object = new Foo();
-        $config = new FormConfig(new FooType());
+        $config = new FormConfig(FooType::class);
 
         $form = $handler->processForm($config, $object);
 
@@ -75,7 +75,7 @@ class FormHandlerTest extends AbstractFormHandlerTest
             new Foo(),
             new Foo(),
         );
-        $config = new FormConfig(new FooType());
+        $config = new FormConfig(FooType::class);
 
         $forms = $handler->processForms($config, $objects);
 
@@ -108,7 +108,7 @@ class FormHandlerTest extends AbstractFormHandlerTest
             new Foo(),
             new Foo(),
         );
-        $config = new FormConfig(new FooType());
+        $config = new FormConfig(FooType::class);
 
         $handler->processForms($config, $objects);
     }
@@ -157,7 +157,7 @@ class FormHandlerTest extends AbstractFormHandlerTest
         $request = Request::create('test', Request::METHOD_POST, array(), array(), array(), array(), json_encode($data));
         $handler = $this->createFormHandler($request, $defaultLimit);
 
-        $config = new FormConfig(new FooType());
+        $config = new FormConfig(FooType::class);
 
         $handler->processForms($config, $objects, $methodLimit);
     }

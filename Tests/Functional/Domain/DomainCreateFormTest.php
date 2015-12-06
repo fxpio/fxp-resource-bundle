@@ -437,7 +437,7 @@ class DomainCreateFormTest extends AbstractDomainTest
         $foo = $domain->newInstance();
 
         /* @var FormInterface $form */
-        $form = $this->getContainer()->get('form.factory')->create(new FooType(), $foo, array());
+        $form = $this->getContainer()->get('form.factory')->create(FooType::class, $foo, array());
 
         $this->loadFixtures(array());
 
@@ -492,7 +492,7 @@ class DomainCreateFormTest extends AbstractDomainTest
     protected function buildForm($object, array $data)
     {
         /* @var FormInterface $form */
-        $form = $this->getContainer()->get('form.factory')->create(new FooType(), $object, array());
+        $form = $this->getContainer()->get('form.factory')->create(FooType::class, $object, array());
         $form->submit($data, true);
 
         return $form;

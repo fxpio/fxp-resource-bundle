@@ -12,6 +12,7 @@
 namespace Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\Bundle\TestBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -27,9 +28,9 @@ class FooType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('name',        'text', array('required' => true));
-        $builder->add('description', 'text', array('required' => false));
-        $builder->add('detail',      'text', array('required' => false));
+        $builder->add('name',        TextType::class, array('required' => true));
+        $builder->add('description', TextType::class, array('required' => false));
+        $builder->add('detail',      TextType::class, array('required' => false));
     }
 
     /**
