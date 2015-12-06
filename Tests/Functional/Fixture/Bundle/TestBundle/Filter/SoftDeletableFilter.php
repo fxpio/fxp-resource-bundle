@@ -34,7 +34,7 @@ class SoftDeletableFilter extends SQLFilter
     {
         $conn = $this->getEntityManager()->getConnection();
         $platform = $conn->getDatabasePlatform();
-        $column = $targetEntity->getColumnName('deletedAt', $platform);
+        $column = $targetEntity->getColumnName('deletedAt');
         $addCondSql = $platform->getIsNullExpression($targetTableAlias.'.'.$column);
 
         $now = $conn->quote(date('Y-m-d H:i:s')); // should use UTC in database and PHP
