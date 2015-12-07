@@ -92,7 +92,7 @@ abstract class AbstractDomainTest extends WebTestCase
         $em = $this->getContainer()->get('doctrine.orm.entity_manager');
         $objects = array();
 
-        for ($i = 0; $i < $size; $i++) {
+        for ($i = 0; $i < $size; ++$i) {
             /* @var Foo|Bar $object */
             $object = $domain->newInstance();
             $object->setName('Bar '.($i+1));

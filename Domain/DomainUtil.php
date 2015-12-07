@@ -239,7 +239,7 @@ abstract class DomainUtil
         $maps = array();
         $size = $errors->count();
 
-        for ($i = 0; $i < $size; $i++) {
+        for ($i = 0; $i < $size; ++$i) {
             $root = $errors->get($i)->getRoot();
 
             if (is_object($root)) {

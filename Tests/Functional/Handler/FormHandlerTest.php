@@ -146,7 +146,7 @@ class FormHandlerTest extends AbstractFormHandlerTest
         $data = array();
         $objects = array();
 
-        for ($i = 0; $i < $size; $i++) {
+        for ($i = 0; $i < $size; ++$i) {
             $data[] = array(
                 'name' => 'Bar '.($i+1),
                 'detail' => 'Detail '.($i+1),
