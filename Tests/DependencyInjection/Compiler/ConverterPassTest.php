@@ -93,13 +93,13 @@ class ConverterPassTest extends \PHPUnit_Framework_TestCase
     protected function getContainer(array $bundles = array())
     {
         $container = new ContainerBuilder(new ParameterBag(array(
-            'kernel.cache_dir'   => $this->rootDir.'/cache',
-            'kernel.debug'       => false,
+            'kernel.cache_dir' => $this->rootDir.'/cache',
+            'kernel.debug' => false,
             'kernel.environment' => 'test',
-            'kernel.name'        => 'kernel',
-            'kernel.root_dir'    => $this->rootDir,
-            'kernel.charset'     => 'UTF-8',
-            'kernel.bundles'     => $bundles,
+            'kernel.name' => 'kernel',
+            'kernel.root_dir' => $this->rootDir,
+            'kernel.charset' => 'UTF-8',
+            'kernel.bundles' => $bundles,
         )));
 
         if (count($bundles) > 0) {

@@ -43,16 +43,16 @@ class SonatraResourceExtensionTest extends \PHPUnit_Framework_TestCase
     protected function createContainer(array $configs = array())
     {
         $container = new ContainerBuilder(new ParameterBag(array(
-            'kernel.bundles'     => array(
-                'FrameworkBundle'       => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle',
+            'kernel.bundles' => array(
+                'FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle',
                 'SonatraResourceBundle' => 'Sonatra\\Bundle\\ResourceBundle\\SonatraResourceBundle',
             ),
-            'kernel.cache_dir'   => sys_get_temp_dir().'/sonatra_resource_bundle',
-            'kernel.debug'       => false,
+            'kernel.cache_dir' => sys_get_temp_dir().'/sonatra_resource_bundle',
+            'kernel.debug' => false,
             'kernel.environment' => 'test',
-            'kernel.name'        => 'kernel',
-            'kernel.root_dir'    => sys_get_temp_dir().'/sonatra_resource_bundle',
-            'kernel.charset'     => 'UTF-8',
+            'kernel.name' => 'kernel',
+            'kernel.root_dir' => sys_get_temp_dir().'/sonatra_resource_bundle',
+            'kernel.charset' => 'UTF-8',
         )));
 
         $sfExt = new FrameworkExtension();

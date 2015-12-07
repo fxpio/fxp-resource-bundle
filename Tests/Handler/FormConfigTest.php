@@ -73,12 +73,12 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
         ), $config->getOptions());
 
         $config->setOptions(array(
-            'method'   => Request::METHOD_PATCH,
+            'method' => Request::METHOD_PATCH,
             'required' => true,
         ));
 
         $this->assertEquals(array(
-            'method'   => Request::METHOD_PATCH,
+            'method' => Request::METHOD_PATCH,
             'required' => true,
         ), $config->getOptions());
         $this->assertSame(Request::METHOD_PATCH, $config->getMethod());
