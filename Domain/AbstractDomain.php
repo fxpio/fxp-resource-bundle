@@ -33,10 +33,10 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 abstract class AbstractDomain implements DomainInterface
 {
-    const TYPE_CREATE   = 0;
-    const TYPE_UPDATE   = 1;
-    const TYPE_UPSERT   = 2;
-    const TYPE_DELETE   = 3;
+    const TYPE_CREATE = 0;
+    const TYPE_UPDATE = 1;
+    const TYPE_UPSERT = 2;
+    const TYPE_DELETE = 3;
     const TYPE_UNDELETE = 4;
 
     /**
