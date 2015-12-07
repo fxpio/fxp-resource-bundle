@@ -12,7 +12,6 @@
 namespace Sonatra\Bundle\ResourceBundle\Handler;
 
 use Sonatra\Bundle\ResourceBundle\Exception\InvalidArgumentException;
-use Symfony\Component\Form\FormTypeInterface;
 
 /**
  * A form config interface.
