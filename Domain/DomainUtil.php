@@ -46,7 +46,7 @@ abstract class DomainUtil
             $pos = strpos($prevMessage, ':');
 
             if ($pos > 0 && 0 === strpos($prevMessage, 'SQLSTATE[')) {
-                $message .= ': '.trim(substr($prevMessage, $pos+1));
+                $message .= ': '.trim(substr($prevMessage, $pos + 1));
             }
         }
 
@@ -164,7 +164,7 @@ abstract class DomainUtil
     {
         $pos = strrpos($class, '\\');
 
-        return substr($class, $pos+1);
+        return substr($class, $pos + 1);
     }
 
     /**

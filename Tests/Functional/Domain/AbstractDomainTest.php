@@ -95,8 +95,8 @@ abstract class AbstractDomainTest extends WebTestCase
         for ($i = 0; $i < $size; ++$i) {
             /* @var Foo|Bar $object */
             $object = $domain->newInstance();
-            $object->setName('Bar '.($i+1));
-            $object->setDetail('Detail '.($i+1));
+            $object->setName('Bar '.($i + 1));
+            $object->setDetail('Detail '.($i + 1));
             $em->persist($object);
             $objects[] = $object;
         }
