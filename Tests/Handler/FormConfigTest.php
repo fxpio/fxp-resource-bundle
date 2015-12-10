@@ -56,7 +56,7 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
 
     public function testSetInvalidType()
     {
-        $msg = 'The form type of domain form config must be an string of an existing class name';
+        $msg = 'The form type of domain form config must be an string of class name of form type';
         $this->setExpectedException('Sonatra\Bundle\ResourceBundle\Exception\InvalidArgumentException', $msg);
 
         $config = new FormConfig('form_type_name');

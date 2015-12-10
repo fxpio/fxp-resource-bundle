@@ -67,8 +67,8 @@ class FormConfig implements FormConfigInterface
      */
     public function setType($type)
     {
-        if (!is_string($type) || !class_exists($type)) {
-            throw new InvalidArgumentException('The form type of domain form config must be an string of an existing class name');
+        if (!is_string($type)) {
+            throw new InvalidArgumentException('The form type of domain form config must be an string of class name of form type');
         }
 
         $this->type = $type;
