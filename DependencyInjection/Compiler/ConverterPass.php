@@ -86,7 +86,7 @@ class ConverterPass implements CompilerPassInterface
         $def = $container->getDefinition($serviceId);
         $class = $this->getRealValue($container, $def->getClass());
         $interfaces = class_implements($class);
-        $type = null;
+        $error = sprintf('The service id "%s" must be an class implementing the "%s" interface.', $serviceId, ConverterInterface::class);
 
         if (in_array(ConverterInterface::class, $interfaces)) {
             $ref = new \ReflectionClass($class);
@@ -97,8 +97,10 @@ class ConverterPass implements CompilerPassInterface
             if ($type) {
                 return $type;
             }
+
+            $error = sprintf('The service id "%s" must have the "type" parameter in the "sonatra_resource.converter" tag.', $serviceId);
         }
 
-        throw new InvalidConfigurationException(sprintf('The service id "%s" must have the "type" parameter in the "sonatra_resource.converter" tag.', $serviceId));
+        throw new InvalidConfigurationException($error);
     }
 }

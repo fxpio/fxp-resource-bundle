@@ -87,7 +87,7 @@ class ConverterPassTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessWithInvalidInterface()
     {
-        $msg = 'The service id "test_invalid_converter_type" must have the "type" parameter in the "sonatra_resource.converter" tag.';
+        $msg = 'The service id "test_invalid_converter_type" must be an class implementing the "Sonatra\Bundle\ResourceBundle\Converter\ConverterInterface" interface.';
         $this->setExpectedException(InvalidConfigurationException::class, $msg);
 
         $container = $this->getContainer(array(
