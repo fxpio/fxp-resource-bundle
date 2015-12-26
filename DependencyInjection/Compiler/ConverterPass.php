@@ -11,6 +11,8 @@
 
 namespace Sonatra\Bundle\ResourceBundle\DependencyInjection\Compiler;
 
+use Sonatra\Bundle\ResourceBundle\Converter\ConverterInterface;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -45,10 +47,58 @@ class ConverterPass implements CompilerPassInterface
         $converters = array();
 
         foreach ($container->findTaggedServiceIds('sonatra_resource.converter') as $serviceId => $tag) {
-            $name = $container->get($serviceId)->getName();
-            $converters[$name] = $container->getDefinition($serviceId);
+            $type = isset($tag[0]['type'])
+                ? $this->getRealValue($container, $tag[0]['type'])
+                : $this->getType($container, $serviceId);
+
+            $converters[$type] = $container->getDefinition($serviceId);
         }
 
         return array_values($converters);
+    }
+    /**
+     * Get the real value.
+     *
+     * @param ContainerBuilder $container The container
+     * @param mixed            $value     The value or parameter name
+     *
+     * @return mixed
+     */
+    protected function getRealValue(ContainerBuilder $container, $value)
+    {
+        return 0 === strpos($value, '%')
+            ? $container->getParameter(trim($value, '%'))
+            : $value;
+    }
+
+    /**
+     * Get the converter type name.
+     *
+     * @param ContainerBuilder $container The container builder
+     * @param string           $serviceId The service id of converter
+     *
+     * @return string
+     *
+     * @throws InvalidConfigurationException When the converter name is not got
+     */
+    protected function getType(ContainerBuilder $container, $serviceId)
+    {
+        $def = $container->getDefinition($serviceId);
+        $class = $this->getRealValue($container, $def->getClass());
+        $interfaces = class_implements($class);
+        $type = null;
+
+        if (in_array(ConverterInterface::class, $interfaces)) {
+            $ref = new \ReflectionClass($class);
+            /* @var ConverterInterface $instance */
+            $instance = $ref->newInstanceWithoutConstructor();
+            $type = $instance->getName();
+
+            if ($type) {
+                return $type;
+            }
+        }
+
+        throw new InvalidConfigurationException(sprintf('The service id "%s" must have the "type" parameter in the "sonatra_resource.converter" tag.', $serviceId));
     }
 }

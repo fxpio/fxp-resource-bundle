@@ -84,33 +84,6 @@ class DomainPassTest extends KernelTestCase
         $this->pass->process($container);
     }
 
-    public function testProcessWithDefaultDomainManager()
-    {
-        $container = $this->buildAndValidateContainerBuilder(array(), false);
-        $this->pass->process($container);
-        $container->compile();
-
-        $dmDef = $container->getDefinition('sonatra_resource.domain_manager');
-        $args = $dmDef->getArguments();
-        $this->assertCount(2, $args);
-        $this->assertCount(2, $args[0]);
-
-        $serviceId = (string) $args[0][0];
-        /* @var Definition $compiledDef */
-        $compiledDef = $container->getDefinition($serviceId);
-
-        $dmDef = $container->getDefinition('sonatra_resource.domain_manager');
-        $args = $dmDef->getArguments();
-        $this->assertCount(2, $args);
-        $this->assertCount(2, $args[0]);
-
-        $serviceId = (string) $args[0][0];
-        /* @var Definition $def */
-        $def = $container->getDefinition($serviceId);
-
-        $this->assertSame($compiledDef, $def);
-    }
-
     public function testProcessWithCustomDomainManager()
     {
         $className = 'Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\Bundle\TestBundle\Entity\Foo';
@@ -127,7 +100,7 @@ class DomainPassTest extends KernelTestCase
         $dmDef = $container->getDefinition('sonatra_resource.domain_manager');
         $args = $dmDef->getArguments();
         $this->assertCount(2, $args);
-        $this->assertCount(2, $args[0]);
+        $this->assertCount(1, $args[0]);
 
         $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $args[0][0]);
         $serviceId = (string) $args[0][0];
@@ -140,7 +113,7 @@ class DomainPassTest extends KernelTestCase
         $dmDef = $container->getDefinition('sonatra_resource.domain_manager');
         $args = $dmDef->getArguments();
         $this->assertCount(2, $args);
-        $this->assertCount(2, $args[0]);
+        $this->assertCount(1, $args[0]);
 
         $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $args[0][0]);
         $serviceId = (string) $args[0][0];
@@ -148,21 +121,6 @@ class DomainPassTest extends KernelTestCase
         $def = $container->getDefinition($serviceId);
 
         $this->assertSame('Sonatra\Bundle\ResourceBundle\Tests\Fixtures\Domain\CustomDomain', $def->getClass());
-    }
-
-    public function testProcessWithResourceNotManagedByDoctrine()
-    {
-        $msg = '/The "(\w+)" class is not managed by doctrine object manager/';
-        $this->setExpectedExceptionRegExp('Sonatra\Bundle\ResourceBundle\Exception\InvalidConfigurationException', $msg);
-
-        $className = 'DateTime';
-        $def = new Definition('Sonatra\Bundle\ResourceBundle\Domain\Domain', array($className));
-        $def->addTag('sonatra_resource.domain');
-        $definitions = array(
-            'test.custom_domain' => $def,
-        );
-
-        $this->buildAndValidateContainerBuilder($definitions);
     }
 
     /**

@@ -12,6 +12,8 @@
 namespace Sonatra\Bundle\ResourceBundle\Tests\DependencyInjection\Compiler;
 
 use Sonatra\Bundle\ResourceBundle\DependencyInjection\Compiler\ConverterPass;
+use Sonatra\Bundle\ResourceBundle\Tests\Fixtures\Converter\CustomConverter;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Definition;
@@ -81,6 +83,42 @@ class ConverterPassTest extends \PHPUnit_Framework_TestCase
         $arg = $def->getArgument(0);
         $this->assertNotEmpty($arg);
         $this->assertInstanceOf('Symfony\Component\DependencyInjection\Definition', $arg[0]);
+    }
+
+    public function testProcessWithInvalidInterface()
+    {
+        $msg = 'The service id "test_invalid_converter_type" must have the "type" parameter in the "sonatra_resource.converter" tag.';
+        $this->setExpectedException(InvalidConfigurationException::class, $msg);
+
+        $container = $this->getContainer(array(
+            'SonatraResourceBundle' => 'Sonatra\\Bundle\\ResourceBundle\\SonatraResourceBundle',
+        ));
+
+        $this->assertTrue($container->has('sonatra_resource.converter_registry'));
+
+        $def = new Definition('stdClass');
+        $def->addTag('sonatra_resource.converter');
+        $container->setDefinition('test_invalid_converter_type', $def);
+
+        $this->pass->process($container);
+    }
+
+    public function testProcessWithInvalidType()
+    {
+        $msg = 'The service id "test_invalid_converter_type" must have the "type" parameter in the "sonatra_resource.converter" tag.';
+        $this->setExpectedException(InvalidConfigurationException::class, $msg);
+
+        $container = $this->getContainer(array(
+            'SonatraResourceBundle' => 'Sonatra\\Bundle\\ResourceBundle\\SonatraResourceBundle',
+        ));
+
+        $this->assertTrue($container->has('sonatra_resource.converter_registry'));
+
+        $def = new Definition(CustomConverter::class);
+        $def->addTag('sonatra_resource.converter');
+        $container->setDefinition('test_invalid_converter_type', $def);
+
+        $this->pass->process($container);
     }
 
     /**
