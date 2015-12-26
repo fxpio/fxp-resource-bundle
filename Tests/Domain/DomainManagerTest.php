@@ -15,6 +15,8 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Persistence\ObjectManager;
 use Sonatra\Bundle\DefaultValueBundle\DefaultValue\ObjectFactoryInterface;
+use Sonatra\Bundle\ResourceBundle\Domain\Domain;
+use Sonatra\Bundle\ResourceBundle\Domain\DomainFactory;
 use Sonatra\Bundle\ResourceBundle\Domain\DomainInterface;
 use Sonatra\Bundle\ResourceBundle\Domain\DomainManager;
 use Sonatra\Bundle\ResourceBundle\Domain\DomainManagerInterface;
@@ -89,7 +91,9 @@ class DomainManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getShortName')
             ->will($this->returnValue('ShortFoo'));
 
-        $this->manager = new DomainManager(array($domain), $or, $ed, $of, $val);
+        $df = new DomainFactory($or, $ed, $of, $val);
+
+        $this->manager = new DomainManager(array($domain), $df);
     }
 
     public function testConstructor()
@@ -101,7 +105,8 @@ class DomainManagerTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertTrue($this->manager->has('Foo'));
         $this->assertTrue($this->manager->has('ShortFoo'));
-        $this->assertFalse($this->manager->has('Bar'));
+        $this->assertTrue($this->manager->has('Bar'));
+        $this->assertFalse($this->manager->has('InvalidClass'));
     }
 
     public function testAdd()
@@ -184,11 +189,11 @@ class DomainManagerTest extends \PHPUnit_Framework_TestCase
         $this->manager->get('InvalidClass');
     }
 
-    public function testGetDomainNotManaged()
+    public function testGetDomainNotAddedManually()
     {
-        $msg = '/The resource domain for "(\w+)" class is not managed/';
-        $this->setExpectedExceptionRegExp('Sonatra\Bundle\ResourceBundle\Exception\InvalidArgumentException', $msg);
-        $this->manager->get('Bar');
+        $domain = $this->manager->get('Bar');
+
+        $this->assertInstanceOf(Domain::class, $domain);
     }
 
     public function testGetDomainWithCache()

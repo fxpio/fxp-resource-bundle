@@ -11,8 +11,6 @@
 
 namespace Sonatra\Bundle\ResourceBundle\Domain;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
 use Sonatra\Bundle\ResourceBundle\Exception\InvalidArgumentException;
 
 /**
@@ -33,9 +31,9 @@ class DomainManager implements DomainManagerInterface
     protected $shortNames;
 
     /**
-     * @var ManagerRegistry
+     * @var DomainFactoryInterface
      */
-    protected $or;
+    protected $factory;
 
     /**
      * @var array
@@ -45,14 +43,14 @@ class DomainManager implements DomainManagerInterface
     /**
      * Constructor.
      *
-     * @param DomainInterface[] $domains The resource domains
-     * @param ManagerRegistry   $or      The doctrine object manager
+     * @param DomainInterface[]      $domains The resource domains
+     * @param DomainFactoryInterface $factory The domain factory
      */
-    public function __construct(array $domains, ManagerRegistry $or)
+    public function __construct(array $domains, DomainFactoryInterface $factory)
     {
         $this->domains = array();
         $this->shortNames = array();
-        $this->or = $or;
+        $this->factory = $factory;
         $this->cache = array();
 
         foreach ($domains as $domain) {
@@ -65,7 +63,10 @@ class DomainManager implements DomainManagerInterface
      */
     public function has($class)
     {
-        return isset($this->domains[$this->findClassName($class)]);
+        $class = $this->findClassName($class);
+
+        return isset($this->domains[$this->findClassName($class)])
+            || $this->factory->isManagedClass($class);
     }
 
     /**
@@ -121,36 +122,14 @@ class DomainManager implements DomainManagerInterface
         }
 
         $getClass = $class;
-        $manager = $this->getManager($class);
-        $class = $manager->getClassMetadata($class)->getName();
+        $class = $this->factory->getManagedClass($class);
+        $this->cache[$getClass] = $class;
 
-        if ($this->has($class)) {
-            $this->cache[$getClass] = $class;
-
-            return $this->domains[$class];
+        if (!isset($this->domains[$class])) {
+            $this->domains[$class] = $this->factory->create($class);
         }
 
-        throw new InvalidArgumentException(sprintf('The resource domain for "%s" class is not managed', $class));
-    }
-
-    /**
-     * Get the doctrine object manager of the class.
-     *
-     * @param string $class The class name or doctrine shortcut class name
-     *
-     * @return ObjectManager
-     *
-     * @throws InvalidArgumentException When the class is not registered in doctrine
-     */
-    protected function getManager($class)
-    {
-        $manager = $this->or->getManagerForClass($class);
-
-        if (null !== $manager) {
-            return $manager;
-        }
-
-        throw new InvalidArgumentException(sprintf('The "%s" class is not registered in doctrine', $class));
+        return $this->domains[$class];
     }
 
     /**
