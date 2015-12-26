@@ -24,7 +24,7 @@ interface FormHandlerInterface
      * Process form for one object instance (create and submit form).
      *
      * @param FormConfigInterface $config The form config
-     * @param object              $object The object instance
+     * @param object|array        $object The object instance
      *
      * @return FormInterface
      */
@@ -34,7 +34,7 @@ interface FormHandlerInterface
      * Process form for one object instance (create and submit form).
      *
      * @param FormConfigInterface $config  The form config
-     * @param object[]            $objects The list of object instance
+     * @param object[]|array[]    $objects The list of object instance
      * @param int|null            $limit   The limit of max row
      *
      * @return FormInterface[]

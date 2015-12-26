@@ -99,7 +99,7 @@ class FormHandler implements FormHandlerInterface
      * Create the list of form for the object instances.
      *
      * @param FormConfigInterface $config  The form config
-     * @param object[]            $objects The list of object instance
+     * @param object[]|array[]    $objects The list of object instance
      * @param bool                $isList  Check if the request data is a list
      * @param int|null            $limit   The limit of max row
      *
