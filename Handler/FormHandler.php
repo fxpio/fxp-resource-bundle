@@ -107,21 +107,8 @@ class FormHandler implements FormHandlerInterface
      */
     private function process(FormConfigInterface $config, array $objects)
     {
-        $limit = $this->getLimit($config instanceof FormConfigListInterface ? $config->getLimit() : null);
+        list($dataList, $objects) = $this->getDataListObjects($config, $objects);
         $forms = array();
-        $dataList = $this->getDataList($config);
-
-        if (null !== $limit && count($dataList) > $limit) {
-            $msg = 'The list of resource sent exceeds the permitted limit (%s)';
-            throw new InvalidResourceException(sprintf($msg, $limit));
-        }
-
-        if (0 === count($objects) && $config instanceof FormConfigListInterface) {
-            $objects = $config->convertObjects($dataList);
-        }
-
-        $objects = array_values($objects);
-        $dataList = array_values($dataList);
 
         if (count($objects) !== count($dataList)) {
             $msg = 'The size of the request data list (%s) is different that the object instance list (%s)';
@@ -135,6 +122,34 @@ class FormHandler implements FormHandlerInterface
         }
 
         return $forms;
+    }
+
+    /**
+     * Get the data list and objects.
+     *
+     * @param FormConfigInterface $config  The form config
+     * @param object[]|array[]    $objects The list of object instance
+     *
+     * @return array
+     */
+    protected function getDataListObjects(FormConfigInterface $config, array $objects)
+    {
+        $limit = $this->getLimit($config instanceof FormConfigListInterface ? $config->getLimit() : null);
+        $dataList = $this->getDataList($config);
+
+        if (null !== $limit && count($dataList) > $limit) {
+            $msg = 'The list of resource sent exceeds the permitted limit (%s)';
+            throw new InvalidResourceException(sprintf($msg, $limit));
+        }
+
+        if (0 === count($objects) && $config instanceof FormConfigListInterface) {
+            $objects = $config->convertObjects($dataList);
+        }
+
+        $dataList = array_values($dataList);
+        $objects = array_values($objects);
+
+        return array($dataList, $objects);
     }
 
     /**
