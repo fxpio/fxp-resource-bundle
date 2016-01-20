@@ -12,6 +12,8 @@
 namespace Sonatra\Bundle\ResourceBundle\Tests\Functional\Handler;
 
 use Sonatra\Bundle\ResourceBundle\Handler\FormConfig;
+use Sonatra\Bundle\ResourceBundle\Handler\FormConfigList;
+use Sonatra\Bundle\ResourceBundle\Handler\FormConfigListInterface;
 use Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\Bundle\TestBundle\Entity\Foo;
 use Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\Bundle\TestBundle\Form\FooType;
 use Symfony\Component\HttpFoundation\Request;
@@ -54,6 +56,51 @@ class FormHandlerTest extends AbstractFormHandlerTest
     public function testProcessForms()
     {
         $data = array(
+            'transaction' => true,
+            'records' => array(
+                array(
+                    'name' => 'Bar 1',
+                    'detail' => 'Detail 1',
+                ),
+                array(
+                    'name' => 'Bar 2',
+                    'detail' => 'Detail 2',
+                ),
+                array(
+                    'name' => 'Bar 3',
+                    'detail' => 'Detail 3',
+                ),
+            ),
+        );
+        $request = Request::create('test', Request::METHOD_POST, array(), array(), array(), array(), json_encode($data));
+        $handler = $this->createFormHandler($request);
+
+        $objects = array(
+            new Foo(),
+            new Foo(),
+            new Foo(),
+        );
+        $config = $this->createFormConfigList($objects, $this->once());
+
+        $forms = $handler->processForms($config);
+
+        $this->assertSame(count($data['records']), count($forms));
+        $this->assertTrue(count($forms) > 0);
+
+        foreach ($forms as $i => $form) {
+            $this->assertInstanceOf('Symfony\Component\Form\FormInterface', $form);
+            $this->assertInstanceOf(get_class($objects[$i]), $form->getData());
+            $this->assertSame($objects[$i], $form->getData());
+            $this->assertTrue($form->isSubmitted());
+        }
+    }
+
+    public function testProcessFormsWithoutRecordsField()
+    {
+        $msg = 'The records field is required';
+        $this->setExpectedException('Sonatra\Bundle\ResourceBundle\Exception\InvalidResourceException', $msg);
+
+        $data = array(
             array(
                 'name' => 'Bar 1',
                 'detail' => 'Detail 1',
@@ -75,19 +122,9 @@ class FormHandlerTest extends AbstractFormHandlerTest
             new Foo(),
             new Foo(),
         );
-        $config = new FormConfig(FooType::class);
+        $config = $this->createFormConfigList($objects, $this->never());
 
-        $forms = $handler->processForms($config, $objects);
-
-        $this->assertSame(count($data), count($forms));
-        $this->assertTrue(count($forms) > 0);
-
-        foreach ($forms as $i => $form) {
-            $this->assertInstanceOf('Symfony\Component\Form\FormInterface', $form);
-            $this->assertInstanceOf(get_class($objects[$i]), $form->getData());
-            $this->assertSame($objects[$i], $form->getData());
-            $this->assertTrue($form->isSubmitted());
-        }
+        $handler->processForms($config);
     }
 
     public function testProcessFormsWithDifferentSize()
@@ -96,9 +133,12 @@ class FormHandlerTest extends AbstractFormHandlerTest
         $this->setExpectedException('Sonatra\Bundle\ResourceBundle\Exception\InvalidResourceException', $msg);
 
         $data = array(
-            array(
-                'name' => 'Bar 1',
-                'detail' => 'Detail 1',
+            'transaction' => true,
+            'records' => array(
+                array(
+                    'name' => 'Bar 1',
+                    'detail' => 'Detail 1',
+                ),
             ),
         );
         $request = Request::create('test', Request::METHOD_POST, array(), array(), array(), array(), json_encode($data));
@@ -108,9 +148,9 @@ class FormHandlerTest extends AbstractFormHandlerTest
             new Foo(),
             new Foo(),
         );
-        $config = new FormConfig(FooType::class);
+        $config = $this->createFormConfigList($objects, $this->once());
 
-        $handler->processForms($config, $objects);
+        $handler->processForms($config);
     }
 
     public function getLimits()
@@ -153,12 +193,35 @@ class FormHandlerTest extends AbstractFormHandlerTest
             );
             $objects[] = new Foo();
         }
+        $data = array(
+            'transaction' => true,
+            'records' => $data,
+        );
 
         $request = Request::create('test', Request::METHOD_POST, array(), array(), array(), array(), json_encode($data));
         $handler = $this->createFormHandler($request, $defaultLimit);
 
-        $config = new FormConfig(FooType::class);
+        $config = $this->createFormConfigList($objects, $this->any());
+        $config->setLimit($methodLimit);
 
-        $handler->processForms($config, $objects, $methodLimit);
+        $handler->processForms($config, $objects);
+    }
+
+    /**
+     * @param array                                                 $objects
+     * @param \PHPUnit_Framework_MockObject_Matcher_InvokedRecorder $count
+     *
+     * @return FormConfigListInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function createFormConfigList($objects, \PHPUnit_Framework_MockObject_Matcher_InvokedRecorder $count)
+    {
+        $config = $this->getMockBuilder(FormConfigList::class)
+            ->setConstructorArgs(array(FooType::class, array(), Request::METHOD_POST, 'json'))
+            ->getMockForAbstractClass();
+        $config->expects($count)
+            ->method('convertObjects')
+            ->will($this->returnValue($objects));
+
+        return $config;
     }
 }

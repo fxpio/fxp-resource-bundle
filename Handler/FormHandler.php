@@ -74,7 +74,7 @@ class FormHandler implements FormHandlerInterface
      */
     public function processForm(FormConfigInterface $config, $object)
     {
-        $forms = $this->process($config, array($object), false);
+        $forms = $this->process($config, array($object));
 
         return $forms[0];
     }
@@ -82,9 +82,9 @@ class FormHandler implements FormHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function processForms(FormConfigInterface $config, array $objects, $limit = null)
+    public function processForms(FormConfigListInterface $config, array $objects = array())
     {
-        return $this->process($config, $objects, true, $limit);
+        return $this->process($config, $objects);
     }
 
     /**
@@ -100,27 +100,24 @@ class FormHandler implements FormHandlerInterface
      *
      * @param FormConfigInterface $config  The form config
      * @param object[]|array[]    $objects The list of object instance
-     * @param bool                $isList  Check if the request data is a list
-     * @param int|null            $limit   The limit of max row
      *
      * @return FormInterface[]
      *
      * @throws InvalidResourceException When the size if request data and the object instances is different
      */
-    private function process(FormConfigInterface $config, array $objects, $isList, $limit = null)
+    private function process(FormConfigInterface $config, array $objects)
     {
-        $limit = $this->getLimit($limit);
+        $limit = $this->getLimit($config instanceof FormConfigListInterface ? $config->getLimit() : null);
         $forms = array();
-        $converter = $this->converterRegistry->get($config->getConverter());
-        $dataList = $converter->convert((string) $this->request->getContent());
-
-        if (!$isList) {
-            $dataList = array($dataList);
-        }
+        $dataList = $this->getDataList($config);
 
         if (null !== $limit && count($dataList) > $limit) {
             $msg = 'The list of resource sent exceeds the permitted limit (%s)';
             throw new InvalidResourceException(sprintf($msg, $limit));
+        }
+
+        if (0 === count($objects) && $config instanceof FormConfigListInterface) {
+            $objects = $config->convertObjects($dataList);
         }
 
         $objects = array_values($objects);
@@ -138,6 +135,27 @@ class FormHandler implements FormHandlerInterface
         }
 
         return $forms;
+    }
+
+    /**
+     * Get the form data list.
+     *
+     * @param FormConfigInterface $config The form config
+     *
+     * @return array
+     */
+    protected function getDataList(FormConfigInterface $config)
+    {
+        $converter = $this->converterRegistry->get($config->getConverter());
+        $dataList = $converter->convert((string) $this->request->getContent());
+
+        if ($config instanceof FormConfigListInterface) {
+            $dataList = $config->findList($dataList);
+        } else {
+            $dataList = array($dataList);
+        }
+
+        return $dataList;
     }
 
     /**
