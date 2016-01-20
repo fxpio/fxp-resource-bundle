@@ -63,6 +63,7 @@ abstract class BaseDomain extends AbstractDomain
         if (!$autoCommit) {
             if ($hasError) {
                 $this->cancelTransaction();
+                DomainUtil::cancelAllSuccessResources($resources);
             } else {
                 $errors = $this->flushTransaction();
                 DomainUtil::moveFlushErrorsInResource($resources, $errors);

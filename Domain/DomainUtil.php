@@ -228,6 +228,20 @@ abstract class DomainUtil
     }
 
     /**
+     * Cancel all resource in list that have an successfully status.
+     *
+     * @param ResourceListInterface $resources The list of resources
+     */
+    public static function cancelAllSuccessResources(ResourceListInterface $resources)
+    {
+        foreach ($resources->all() as $resource) {
+            if (ResourceStatutes::ERROR !== $resource->getStatus()) {
+                $resource->setStatus(ResourceStatutes::CANCELED);
+            }
+        }
+    }
+
+    /**
      * Get the map of object hash and constraint violation list.
      *
      * @param ConstraintViolationListInterface $errors

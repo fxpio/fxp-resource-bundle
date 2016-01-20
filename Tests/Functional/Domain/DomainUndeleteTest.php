@@ -233,6 +233,7 @@ class DomainUndeleteTest extends AbstractDomainTest
     {
         $this->configureEntityManager();
 
+        $successStatus = $autoCommit ? ResourceStatutes::UNDELETED : ResourceStatutes::CANCELED;
         $domain = $this->createDomain($this->softClass);
         /* @var Bar[] $objects */
         $objects = $this->insertResources($domain, 4);
@@ -259,10 +260,10 @@ class DomainUndeleteTest extends AbstractDomainTest
         $this->assertSame(ResourceListStatutes::MIXED, $res->getStatus());
 
         $this->assertInstanceOf($domain->getClass(), $res->get(0)->getRealData());
-        $this->assertSame(ResourceStatutes::UNDELETED, $res->get(0)->getStatus());
+        $this->assertSame($successStatus, $res->get(0)->getStatus());
         $this->assertTrue($res->get(0)->isValid());
         $this->assertInstanceOf($domain->getClass(), $res->get(1)->getRealData());
-        $this->assertSame(ResourceStatutes::UNDELETED, $res->get(1)->getStatus());
+        $this->assertSame($successStatus, $res->get(1)->getStatus());
         $this->assertTrue($res->get(1)->isValid());
         $this->assertInstanceOf('stdClass', $res->get(2)->getRealData());
         $this->assertSame(ResourceStatutes::ERROR, $res->get(2)->getStatus());
