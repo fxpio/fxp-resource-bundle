@@ -36,7 +36,7 @@ class DomainFormConfigListTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->domain = $this->getMock(DomainInterface::class);
+        $this->domain = $this->getMockBuilder(DomainInterface::class)->getMock();
         $this->config = new DomainFormConfigList($this->domain, FooType::class);
     }
 
@@ -112,7 +112,7 @@ class DomainFormConfigListTest extends \PHPUnit_Framework_TestCase
         $instances[0]->setBar('test1');
         $instances[1]->setBar('test2');
 
-        $repo = $this->getMock(ObjectRepository::class);
+        $repo = $this->getMockBuilder(ObjectRepository::class)->getMock();
         $repo->expects($this->once())
             ->method('findBy')
             ->will($this->returnValue($instances));

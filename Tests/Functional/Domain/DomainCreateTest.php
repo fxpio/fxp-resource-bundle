@@ -359,11 +359,12 @@ class DomainCreateTest extends AbstractDomainTest
         $this->assertSame(ResourceStatutes::CREATED, $resources->get(1)->getStatus());
     }
 
+    /**
+     * @expectedException \Sonatra\Bundle\ResourceBundle\Exception\UnexpectedTypeException
+     * @expectedExceptionMessage Expected argument of type "Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\Bundle\TestBundle\Entity\Foo", "integer" given at the position "0"
+     */
     public function testInvalidObjectType()
     {
-        $msg = 'Expected argument of type "Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\Bundle\TestBundle\Entity\Foo", "integer" given at the position "0"';
-        $this->setExpectedException('Sonatra\Bundle\ResourceBundle\Exception\UnexpectedTypeException', $msg);
-
         $domain = $this->createDomain();
         /* @var object $object */
         $object = 42;

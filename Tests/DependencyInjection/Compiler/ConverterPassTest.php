@@ -13,7 +13,6 @@ namespace Sonatra\Bundle\ResourceBundle\Tests\DependencyInjection\Compiler;
 
 use Sonatra\Bundle\ResourceBundle\DependencyInjection\Compiler\ConverterPass;
 use Sonatra\Bundle\ResourceBundle\Tests\Fixtures\Converter\CustomConverter;
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Definition;
@@ -85,11 +84,12 @@ class ConverterPassTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\DependencyInjection\Definition', $arg[0]);
     }
 
+    /**
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage The service id "test_invalid_converter_type" must be an class implementing the "Sonatra\Bundle\ResourceBundle\Converter\ConverterInterface" interface.
+     */
     public function testProcessWithInvalidInterface()
     {
-        $msg = 'The service id "test_invalid_converter_type" must be an class implementing the "Sonatra\Bundle\ResourceBundle\Converter\ConverterInterface" interface.';
-        $this->setExpectedException(InvalidConfigurationException::class, $msg);
-
         $container = $this->getContainer(array(
             'SonatraResourceBundle' => 'Sonatra\\Bundle\\ResourceBundle\\SonatraResourceBundle',
         ));
@@ -103,11 +103,12 @@ class ConverterPassTest extends \PHPUnit_Framework_TestCase
         $this->pass->process($container);
     }
 
+    /**
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage The service id "test_invalid_converter_type" must have the "type" parameter in the "sonatra_resource.converter" tag.
+     */
     public function testProcessWithInvalidType()
     {
-        $msg = 'The service id "test_invalid_converter_type" must have the "type" parameter in the "sonatra_resource.converter" tag.';
-        $this->setExpectedException(InvalidConfigurationException::class, $msg);
-
         $container = $this->getContainer(array(
             'SonatraResourceBundle' => 'Sonatra\\Bundle\\ResourceBundle\\SonatraResourceBundle',
         ));

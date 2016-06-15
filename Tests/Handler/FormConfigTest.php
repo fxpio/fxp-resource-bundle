@@ -54,11 +54,12 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(FooType::class, $config->getType());
     }
 
+    /**
+     * @expectedException \Sonatra\Bundle\ResourceBundle\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The form type of domain form config must be an string of class name of form type
+     */
     public function testSetInvalidType()
     {
-        $msg = 'The form type of domain form config must be an string of class name of form type';
-        $this->setExpectedException('Sonatra\Bundle\ResourceBundle\Exception\InvalidArgumentException', $msg);
-
         $config = new FormConfig('form_type_name');
         $config->setType(42);
     }

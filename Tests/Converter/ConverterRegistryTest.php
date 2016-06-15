@@ -28,7 +28,7 @@ class ConverterRegistryTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $converter = $this->getMock('Sonatra\Bundle\ResourceBundle\Converter\ConverterInterface');
+        $converter = $this->getMockBuilder('Sonatra\Bundle\ResourceBundle\Converter\ConverterInterface')->getMock();
         $converter->expects($this->any())
             ->method('getName')
             ->will($this->returnValue('foo'));
@@ -38,11 +38,12 @@ class ConverterRegistryTest extends \PHPUnit_Framework_TestCase
         ));
     }
 
+    /**
+     * @expectedException \Sonatra\Bundle\ResourceBundle\Exception\UnexpectedTypeException
+     * @expectedExceptionMessage Expected argument of type "Sonatra\Bundle\ResourceBundle\Converter\ConverterInterface", "DateTime" given
+     */
     public function testUnexpectedTypeException()
     {
-        $msg = 'Expected argument of type "Sonatra\Bundle\ResourceBundle\Converter\ConverterInterface", "DateTime" given';
-        $this->setExpectedException('Sonatra\Bundle\ResourceBundle\Exception\UnexpectedTypeException', $msg);
-
         new ConverterRegistry(array(
             new \DateTime(),
         ));
@@ -54,19 +55,21 @@ class ConverterRegistryTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->registry->has('bar'));
     }
 
+    /**
+     * @expectedException \Sonatra\Bundle\ResourceBundle\Exception\UnexpectedTypeException
+     * @expectedExceptionMessageRegExp /Expected argument of type "(\w+)", "(\w+)" given/
+     */
     public function testGetInvalidType()
     {
-        $msg = '/Expected argument of type "(\w+)", "(\w+)" given/';
-        $this->setExpectedExceptionRegExp('Sonatra\Bundle\ResourceBundle\Exception\UnexpectedTypeException', $msg);
-
         $this->registry->get(42);
     }
 
+    /**
+     * @expectedException \Sonatra\Bundle\ResourceBundle\Exception\InvalidArgumentException
+     * @expectedExceptionMessageRegExp /Could not load content converter "(\w+)"/
+     */
     public function testGetNonExistentConverter()
     {
-        $msg = '/Could not load content converter "(\w+)"/';
-        $this->setExpectedExceptionRegExp('Sonatra\Bundle\ResourceBundle\Exception\InvalidArgumentException', $msg);
-
         $this->registry->get('bar');
     }
 

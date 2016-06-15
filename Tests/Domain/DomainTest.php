@@ -53,11 +53,12 @@ class DomainTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Doctrine\ORM\QueryBuilder', $qb);
     }
 
+    /**
+     * @expectedException \Sonatra\Bundle\ResourceBundle\Exception\BadMethodCallException
+     * @expectedExceptionMessage The "Domain::createQueryBuilder()" method can only be called for a domain with Doctrine ORM Entity Manager
+     */
     public function testCreateQueryBuilderInvalidObjectManager()
     {
-        $msg = 'The "Domain::createQueryBuilder()" method can only be called for a domain with Doctrine ORM Entity Manager';
-        $this->setExpectedException('Sonatra\Bundle\ResourceBundle\Exception\BadMethodCallException', $msg);
-
         $domain = new Domain('Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\Bundle\TestBundle\Entity\Foo');
         $domain->createQueryBuilder();
     }

@@ -55,7 +55,7 @@ class ResourceListTest extends \PHPUnit_Framework_TestCase
         $resources = array();
 
         foreach ($resourceStatutes as $rStatus) {
-            $resource = $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface');
+            $resource = $this->getMockBuilder('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface')->getMock();
             $resource->expects($this->any())
                 ->method('getStatus')
                 ->will($this->returnValue($rStatus));
@@ -71,16 +71,16 @@ class ResourceListTest extends \PHPUnit_Framework_TestCase
     public function testGetResources()
     {
         $resources = array(
-            $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface'),
-            $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface'),
+            $this->getMockBuilder('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface')->getMock(),
+            $this->getMockBuilder('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface')->getMock(),
         );
 
         $list = new ResourceList($resources);
         $this->assertSame($resources, $list->getResources());
 
         $resources2 = array(
-            $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface'),
-            $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface'),
+            $this->getMockBuilder('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface')->getMock(),
+            $this->getMockBuilder('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface')->getMock(),
         );
 
         $list2 = new ResourceList($resources2);
@@ -108,11 +108,12 @@ class ResourceListTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($all[3], $list->offsetGet(3));
     }
 
+    /**
+     * @expectedException \Sonatra\Bundle\ResourceBundle\Exception\OutOfBoundsException
+     * @expectedExceptionMessage The offset "0" does not exist.
+     */
     public function testGetOUtOfBoundsException()
     {
-        $msg = 'The offset "0" does not exist.';
-        $this->setExpectedException('Sonatra\Bundle\ResourceBundle\Exception\OutOfBoundsException', $msg);
-
         $list = new ResourceList(array());
         $list->get(0);
     }
@@ -120,13 +121,13 @@ class ResourceListTest extends \PHPUnit_Framework_TestCase
     public function testSet()
     {
         $resources = array(
-            $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface'),
-            $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface'),
+            $this->getMockBuilder('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface')->getMock(),
+            $this->getMockBuilder('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface')->getMock(),
         );
         $list = new ResourceList($resources);
 
         /* @var ResourceInterface $new */
-        $new = $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface');
+        $new = $this->getMockBuilder('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface')->getMock();
 
         $this->assertNotSame($new, $list->get(0));
         $list->set(0, $new);
@@ -134,7 +135,7 @@ class ResourceListTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($new, $list->get(0));
 
         /* @var ResourceInterface $new2 */
-        $new2 = $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface');
+        $new2 = $this->getMockBuilder('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface')->getMock();
 
         $this->assertNotSame($new2, $list->offsetGet(1));
         $list->offsetSet(1, $new2);
@@ -142,7 +143,7 @@ class ResourceListTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($new2, $list->offsetGet(1));
 
         /* @var ResourceInterface $new3 */
-        $new3 = $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface');
+        $new3 = $this->getMockBuilder('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface')->getMock();
 
         $this->assertCount(2, $list);
 
@@ -154,8 +155,8 @@ class ResourceListTest extends \PHPUnit_Framework_TestCase
     public function testRemove()
     {
         $resources = array(
-            $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface'),
-            $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface'),
+            $this->getMockBuilder('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface')->getMock(),
+            $this->getMockBuilder('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface')->getMock(),
         );
         $list = new ResourceList($resources);
 
@@ -173,8 +174,8 @@ class ResourceListTest extends \PHPUnit_Framework_TestCase
     public function testGetEmptyErrorsAndEmptyChildrenErrors()
     {
         $resources = array(
-            $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface'),
-            $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface'),
+            $this->getMockBuilder('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface')->getMock(),
+            $this->getMockBuilder('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface')->getMock(),
         );
         $list = new ResourceList($resources);
 
@@ -186,15 +187,15 @@ class ResourceListTest extends \PHPUnit_Framework_TestCase
     public function testGetErrorsAndEmptyChildrenErrors()
     {
         $resources = array(
-            $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface'),
-            $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface'),
+            $this->getMockBuilder('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface')->getMock(),
+            $this->getMockBuilder('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface')->getMock(),
         );
         $list = new ResourceList($resources);
 
         $this->assertInstanceOf('Symfony\Component\Validator\ConstraintViolationListInterface', $list->getErrors());
 
         /* @var ConstraintViolationInterface $error */
-        $error = $this->getMock('Symfony\Component\Validator\ConstraintViolationInterface');
+        $error = $this->getMockBuilder('Symfony\Component\Validator\ConstraintViolationInterface')->getMock();
         $list->getErrors()->add($error);
         $this->assertCount(1, $list->getErrors());
         $this->assertTrue($list->hasErrors());
@@ -203,7 +204,7 @@ class ResourceListTest extends \PHPUnit_Framework_TestCase
     public function testGetEmptyErrorsAndChildrenErrors()
     {
         /* @var ResourceInterface|\PHPUnit_Framework_MockObject_MockObject $errorResource */
-        $errorResource = $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface');
+        $errorResource = $this->getMockBuilder('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface')->getMock();
         $errorResource->expects($this->any())
             ->method('getStatus')
             ->will($this->returnValue(ResourceStatutes::ERROR));
@@ -213,7 +214,7 @@ class ResourceListTest extends \PHPUnit_Framework_TestCase
 
         $resources = array(
             $errorResource,
-            $this->getMock('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface'),
+            $this->getMockBuilder('Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface')->getMock(),
         );
         $list = new ResourceList($resources);
 

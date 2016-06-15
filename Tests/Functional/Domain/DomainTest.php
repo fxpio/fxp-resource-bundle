@@ -18,11 +18,13 @@ namespace Sonatra\Bundle\ResourceBundle\Tests\Functional\Domain;
  */
 class DomainTest extends AbstractDomainTest
 {
+    /**
+     * @expectedException \Sonatra\Bundle\ResourceBundle\Exception\InvalidConfigurationException
+     * @expectedExceptionMessageRegExp /The "([\w\\\/]+)" class is not managed by doctrine object manager/
+     */
     public function testMappingException()
     {
         $class = 'DateTime';
-        $msg = 'The "'.$class.'" class is not managed by doctrine object manager';
-        $this->setExpectedException('Sonatra\Bundle\ResourceBundle\Exception\InvalidConfigurationException', $msg);
 
         $this->createDomain($class);
     }

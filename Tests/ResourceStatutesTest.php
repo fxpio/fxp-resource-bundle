@@ -18,9 +18,11 @@ use Sonatra\Bundle\ResourceBundle\ResourceStatutes;
  */
 class ResourceStatutesTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @expectedException \Sonatra\Bundle\ResourceBundle\Exception\ClassNotInstantiableException
+     */
     public function testInstantiationOfClass()
     {
-        $this->setExpectedException('Sonatra\Bundle\ResourceBundle\Exception\ClassNotInstantiableException');
         new ResourceStatutes();
     }
 }

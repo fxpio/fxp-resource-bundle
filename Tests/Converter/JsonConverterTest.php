@@ -36,10 +36,12 @@ class JsonConverterTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('json', $this->converter->getName());
     }
 
+    /**
+     * @expectedException \Sonatra\Bundle\ResourceBundle\Exception\InvalidConverterException
+     * @expectedExceptionMessage Body should be a JSON object
+     */
     public function testInvalidConversion()
     {
-        $this->setExpectedException('Sonatra\Bundle\ResourceBundle\Exception\InvalidConverterException', 'Body should be a JSON object');
-
         $this->converter->convert('<xml>content</xml>');
     }
 

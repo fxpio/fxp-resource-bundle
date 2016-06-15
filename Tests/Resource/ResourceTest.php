@@ -22,11 +22,12 @@ use Symfony\Component\Form\Test\FormInterface;
  */
 class ResourceTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @expectedException \Sonatra\Bundle\ResourceBundle\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The data of resource is not a form instance, used the "getErrors()" method
+     */
     public function testGetFormErrorsWithObjectData()
     {
-        $msg = 'The data of resource is not a form instance, used the "getErrors()" method';
-        $this->setExpectedException('Sonatra\Bundle\ResourceBundle\Exception\InvalidArgumentException', $msg);
-
         $resource = new Resource(new Foo());
         $resource->getFormErrors();
     }
@@ -38,7 +39,7 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         /* @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $form */
-        $form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $form = $this->getMockBuilder('Symfony\Component\Form\FormInterface')->getMock();
         $form->expects($this->any())
             ->method('getData')
             ->will($this->returnValue(new Foo()));
@@ -52,27 +53,29 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\Form\FormErrorIterator', $errors);
     }
 
+    /**
+     * @expectedException \Sonatra\Bundle\ResourceBundle\Exception\UnexpectedTypeException
+     * @expectedExceptionMessage Expected argument of type "object", "integer" given
+     */
     public function testUnexpectedTypeException()
     {
-        $msg = 'Expected argument of type "object", "integer" given';
-        $this->setExpectedException('Sonatra\Bundle\ResourceBundle\Exception\UnexpectedTypeException', $msg);
-
         /* @var object $object */
         $object = 42;
 
         new Resource($object);
     }
 
+    /**
+     * @expectedException \Sonatra\Bundle\ResourceBundle\Exception\UnexpectedTypeException
+     * @expectedExceptionMessage Expected argument of type "object", "integer" given
+     */
     public function testUnexpectedTypeExceptionWithForm()
     {
-        $msg = 'Expected argument of type "object", "integer" given';
-        $this->setExpectedException('Sonatra\Bundle\ResourceBundle\Exception\UnexpectedTypeException', $msg);
-
         /* @var object $object */
         $object = 42;
 
         /* @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $form */
-        $form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $form = $this->getMockBuilder('Symfony\Component\Form\FormInterface')->getMock();
         $form->expects($this->any())
             ->method('getData')
             ->will($this->returnValue($object));

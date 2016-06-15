@@ -25,11 +25,12 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class FormHandlerTest extends AbstractFormHandlerTest
 {
+    /**
+     * @expectedException \Sonatra\Bundle\ResourceBundle\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The current request is required in request stack
+     */
     public function testEmptyCurrentRequestException()
     {
-        $msg = 'The current request is required in request stack';
-        $this->setExpectedException('Sonatra\Bundle\ResourceBundle\Exception\InvalidArgumentException', $msg);
-
         $this->createFormHandler();
     }
 
@@ -95,11 +96,12 @@ class FormHandlerTest extends AbstractFormHandlerTest
         }
     }
 
+    /**
+     * @expectedException \Sonatra\Bundle\ResourceBundle\Exception\InvalidResourceException
+     * @expectedExceptionMessage The records field is required
+     */
     public function testProcessFormsWithoutRecordsField()
     {
-        $msg = 'The records field is required';
-        $this->setExpectedException('Sonatra\Bundle\ResourceBundle\Exception\InvalidResourceException', $msg);
-
         $data = array(
             array(
                 'name' => 'Bar 1',
@@ -127,11 +129,12 @@ class FormHandlerTest extends AbstractFormHandlerTest
         $handler->processForms($config);
     }
 
+    /**
+     * @expectedException \Sonatra\Bundle\ResourceBundle\Exception\InvalidResourceException
+     * @expectedExceptionMessage The size of the request data list (1) is different that the object instance list (2)
+     */
     public function testProcessFormsWithDifferentSize()
     {
-        $msg = 'The size of the request data list (1) is different that the object instance list (2)';
-        $this->setExpectedException('Sonatra\Bundle\ResourceBundle\Exception\InvalidResourceException', $msg);
-
         $data = array(
             'transaction' => true,
             'records' => array(
@@ -170,19 +173,12 @@ class FormHandlerTest extends AbstractFormHandlerTest
      * @param int      $size
      * @param int|null $defaultLimit
      * @param int|null $methodLimit
-     * @param int|null $validLimit
+     *
+     * @expectedException \Sonatra\Bundle\ResourceBundle\Exception\InvalidResourceException
+     * @expectedExceptionMessageRegExp /The list of resource sent exceeds the permitted limit \(\d+\)/
      */
-    public function testLimitMethod($size, $defaultLimit, $methodLimit, $validLimit)
+    public function testLimitMethod($size, $defaultLimit, $methodLimit)
     {
-        $exceptionLimit = null === $defaultLimit ? $methodLimit : $defaultLimit;
-
-        if ($exceptionLimit !== $validLimit) {
-            $exceptionLimit = $validLimit;
-        }
-
-        $msg = 'The list of resource sent exceeds the permitted limit ('.$exceptionLimit.')';
-        $this->setExpectedException('Sonatra\Bundle\ResourceBundle\Exception\InvalidResourceException', $msg);
-
         $data = array();
         $objects = array();
 
