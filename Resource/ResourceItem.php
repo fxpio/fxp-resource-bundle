@@ -23,7 +23,7 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  *
  * @author François Pluchino <francois.pluchino@sonatra.com>
  */
-class Resource implements ResourceInterface
+class ResourceItem implements ResourceInterface
 {
     /**
      * @var string

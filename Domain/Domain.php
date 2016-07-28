@@ -16,7 +16,7 @@ use Doctrine\ORM\QueryBuilder;
 use Sonatra\Bundle\ResourceBundle\Event\ResourceEvent;
 use Sonatra\Bundle\ResourceBundle\Exception\BadMethodCallException;
 use Sonatra\Bundle\ResourceBundle\Model\SoftDeletableInterface;
-use Sonatra\Bundle\ResourceBundle\Resource\Resource;
+use Sonatra\Bundle\ResourceBundle\Resource\ResourceItem;
 use Sonatra\Bundle\ResourceBundle\Resource\ResourceInterface;
 use Sonatra\Bundle\ResourceBundle\Resource\ResourceListInterface;
 use Sonatra\Bundle\ResourceBundle\Resource\ResourceUtil;
@@ -74,7 +74,7 @@ class Domain extends BaseDomain
         foreach ($missingIds as $id) {
             $sdt = new \stdClass();
             $sdt->{DomainUtil::getIdentifierName($this->om, $this->getClass())} = $id;
-            $resource = new Resource($sdt);
+            $resource = new ResourceItem($sdt);
             DomainUtil::addResourceError($resource, sprintf('The object with the identifier "%s" does not exist', $id));
             $errorResources[] = $resource;
         }

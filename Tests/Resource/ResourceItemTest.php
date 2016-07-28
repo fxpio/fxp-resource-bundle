@@ -11,16 +11,16 @@
 
 namespace Sonatra\Bundle\ResourceBundle\Tests\Resource;
 
-use Sonatra\Bundle\ResourceBundle\Resource\Resource;
+use Sonatra\Bundle\ResourceBundle\Resource\ResourceItem;
 use Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\Bundle\TestBundle\Entity\Foo;
 use Symfony\Component\Form\Test\FormInterface;
 
 /**
- * Tests case for resource.
+ * Tests case for resource item.
  *
  * @author François Pluchino <francois.pluchino@sonatra.com>
  */
-class ResourceTest extends \PHPUnit_Framework_TestCase
+class ResourceItemTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @expectedException \Sonatra\Bundle\ResourceBundle\Exception\InvalidArgumentException
@@ -28,7 +28,7 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetFormErrorsWithObjectData()
     {
-        $resource = new Resource(new Foo());
+        $resource = new ResourceItem(new Foo());
         $resource->getFormErrors();
     }
 
@@ -47,7 +47,7 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
             ->method('getErrors')
             ->will($this->returnValue($fErrors));
 
-        $resource = new Resource($form);
+        $resource = new ResourceItem($form);
         $errors = $resource->getFormErrors();
 
         $this->assertInstanceOf('Symfony\Component\Form\FormErrorIterator', $errors);
@@ -62,7 +62,7 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
         /* @var object $object */
         $object = 42;
 
-        new Resource($object);
+        new ResourceItem($object);
     }
 
     /**
@@ -80,6 +80,6 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
             ->method('getData')
             ->will($this->returnValue($object));
 
-        new Resource($form);
+        new ResourceItem($form);
     }
 }

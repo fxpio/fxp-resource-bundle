@@ -39,7 +39,7 @@ abstract class ResourceUtil
 
         foreach ($objects as $i => $object) {
             static::validateObjectResource($object, $requireClass, $i, $allowForm);
-            $list->add(new Resource((object) $object));
+            $list->add(new ResourceItem((object) $object));
         }
 
         return $list;
