@@ -135,6 +135,14 @@ abstract class AbstractDomain implements DomainInterface
     /**
      * {@inheritdoc}
      */
+    public function getObjectManager()
+    {
+        return $this->om;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function setEventDispatcher(EventDispatcherInterface $ed)
     {
         $this->ed = $ed;

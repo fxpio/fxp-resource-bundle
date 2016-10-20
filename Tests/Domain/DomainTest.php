@@ -50,6 +50,7 @@ class DomainTest extends \PHPUnit_Framework_TestCase
         $domain->setObjectManager($om);
         $qb = $domain->createQueryBuilder('f');
 
+        $this->assertSame($om, $domain->getObjectManager());
         $this->assertInstanceOf('Doctrine\ORM\QueryBuilder', $qb);
     }
 

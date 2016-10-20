@@ -47,6 +47,13 @@ interface DomainInterface
     public function setObjectManager(ObjectManager $om, $disableFilters = array());
 
     /**
+     * Get the doctrine object registry.
+     *
+     * @return ObjectManager
+     */
+    public function getObjectManager();
+
+    /**
      * Set the event dispatcher.
      *
      * @param EventDispatcherInterface $ed
