@@ -11,6 +11,7 @@
 
 namespace Sonatra\Bundle\ResourceBundle\Exception;
 
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
@@ -32,9 +33,9 @@ class ConstraintViolationException extends RuntimeException
      * @param \Exception                       $previous   The previous exception
      */
     public function __construct(ConstraintViolationListInterface $violations,
-                                $message = 'Failed validation', $code = 0, \Exception $previous = null)
+                                $message = null, $code = 0, \Exception $previous = null)
     {
-        parent::__construct($message, $code, $previous);
+        parent::__construct(null !== $message ? $message : Response::$statusTexts[422], $code, $previous);
 
         $this->violations = $violations;
     }
