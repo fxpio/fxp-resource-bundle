@@ -11,36 +11,31 @@
 
 namespace Sonatra\Bundle\ResourceBundle\Tests\DependencyInjection\Compiler;
 
-use Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\TestAppKernel;
+use Sonatra\Bundle\ResourceBundle\Tests\Fixtures\Domain\CustomDomain;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Definition;
 use Sonatra\Bundle\ResourceBundle\DependencyInjection\Compiler\DomainPass;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 /**
  * Tests case for domain pass compiler.
  *
  * @author François Pluchino <francois.pluchino@sonatra.com>
  */
-class DomainPassTest extends KernelTestCase
+class DomainPassTest extends \PHPUnit_Framework_TestCase
 {
-    protected static $class = 'Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\TestAppKernel';
-
-    /**
-     * @var TestAppKernel
-     */
-    protected static $kernel;
-
     /**
      * @var string
      */
     protected $rootDir;
+
     /**
      * @var Filesystem
      */
     protected $fs;
+
     /**
      * @var DomainPass
      */
@@ -86,60 +81,52 @@ class DomainPassTest extends KernelTestCase
 
     public function testProcessWithCustomDomainManager()
     {
-        $className = 'Sonatra\Bundle\ResourceBundle\Tests\Functional\Fixture\Bundle\TestBundle\Entity\Foo';
-        $def = new Definition('Sonatra\Bundle\ResourceBundle\Tests\Fixtures\Domain\CustomDomain', array($className));
+        $container = $this->getContainer(array(
+            'SonatraResourceBundle' => 'Sonatra\\Bundle\\ResourceBundle\\SonatraResourceBundle',
+        ));
+
+        $this->assertTrue($container->has('sonatra_resource.domain_manager'));
+
+        $def = new Definition(CustomDomain::class);
         $def->addTag('sonatra_resource.domain');
-        $definitions = array(
-            'test.custom_domain' => $def,
-        );
+        $def->setArguments(array(
+            \stdClass::class,
+        ));
+        $container->setDefinition('test_valid_custom_domain', $def);
 
-        $container = $this->buildAndValidateContainerBuilder($definitions, false);
         $this->pass->process($container);
-        $container->compile();
 
-        $dmDef = $container->getDefinition('sonatra_resource.domain_manager');
-        $args = $dmDef->getArguments();
-        $this->assertCount(2, $args);
-        $this->assertCount(1, $args[0]);
+        $this->assertCount(5, $def->getMethodCalls());
+        $methods = array();
 
-        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $args[0][0]);
-        $serviceId = (string) $args[0][0];
+        foreach ($def->getMethodCalls() as $test => $config) {
+            $methods[] = $config[0];
+        }
 
-        /* @var Definition $compiledDef */
-        $compiledDef = $container->getDefinition($serviceId);
-
-        $this->assertNotSame('Sonatra\Bundle\ResourceBundle\Domain\Domain', $compiledDef->getClass());
-
-        $dmDef = $container->getDefinition('sonatra_resource.domain_manager');
-        $args = $dmDef->getArguments();
-        $this->assertCount(2, $args);
-        $this->assertCount(1, $args[0]);
-
-        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $args[0][0]);
-        $serviceId = (string) $args[0][0];
-        /* @var Definition $def */
-        $def = $container->getDefinition($serviceId);
-
-        $this->assertSame('Sonatra\Bundle\ResourceBundle\Tests\Fixtures\Domain\CustomDomain', $def->getClass());
+        $this->assertTrue(in_array('setDebug', $methods));
+        $this->assertTrue(in_array('setObjectManager', $methods));
+        $this->assertTrue(in_array('setEventDispatcher', $methods));
+        $this->assertTrue(in_array('setObjectFactory', $methods));
+        $this->assertTrue(in_array('setValidator', $methods));
     }
 
     /**
-     * @param Definition[] $definitions The definitions
-     * @param bool         $compile     Compile the container
-     *
-     * @return ContainerBuilder
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The service "test_invalid_custom_domain" must define the managed class by Doctrine with the first argument
      */
-    protected function buildAndValidateContainerBuilder(array $definitions = array(), $compile = true)
+    public function testProcessWithCustomDomainManagerWithoutClassname()
     {
-        static::$kernel = static::createKernel(array());
-        $container = static::$kernel->getContainerBuilderForCompilerPass($definitions, $compile);
+        $container = $this->getContainer(array(
+            'SonatraResourceBundle' => 'Sonatra\\Bundle\\ResourceBundle\\SonatraResourceBundle',
+        ));
 
-        if ($compile) {
-            $this->assertTrue($container->has('sonatra_resource.domain_manager'));
-            $this->assertTrue($container->has('doctrine'));
-        }
+        $this->assertTrue($container->has('sonatra_resource.domain_manager'));
 
-        return $container;
+        $def = new Definition(CustomDomain::class);
+        $def->addTag('sonatra_resource.domain');
+        $container->setDefinition('test_invalid_custom_domain', $def);
+
+        $this->pass->process($container);
     }
 
     /**
@@ -163,7 +150,11 @@ class DomainPassTest extends KernelTestCase
         )));
 
         if (!$empty) {
-            $dmDef = new Definition('Sonatra\Bundle\ResourceBundle\Domain\DomainManager');
+            $dmDef = new Definition('Sonatra\Component\Resource\Domain\DomainManager');
+            $dmDef->setArguments(array(
+                array(),
+                new Reference('sonatra_resource.domain_factory'),
+            ));
             $container->setDefinition('sonatra_resource.domain_manager', $dmDef);
 
             $drDef = new Definition('Doctrine\Common\Persistence\ManagerRegistry');

@@ -14,6 +14,7 @@ namespace Sonatra\Bundle\ResourceBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\Expression;
 
@@ -35,7 +36,7 @@ class DomainPass implements CompilerPassInterface
         $managers = array();
 
         foreach ($container->findTaggedServiceIds('sonatra_resource.domain') as $serviceId => $tag) {
-            $managers[] = new Reference($serviceId);
+            $managers[$serviceId] = new Reference($serviceId);
         }
 
         $container->getDefinition('sonatra_resource.domain_manager')->replaceArgument(0, $managers);
@@ -50,8 +51,14 @@ class DomainPass implements CompilerPassInterface
      */
     private function injectDependencies(ContainerBuilder $container, array $managers)
     {
-        foreach ($managers as $manager) {
+        foreach ($managers as $serviceId => $manager) {
             $def = $container->getDefinition((string) $manager);
+
+            if (0 === count($def->getArguments())) {
+                $msg = 'The service "%s" must define the managed class by Doctrine with the first argument';
+                throw new InvalidArgumentException(sprintf($msg, $serviceId));
+            }
+
             $pos = $this->getClassPosition($def);
             $def->addMethodCall('setDebug', array('%kernel.debug%'));
             $om = new Expression('service("doctrine").getManagerForClass("'.str_replace('\\', '\\\\', $def->getArgument($pos)).'")');

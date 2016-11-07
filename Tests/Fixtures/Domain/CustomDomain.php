@@ -11,7 +11,7 @@
 
 namespace Sonatra\Bundle\ResourceBundle\Tests\Fixtures\Domain;
 
-use Sonatra\Bundle\ResourceBundle\Domain\Domain;
+use Sonatra\Component\Resource\Domain\Domain;
 
 /**
  * Custom domain mock.

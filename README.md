@@ -19,27 +19,9 @@ invalid resources), whether for a resource or set of resources.
 
 Features include:
 
-- Resource Domain Manager for get a resource domain for an doctrine resource
-- Resource Domain for each doctrine resource for easy management:
-  - generate new instance of resource with default value configured by Sonatra DefaultValueBundle
-  - create one resource with validation (for object or Form instance)
-  - create a list of resources with validation for each resource (for object or Form instance)
-  - update one resource with validation (for object or Form instance)
-  - update a list of resources with validation for each resource (for object or Form instance)
-  - upsert one resource with validation (create or update for object or Form instance)
-  - upsert a list of resources with validation for each resource (create or update for object or Form instance)
-  - delete one resource with soft delete or hard delete for compatible resources
-  - delete a list of resources with soft delete or hard delete for compatible resources
-  - undelete one resource for compatible resources with soft delete
-  - undelete a list of resources for compatible resources with soft delete
-- Each resource domain allow:
-  - to have the possibility to do an transaction with rollback for each resource of the list or for all resources in only one time
-  - to have the possibility to skip the errors of an resource, and continue to run the rest of the list (compatible only with the transaction for each resource)
-  - to return the list of resources with the status of the action (created, updated, error ...) on each resource of the list
-- Compiler pass for override or add a custom resource domain
-
-> **Note:**
-> <sup>1</sup> A resource is an doctrine entity or doctrine document
+- All features of [Sonatra Resource](https://github.com/sonatra/sonatra-resource)
+- Compiler pass to override or add a custom resource domain
+- Compiler pass to add a custom converter
 
 Documentation
 -------------
@@ -65,7 +47,7 @@ About
 -----
 
 Sonatra ResourceBundle is a [sonatra](https://github.com/sonatra) initiative.
-See also the list of [contributors](https://github.com/sonatra/SonatraResourceBundle/contributors).
+See also the list of [contributors](https://github.com/sonatra/SonatraResourceBundle/graphs/contributors).
 
 Reporting an issue or a feature request
 ---------------------------------------

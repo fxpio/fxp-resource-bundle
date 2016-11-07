@@ -86,7 +86,7 @@ class ConverterPassTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage The service id "test_invalid_converter_type" must be an class implementing the "Sonatra\Bundle\ResourceBundle\Converter\ConverterInterface" interface.
+     * @expectedExceptionMessage The service id "test_invalid_converter_type" must be an class implementing the "Sonatra\Component\Resource\Converter\ConverterInterface" interface.
      */
     public function testProcessWithInvalidInterface()
     {
@@ -142,11 +142,11 @@ class ConverterPassTest extends \PHPUnit_Framework_TestCase
         )));
 
         if (count($bundles) > 0) {
-            $crDef = new Definition('Sonatra\Bundle\ResourceBundle\Converter\ConverterRegistry');
+            $crDef = new Definition('Sonatra\Component\Resource\Converter\ConverterRegistry');
             $crDef->addArgument(array());
             $container->setDefinition('sonatra_resource.converter_registry', $crDef);
 
-            $jcDef = new Definition('Sonatra\Bundle\ResourceBundle\Converter\JsonConverter');
+            $jcDef = new Definition('Sonatra\Component\Resource\Converter\JsonConverter');
             $jcDef->addTag('sonatra_resource.converter');
             $container->setDefinition('sonatra_resource.converter.json', $jcDef);
         }

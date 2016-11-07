@@ -5,7 +5,7 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="sonatra_resource.form_handler.class">Sonatra\Bundle\ResourceBundle\Handler\FormHandler</parameter>
+        <parameter key="sonatra_resource.form_handler.class">Sonatra\Component\Resource\Handler\FormHandler</parameter>
     </parameters>
 
     <services>

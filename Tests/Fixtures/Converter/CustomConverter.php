@@ -11,7 +11,7 @@
 
 namespace Sonatra\Bundle\ResourceBundle\Tests\Fixtures\Converter;
 
-use Sonatra\Bundle\ResourceBundle\Converter\ConverterInterface;
+use Sonatra\Component\Resource\Converter\ConverterInterface;
 
 /**
  * Custom converter mock.
