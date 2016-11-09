@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "7acdc4408fc8bfb2e50dcf0a1b3f6315",
+    "hash": "50c9d7dba84c4bed1a7235de95512287",
     "content-hash": "7baf4540148dedc6a741b0488c17335b",
     "packages": [
         {
@@ -608,16 +608,16 @@
         },
         {
             "name": "paragonie/random_compat",
-            "version": "v2.0.3",
+            "version": "v2.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/paragonie/random_compat.git",
-                "reference": "c0125896dbb151380ab47e96c621741e79623beb"
+                "reference": "a9b97968bcde1c4de2a5ec6cbd06a0f6c919b46e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/paragonie/random_compat/zipball/c0125896dbb151380ab47e96c621741e79623beb",
-                "reference": "c0125896dbb151380ab47e96c621741e79623beb",
+                "url": "https://api.github.com/repos/paragonie/random_compat/zipball/a9b97968bcde1c4de2a5ec6cbd06a0f6c919b46e",
+                "reference": "a9b97968bcde1c4de2a5ec6cbd06a0f6c919b46e",
                 "shasum": ""
             },
             "require": {
@@ -652,7 +652,7 @@
                 "pseudorandom",
                 "random"
             ],
-            "time": "2016-10-17 15:23:22"
+            "time": "2016-11-07 23:38:38"
         },
         {
             "name": "psr/cache",
@@ -809,13 +809,13 @@
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/sonatra/SonatraDefaultValueBundle.git",
-                "reference": "8eef80e0a422bca59d0087611aa6e5431f3a0f2b"
+                "url": "https://github.com/sonatra/sonatra-default-value-bundle.git",
+                "reference": "8310f48b3c2d76caad7151f0b2d58c07c1f4ad19"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sonatra/SonatraDefaultValueBundle/zipball/8eef80e0a422bca59d0087611aa6e5431f3a0f2b",
-                "reference": "8eef80e0a422bca59d0087611aa6e5431f3a0f2b",
+                "url": "https://api.github.com/repos/sonatra/sonatra-default-value-bundle/zipball/8310f48b3c2d76caad7151f0b2d58c07c1f4ad19",
+                "reference": "8310f48b3c2d76caad7151f0b2d58c07c1f4ad19",
                 "shasum": ""
             },
             "require": {
@@ -848,14 +848,14 @@
                 }
             ],
             "description": "Creates or injects the default values ​​with a advanced configuration in the object",
-            "homepage": "https://github.com/sonatra/SonatraDefaultValueBundle",
+            "homepage": "https://github.com/sonatra/sonatra-default-value-bundle",
             "keywords": [
                 "default value",
                 "document",
                 "entity",
                 "object"
             ],
-            "time": "2016-11-05 19:28:28"
+            "time": "2016-11-09 10:11:25"
         },
         {
             "name": "sonatra/resource",
