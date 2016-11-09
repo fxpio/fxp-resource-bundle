@@ -2,9 +2,9 @@ Sonatra Resource Bundle
 =======================
 
 [![Latest Version](https://img.shields.io/packagist/v/sonatra/resource-bundle.svg)](https://packagist.org/packages/sonatra/resource-bundle)
-[![Build Status](https://img.shields.io/travis/sonatra/SonatraResourceBundle/master.svg)](https://travis-ci.org/sonatra/SonatraResourceBundle)
-[![Coverage Status](https://img.shields.io/coveralls/sonatra/SonatraResourceBundle/master.svg)](https://coveralls.io/r/sonatra/SonatraResourceBundle?branch=master)
-[![Scrutinizer Code Quality](https://img.shields.io/scrutinizer/g/sonatra/SonatraResourceBundle/master.svg)](https://scrutinizer-ci.com/g/sonatra/SonatraResourceBundle?branch=master)
+[![Build Status](https://img.shields.io/travis/sonatra/sonatra-resource-bundle/master.svg)](https://travis-ci.org/sonatra/sonatra-resource-bundle)
+[![Coverage Status](https://img.shields.io/coveralls/sonatra/sonatra-resource-bundle/master.svg)](https://coveralls.io/r/sonatra/sonatra-resource-bundle?branch=master)
+[![Scrutinizer Code Quality](https://img.shields.io/scrutinizer/g/sonatra/sonatra-resource-bundle/master.svg)](https://scrutinizer-ci.com/g/sonatra/sonatra-resource-bundle?branch=master)
 [![SensioLabsInsight](https://img.shields.io/sensiolabs/i/9048a77d-9d67-40cb-8d31-1783e5bf6738.svg)](https://insight.sensiolabs.com/projects/9048a77d-9d67-40cb-8d31-1783e5bf6738)
 
 The Sonatra ResourceBundle is a resource management layer for doctrine. This bundle has been
@@ -47,12 +47,12 @@ About
 -----
 
 Sonatra ResourceBundle is a [sonatra](https://github.com/sonatra) initiative.
-See also the list of [contributors](https://github.com/sonatra/SonatraResourceBundle/graphs/contributors).
+See also the list of [contributors](https://github.com/sonatra/sonatra-resource-bundle/graphs/contributors).
 
 Reporting an issue or a feature request
 ---------------------------------------
 
-Issues and feature requests are tracked in the [Github issue tracker](https://github.com/sonatra/SonatraResourceBundle/issues).
+Issues and feature requests are tracked in the [Github issue tracker](https://github.com/sonatra/sonatra-resource-bundle/issues).
 
 When reporting a bug, it may be a good idea to reproduce it in a basic project
 built using the [Symfony Standard Edition](https://github.com/symfony/symfony-standard)

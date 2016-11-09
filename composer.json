@@ -3,7 +3,7 @@
     "type": "symfony-bundle",
     "description": "Resource management layer for doctrine",
     "keywords": ["resource", "doctrine", "batch", "manager", "validation"],
-    "homepage": "https://github.com/sonatra/SonatraResourceBundle",
+    "homepage": "https://github.com/sonatra/sonatra-resource-bundle",
     "license": "MIT",
     "authors": [
         {
