@@ -56,6 +56,7 @@ class ConverterPass implements CompilerPassInterface
 
         return array_values($converters);
     }
+
     /**
      * Get the real value.
      *
