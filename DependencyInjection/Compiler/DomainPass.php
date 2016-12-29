@@ -24,6 +24,11 @@ use Symfony\Component\ExpressionLanguage\Expression;
 class DomainPass implements CompilerPassInterface
 {
     /**
+     * @var array|null
+     */
+    private $resolveTargets;
+
+    /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
@@ -39,7 +44,9 @@ class DomainPass implements CompilerPassInterface
             $managers[$serviceId] = new Reference($serviceId);
         }
 
-        $container->getDefinition('sonatra_resource.domain_manager')->replaceArgument(0, $managers);
+        $container->getDefinition('sonatra_resource.domain_manager')
+            ->replaceArgument(0, $managers)
+            ->addMethodCall('addResolveTargets', array($this->getResolveTargets($container)));
         $this->injectDependencies($container, $managers);
     }
 
@@ -59,14 +66,57 @@ class DomainPass implements CompilerPassInterface
                 throw new InvalidArgumentException(sprintf($msg, $serviceId));
             }
 
-            $pos = $this->getClassPosition($def);
+            $class = $this->getResolveTarget($container, $def);
             $def->addMethodCall('setDebug', array('%kernel.debug%'));
-            $om = new Expression('service("doctrine").getManagerForClass("'.str_replace('\\', '\\\\', $def->getArgument($pos)).'")');
+            $om = new Expression('service("doctrine").getManagerForClass("'.str_replace('\\', '\\\\', $class).'")');
             $def->addMethodCall('setObjectManager', array($om, '%sonatra_resource.domain.undelete_disable_filters%'));
             $def->addMethodCall('setEventDispatcher', array(new Reference('event_dispatcher')));
             $def->addMethodCall('setObjectFactory', array(new Reference('sonatra_default_value.factory')));
             $def->addMethodCall('setValidator', array(new Reference('validator')));
         }
+    }
+
+    /**
+     * Get the resolve target class.
+     *
+     * @param ContainerBuilder $container The container
+     * @param Definition       $def       The resource domain definition
+     *
+     * @return string
+     */
+    private function getResolveTarget(ContainerBuilder $container, Definition $def)
+    {
+        $classMap = $this->getResolveTargets($container);
+        $pos = $this->getClassPosition($def);
+        $class = $def->getArgument($pos);
+
+        return isset($classMap[$class]) ? $classMap[$class] : $class;
+    }
+
+    /**
+     * Get the resolve target classes.
+     *
+     * @param ContainerBuilder $container The container
+     *
+     * @return array
+     */
+    private function getResolveTargets(ContainerBuilder $container)
+    {
+        if (null === $this->resolveTargets) {
+            $this->resolveTargets = array();
+
+            if ($container->hasDefinition('doctrine.orm.listeners.resolve_target_entity')) {
+                $def = $container->getDefinition('doctrine.orm.listeners.resolve_target_entity');
+
+                foreach ($def->getMethodCalls() as $call) {
+                    if ('addResolveTargetEntity' === $call[0]) {
+                        $this->resolveTargets[$call[1][0]] = $call[1][1];
+                    }
+                }
+            }
+        }
+
+        return $this->resolveTargets;
     }
 
     /**
@@ -76,7 +126,7 @@ class DomainPass implements CompilerPassInterface
      *
      * @return int
      */
-    protected function getClassPosition(Definition $def)
+    private function getClassPosition(Definition $def)
     {
         $tag = $def->getTag('sonatra_resource.domain');
 
