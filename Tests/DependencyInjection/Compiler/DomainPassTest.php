@@ -96,18 +96,7 @@ class DomainPassTest extends \PHPUnit_Framework_TestCase
 
         $this->pass->process($container);
 
-        $this->assertCount(5, $def->getMethodCalls());
-        $methods = array();
-
-        foreach ($def->getMethodCalls() as $test => $config) {
-            $methods[] = $config[0];
-        }
-
-        $this->assertTrue(in_array('setDebug', $methods));
-        $this->assertTrue(in_array('setObjectManager', $methods));
-        $this->assertTrue(in_array('setEventDispatcher', $methods));
-        $this->assertTrue(in_array('setObjectFactory', $methods));
-        $this->assertTrue(in_array('setValidator', $methods));
+        $this->assertCount(0, $def->getMethodCalls());
     }
 
     public function testProcessWithDoctrineResolveTargets()
@@ -130,25 +119,6 @@ class DomainPassTest extends \PHPUnit_Framework_TestCase
         $calls = $managerDef->getMethodCalls();
         $this->assertCount(1, $managerDef->getMethodCalls());
         $this->assertSame('addResolveTargets', $calls[0][0]);
-    }
-
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The service "test_invalid_custom_domain" must define the managed class by Doctrine with the first argument
-     */
-    public function testProcessWithCustomDomainManagerWithoutClassname()
-    {
-        $container = $this->getContainer(array(
-            'SonatraResourceBundle' => 'Sonatra\\Bundle\\ResourceBundle\\SonatraResourceBundle',
-        ));
-
-        $this->assertTrue($container->has('sonatra_resource.domain_manager'));
-
-        $def = new Definition(CustomDomain::class);
-        $def->addTag('sonatra_resource.domain');
-        $container->setDefinition('test_invalid_custom_domain', $def);
-
-        $this->pass->process($container);
     }
 
     /**
