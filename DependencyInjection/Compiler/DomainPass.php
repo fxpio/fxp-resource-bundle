@@ -42,7 +42,9 @@ class DomainPass implements CompilerPassInterface
         }
 
         $container->getDefinition('sonatra_resource.domain_manager')
-            ->replaceArgument(0, $managers)
+            ->replaceArgument(0, $managers);
+
+        $container->getDefinition('sonatra_resource.domain_factory')
             ->addMethodCall('addResolveTargets', array($this->getResolveTargets($container)));
     }
 

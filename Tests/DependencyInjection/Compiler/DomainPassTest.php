@@ -11,7 +11,10 @@
 
 namespace Sonatra\Bundle\ResourceBundle\Tests\DependencyInjection\Compiler;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Sonatra\Bundle\ResourceBundle\Tests\Fixtures\Domain\CustomDomain;
+use Sonatra\Component\Resource\Domain\DomainFactory;
+use Sonatra\Component\Resource\Domain\DomainManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Definition;
@@ -112,12 +115,12 @@ class DomainPassTest extends \PHPUnit_Framework_TestCase
         $rteDef->addMethodCall('addResolveTargetEntity', array('stdClassInterface', \stdClass::class));
         $container->setDefinition('doctrine.orm.listeners.resolve_target_entity', $rteDef);
 
-        $managerDef = $container->getDefinition('sonatra_resource.domain_manager');
-        $this->assertCount(0, $managerDef->getMethodCalls());
+        $factoryDef = $container->getDefinition('sonatra_resource.domain_factory');
+        $this->assertCount(0, $factoryDef->getMethodCalls());
 
         $this->pass->process($container);
-        $calls = $managerDef->getMethodCalls();
-        $this->assertCount(1, $managerDef->getMethodCalls());
+        $calls = $factoryDef->getMethodCalls();
+        $this->assertCount(1, $factoryDef->getMethodCalls());
         $this->assertSame('addResolveTargets', $calls[0][0]);
     }
 
@@ -142,14 +145,23 @@ class DomainPassTest extends \PHPUnit_Framework_TestCase
         )));
 
         if (!$empty) {
-            $dmDef = new Definition('Sonatra\Component\Resource\Domain\DomainManager');
+            $dmDef = new Definition(DomainManager::class);
             $dmDef->setArguments(array(
                 array(),
                 new Reference('sonatra_resource.domain_factory'),
             ));
             $container->setDefinition('sonatra_resource.domain_manager', $dmDef);
 
-            $drDef = new Definition('Doctrine\Common\Persistence\ManagerRegistry');
+            $dfDef = new Definition(DomainFactory::class);
+            $dfDef->setArguments(array(
+                new Reference('doctrine'),
+                new Reference('event_dispatcher'),
+                new Reference('sonatra_default_value.factory'),
+                new Reference('validator'),
+            ));
+            $container->setDefinition('sonatra_resource.domain_factory', $dfDef);
+
+            $drDef = new Definition(ManagerRegistry::class);
             $container->setDefinition('doctrine', $drDef);
         }
 
