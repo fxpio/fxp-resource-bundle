@@ -12,13 +12,13 @@
 namespace Sonatra\Bundle\ResourceBundle\Tests\DependencyInjection\Compiler;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Sonatra\Bundle\ResourceBundle\DependencyInjection\Compiler\DomainPass;
 use Sonatra\Bundle\ResourceBundle\Tests\Fixtures\Domain\CustomDomain;
 use Sonatra\Component\Resource\Domain\DomainFactory;
 use Sonatra\Component\Resource\Domain\DomainManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Definition;
-use Sonatra\Bundle\ResourceBundle\DependencyInjection\Compiler\DomainPass;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Filesystem\Filesystem;
 

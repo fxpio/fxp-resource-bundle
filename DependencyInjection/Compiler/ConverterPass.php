@@ -13,8 +13,8 @@ namespace Sonatra\Bundle\ResourceBundle\DependencyInjection\Compiler;
 
 use Sonatra\Component\Resource\Converter\ConverterInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
 /**

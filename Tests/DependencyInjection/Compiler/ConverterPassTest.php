@@ -14,8 +14,8 @@ namespace Sonatra\Bundle\ResourceBundle\Tests\DependencyInjection\Compiler;
 use Sonatra\Bundle\ResourceBundle\DependencyInjection\Compiler\ConverterPass;
 use Sonatra\Bundle\ResourceBundle\Tests\Fixtures\Converter\CustomConverter;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**

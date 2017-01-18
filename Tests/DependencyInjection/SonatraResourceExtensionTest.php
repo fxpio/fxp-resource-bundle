@@ -11,10 +11,10 @@
 
 namespace Sonatra\Bundle\ResourceBundle\Tests\DependencyInjection;
 
+use Sonatra\Bundle\ResourceBundle\DependencyInjection\SonatraResourceExtension;
+use Sonatra\Bundle\ResourceBundle\SonatraResourceBundle;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Sonatra\Bundle\ResourceBundle\SonatraResourceBundle;
-use Sonatra\Bundle\ResourceBundle\DependencyInjection\SonatraResourceExtension;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 /**
