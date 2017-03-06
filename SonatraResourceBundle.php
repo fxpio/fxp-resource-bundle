@@ -13,6 +13,7 @@ namespace Sonatra\Bundle\ResourceBundle;
 
 use Sonatra\Bundle\ResourceBundle\DependencyInjection\Compiler\ConverterPass;
 use Sonatra\Bundle\ResourceBundle\DependencyInjection\Compiler\DomainPass;
+use Sonatra\Bundle\ResourceBundle\DependencyInjection\Compiler\TranslatorPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -27,6 +28,7 @@ class SonatraResourceBundle extends Bundle
     public function build(ContainerBuilder $container)
     {
         parent::build($container);
+        $container->addCompilerPass(new TranslatorPass());
         $container->addCompilerPass(new ConverterPass());
         $container->addCompilerPass(new DomainPass());
     }

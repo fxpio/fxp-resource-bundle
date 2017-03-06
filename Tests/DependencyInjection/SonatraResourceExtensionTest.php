@@ -47,6 +47,7 @@ class SonatraResourceExtensionTest extends \PHPUnit_Framework_TestCase
                 'FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle',
                 'SonatraResourceBundle' => 'Sonatra\\Bundle\\ResourceBundle\\SonatraResourceBundle',
             ),
+            'kernel.bundles_metadata' => array(),
             'kernel.cache_dir' => sys_get_temp_dir().'/sonatra_resource_bundle',
             'kernel.debug' => false,
             'kernel.environment' => 'test',
