@@ -18,6 +18,7 @@
         <!-- Json Converter -->
         <service id="sonatra_resource.converter.json" class="%sonatra_resource.converter.json.class%">
             <tag name="sonatra_resource.converter" />
+            <argument type="service" id="translator" />
         </service>
     </services>
 </container>
