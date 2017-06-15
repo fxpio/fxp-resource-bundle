@@ -11,6 +11,7 @@
 
 namespace Sonatra\Bundle\ResourceBundle\Tests\DependencyInjection\Compiler;
 
+use PHPUnit\Framework\TestCase;
 use Sonatra\Bundle\ResourceBundle\DependencyInjection\Compiler\ConverterPass;
 use Sonatra\Bundle\ResourceBundle\Tests\Fixtures\Converter\CustomConverter;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -23,7 +24,7 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * @author François Pluchino <francois.pluchino@sonatra.com>
  */
-class ConverterPassTest extends \PHPUnit_Framework_TestCase
+class ConverterPassTest extends TestCase
 {
     /**
      * @var string

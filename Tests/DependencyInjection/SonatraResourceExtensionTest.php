@@ -11,6 +11,7 @@
 
 namespace Sonatra\Bundle\ResourceBundle\Tests\DependencyInjection;
 
+use PHPUnit\Framework\TestCase;
 use Sonatra\Bundle\ResourceBundle\DependencyInjection\SonatraResourceExtension;
 use Sonatra\Bundle\ResourceBundle\SonatraResourceBundle;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
@@ -22,7 +23,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
  *
  * @author François Pluchino <francois.pluchino@sonatra.com>
  */
-class SonatraResourceExtensionTest extends \PHPUnit_Framework_TestCase
+class SonatraResourceExtensionTest extends TestCase
 {
     public function testExtensionExist()
     {

@@ -12,6 +12,7 @@
 namespace Sonatra\Bundle\ResourceBundle\Tests\DependencyInjection\Compiler;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use PHPUnit\Framework\TestCase;
 use Sonatra\Bundle\ResourceBundle\DependencyInjection\Compiler\DomainPass;
 use Sonatra\Bundle\ResourceBundle\Tests\Fixtures\Domain\CustomDomain;
 use Sonatra\Component\Resource\Domain\DomainFactory;
@@ -27,7 +28,7 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * @author François Pluchino <francois.pluchino@sonatra.com>
  */
-class DomainPassTest extends \PHPUnit_Framework_TestCase
+class DomainPassTest extends TestCase
 {
     /**
      * @var string
