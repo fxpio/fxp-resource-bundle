@@ -37,7 +37,8 @@ class TranslatorPass implements CompilerPassInterface
 
         $container->addResource(new DirectoryResource($dir));
 
-        $options = $translator->getArgument(3);
+        $optionsArgumentIndex = count($translator->getArguments()) - 1;
+        $options = $translator->getArgument($optionsArgumentIndex);
         $options['resource_files'] = isset($options['resource_files']) ? $options['resource_files'] : array();
 
         /* @var Finder|\SplFileInfo[] $finder */
@@ -59,6 +60,6 @@ class TranslatorPass implements CompilerPassInterface
             array_unshift($options['resource_files'][$locale], (string) $file);
         }
 
-        $translator->replaceArgument(3, $options);
+        $translator->replaceArgument($optionsArgumentIndex, $options);
     }
 }
