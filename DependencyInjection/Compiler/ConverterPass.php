@@ -47,10 +47,7 @@ class ConverterPass implements CompilerPassInterface
         $converters = array();
 
         foreach ($container->findTaggedServiceIds('sonatra_resource.converter') as $serviceId => $tag) {
-            $type = isset($tag[0]['type'])
-                ? $this->getRealValue($container, $tag[0]['type'])
-                : $this->getType($container, $serviceId);
-
+            $type = isset($tag[0]['type']) ? $this->getRealValue($container, $tag[0]['type']) : $this->getType($container, $serviceId);
             $converters[$type] = $container->getDefinition($serviceId);
         }
 

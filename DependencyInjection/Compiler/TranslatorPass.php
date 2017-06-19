@@ -52,10 +52,7 @@ class TranslatorPass implements CompilerPassInterface
 
         foreach ($finder as $file) {
             list(, $locale) = explode('.', $file->getBasename(), 3);
-
-            if (!isset($options['resource_files'][$locale])) {
-                $options['resource_files'][$locale] = array();
-            }
+            $options['resource_files'][$locale] = isset($options['resource_files'][$locale]) ? $options['resource_files'][$locale] : array();
 
             array_unshift($options['resource_files'][$locale], (string) $file);
         }
