@@ -22,7 +22,7 @@
         </service>
 
         <!-- Domain Manager -->
-        <service id="sonatra_resource.domain_manager" class="%sonatra_resource.domain_manager.class%">
+        <service id="sonatra_resource.domain_manager" class="%sonatra_resource.domain_manager.class%" public="true">
             <argument type="collection" />
             <argument type="service" id="sonatra_resource.domain_factory" />
         </service>

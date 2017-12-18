@@ -11,7 +11,7 @@
 
     <services>
         <!-- Converter Registry -->
-        <service id="sonatra_resource.converter_registry" class="%sonatra_resource.converter_registry.class%">
+        <service id="sonatra_resource.converter_registry" class="%sonatra_resource.converter_registry.class%" public="true">
             <argument type="collection" />
         </service>
 
