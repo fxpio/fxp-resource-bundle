@@ -54,6 +54,7 @@ class SonatraResourceExtensionTest extends TestCase
             'kernel.environment' => 'test',
             'kernel.name' => 'kernel',
             'kernel.root_dir' => sys_get_temp_dir().'/sonatra_resource_bundle',
+            'kernel.project_dir' => sys_get_temp_dir().'/sonatra_resource_bundle',
             'kernel.charset' => 'UTF-8',
         )));
 
