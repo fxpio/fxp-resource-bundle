@@ -10,7 +10,7 @@
 
     <services>
         <!-- Form Handler -->
-        <service id="sonatra_resource.form_handler" class="%sonatra_resource.form_handler.class%">
+        <service id="sonatra_resource.form_handler" class="%sonatra_resource.form_handler.class%" public="true">
             <argument type="service" id="sonatra_resource.converter_registry" />
             <argument type="service" id="form.factory" />
             <argument type="service" id="request_stack" />
