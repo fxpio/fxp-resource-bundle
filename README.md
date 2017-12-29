@@ -1,13 +1,13 @@
-Sonatra Resource Bundle
-=======================
+Fxp Resource Bundle
+===================
 
-[![Latest Version](https://img.shields.io/packagist/v/sonatra/resource-bundle.svg)](https://packagist.org/packages/sonatra/resource-bundle)
-[![Build Status](https://img.shields.io/travis/sonatra/sonatra-resource-bundle/master.svg)](https://travis-ci.org/sonatra/sonatra-resource-bundle)
-[![Coverage Status](https://img.shields.io/coveralls/sonatra/sonatra-resource-bundle/master.svg)](https://coveralls.io/r/sonatra/sonatra-resource-bundle?branch=master)
-[![Scrutinizer Code Quality](https://img.shields.io/scrutinizer/g/sonatra/sonatra-resource-bundle/master.svg)](https://scrutinizer-ci.com/g/sonatra/sonatra-resource-bundle?branch=master)
+[![Latest Version](https://img.shields.io/packagist/v/fxp/resource-bundle.svg)](https://packagist.org/packages/fxp/resource-bundle)
+[![Build Status](https://img.shields.io/travis/fxpio/fxp-resource-bundle/master.svg)](https://travis-ci.org/fxpio/fxp-resource-bundle)
+[![Coverage Status](https://img.shields.io/coveralls/fxpio/fxp-resource-bundle/master.svg)](https://coveralls.io/r/fxpio/fxp-resource-bundle?branch=master)
+[![Scrutinizer Code Quality](https://img.shields.io/scrutinizer/g/fxpio/fxp-resource-bundle/master.svg)](https://scrutinizer-ci.com/g/fxpio/fxp-resource-bundle?branch=master)
 [![SensioLabsInsight](https://img.shields.io/sensiolabs/i/9048a77d-9d67-40cb-8d31-1783e5bf6738.svg)](https://insight.sensiolabs.com/projects/9048a77d-9d67-40cb-8d31-1783e5bf6738)
 
-The Sonatra ResourceBundle is a resource management layer for doctrine. This bundle has been
+The Fxp ResourceBundle is a resource management layer for doctrine. This bundle has been
 designed to facilitate the creation of a Batch API for processing a list of resources<sup>1</sup>
 (ex. external data loader).
 
@@ -19,7 +19,7 @@ invalid resources), whether for a resource or set of resources.
 
 Features include:
 
-- All features of [Sonatra Resource](https://github.com/sonatra/sonatra-resource)
+- All features of [Fxp Resource](https://github.com/fxpio/fxp-resource)
 - Compiler pass to override or add a custom resource domain
 - Compiler pass to add a custom converter
 
@@ -46,13 +46,13 @@ This bundle is under the MIT license. See the complete license in the bundle:
 About
 -----
 
-Sonatra ResourceBundle is a [sonatra](https://github.com/sonatra) initiative.
-See also the list of [contributors](https://github.com/sonatra/sonatra-resource-bundle/graphs/contributors).
+Fxp ResourceBundle is a [François Pluchino](https://github.com/francoispluchino) initiative.
+See also the list of [contributors](https://github.com/fxpio/fxp-resource-bundle/graphs/contributors).
 
 Reporting an issue or a feature request
 ---------------------------------------
 
-Issues and feature requests are tracked in the [Github issue tracker](https://github.com/sonatra/sonatra-resource-bundle/issues).
+Issues and feature requests are tracked in the [Github issue tracker](https://github.com/fxpio/fxp-resource-bundle/issues).
 
 When reporting a bug, it may be a good idea to reproduce it in a basic project
 built using the [Symfony Standard Edition](https://github.com/symfony/symfony-standard)

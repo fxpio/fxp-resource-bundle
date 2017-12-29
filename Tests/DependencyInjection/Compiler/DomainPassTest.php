@@ -1,22 +1,22 @@
 <?php
 
 /*
- * This file is part of the Sonatra package.
+ * This file is part of the Fxp package.
  *
- * (c) François Pluchino <francois.pluchino@sonatra.com>
+ * (c) François Pluchino <francois.pluchino@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace Sonatra\Bundle\ResourceBundle\Tests\DependencyInjection\Compiler;
+namespace Fxp\Bundle\ResourceBundle\Tests\DependencyInjection\Compiler;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Fxp\Bundle\ResourceBundle\DependencyInjection\Compiler\DomainPass;
+use Fxp\Bundle\ResourceBundle\Tests\Fixtures\Domain\CustomDomain;
+use Fxp\Component\Resource\Domain\DomainFactory;
+use Fxp\Component\Resource\Domain\DomainManager;
 use PHPUnit\Framework\TestCase;
-use Sonatra\Bundle\ResourceBundle\DependencyInjection\Compiler\DomainPass;
-use Sonatra\Bundle\ResourceBundle\Tests\Fixtures\Domain\CustomDomain;
-use Sonatra\Component\Resource\Domain\DomainFactory;
-use Sonatra\Component\Resource\Domain\DomainManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -26,7 +26,7 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * Tests case for domain pass compiler.
  *
- * @author François Pluchino <francois.pluchino@sonatra.com>
+ * @author François Pluchino <francois.pluchino@gmail.com>
  */
 class DomainPassTest extends TestCase
 {
@@ -47,7 +47,7 @@ class DomainPassTest extends TestCase
 
     protected function setUp()
     {
-        $this->rootDir = sys_get_temp_dir().DIRECTORY_SEPARATOR.'sonatra_resource_bundle_compiler';
+        $this->rootDir = sys_get_temp_dir().DIRECTORY_SEPARATOR.'fxp_resource_bundle_compiler';
         $this->fs = new Filesystem();
         $this->pass = new DomainPass();
     }
@@ -63,7 +63,7 @@ class DomainPassTest extends TestCase
         return array(
             array(array()),
             array(array(
-                'SonatraResourceBundle' => 'Sonatra\\Bundle\\ResourceBundle\\SonatraResourceBundle',
+                'FxpResourceBundle' => 'Fxp\\Bundle\\ResourceBundle\\FxpResourceBundle',
             )),
         );
     }
@@ -77,7 +77,7 @@ class DomainPassTest extends TestCase
     {
         $container = $this->getContainer($bundles, true);
 
-        $this->assertFalse($container->hasDefinition('sonatra_resource.domain_manager'));
+        $this->assertFalse($container->hasDefinition('fxp_resource.domain_manager'));
         $this->assertFalse($container->hasDefinition('doctrine'));
 
         $this->pass->process($container);
@@ -86,13 +86,13 @@ class DomainPassTest extends TestCase
     public function testProcessWithCustomDomainManager()
     {
         $container = $this->getContainer(array(
-            'SonatraResourceBundle' => 'Sonatra\\Bundle\\ResourceBundle\\SonatraResourceBundle',
+            'FxpResourceBundle' => 'Fxp\\Bundle\\ResourceBundle\\FxpResourceBundle',
         ));
 
-        $this->assertTrue($container->has('sonatra_resource.domain_manager'));
+        $this->assertTrue($container->has('fxp_resource.domain_manager'));
 
         $def = new Definition(CustomDomain::class);
-        $def->addTag('sonatra_resource.domain');
+        $def->addTag('fxp_resource.domain');
         $def->setArguments(array(
             \stdClass::class,
         ));
@@ -106,17 +106,17 @@ class DomainPassTest extends TestCase
     public function testProcessWithDoctrineResolveTargets()
     {
         $container = $this->getContainer(array(
-            'SonatraResourceBundle' => 'Sonatra\\Bundle\\ResourceBundle\\SonatraResourceBundle',
+            'FxpResourceBundle' => 'Fxp\\Bundle\\ResourceBundle\\FxpResourceBundle',
         ));
 
-        $this->assertTrue($container->hasDefinition('sonatra_resource.domain_manager'));
+        $this->assertTrue($container->hasDefinition('fxp_resource.domain_manager'));
         $this->assertFalse($container->hasDefinition('doctrine.orm.listeners.resolve_target_entity'));
 
         $rteDef = new Definition();
         $rteDef->addMethodCall('addResolveTargetEntity', array('stdClassInterface', \stdClass::class));
         $container->setDefinition('doctrine.orm.listeners.resolve_target_entity', $rteDef);
 
-        $factoryDef = $container->getDefinition('sonatra_resource.domain_factory');
+        $factoryDef = $container->getDefinition('fxp_resource.domain_factory');
         $this->assertCount(0, $factoryDef->getMethodCalls());
 
         $this->pass->process($container);
@@ -149,18 +149,18 @@ class DomainPassTest extends TestCase
             $dmDef = new Definition(DomainManager::class);
             $dmDef->setArguments(array(
                 array(),
-                new Reference('sonatra_resource.domain_factory'),
+                new Reference('fxp_resource.domain_factory'),
             ));
-            $container->setDefinition('sonatra_resource.domain_manager', $dmDef);
+            $container->setDefinition('fxp_resource.domain_manager', $dmDef);
 
             $dfDef = new Definition(DomainFactory::class);
             $dfDef->setArguments(array(
                 new Reference('doctrine'),
                 new Reference('event_dispatcher'),
-                new Reference('sonatra_default_value.factory'),
+                new Reference('fxp_default_value.factory'),
                 new Reference('validator'),
             ));
-            $container->setDefinition('sonatra_resource.domain_factory', $dfDef);
+            $container->setDefinition('fxp_resource.domain_factory', $dfDef);
 
             $drDef = new Definition(ManagerRegistry::class);
             $container->setDefinition('doctrine', $drDef);

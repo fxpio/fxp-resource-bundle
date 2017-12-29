@@ -6,12 +6,12 @@
 
     <services>
         <!-- Form Handler -->
-        <service id="sonatra_resource.form_handler" class="Sonatra\Component\Resource\Handler\FormHandler" public="true">
-            <argument type="service" id="sonatra_resource.converter_registry" />
+        <service id="fxp_resource.form_handler" class="Fxp\Component\Resource\Handler\FormHandler" public="true">
+            <argument type="service" id="fxp_resource.converter_registry" />
             <argument type="service" id="form.factory" />
             <argument type="service" id="request_stack" />
             <argument type="service" id="translator" />
-            <argument>%sonatra_resource.form_handler_default_limit%</argument>
+            <argument>%fxp_resource.form_handler_default_limit%</argument>
         </service>
     </services>
 </container>

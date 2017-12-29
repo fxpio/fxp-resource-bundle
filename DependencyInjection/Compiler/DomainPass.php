@@ -1,22 +1,22 @@
 <?php
 
 /*
- * This file is part of the Sonatra package.
+ * This file is part of the Fxp package.
  *
- * (c) François Pluchino <francois.pluchino@sonatra.com>
+ * (c) François Pluchino <francois.pluchino@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace Sonatra\Bundle\ResourceBundle\DependencyInjection\Compiler;
+namespace Fxp\Bundle\ResourceBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * @author François Pluchino <francois.pluchino@sonatra.com>
+ * @author François Pluchino <francois.pluchino@gmail.com>
  */
 class DomainPass implements CompilerPassInterface
 {
@@ -30,21 +30,21 @@ class DomainPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('sonatra_resource.domain_manager')
+        if (!$container->hasDefinition('fxp_resource.domain_manager')
                 || !$container->hasDefinition('doctrine')) {
             return;
         }
 
         $managers = array();
 
-        foreach ($container->findTaggedServiceIds('sonatra_resource.domain') as $serviceId => $tag) {
+        foreach ($container->findTaggedServiceIds('fxp_resource.domain') as $serviceId => $tag) {
             $managers[$serviceId] = new Reference($serviceId);
         }
 
-        $container->getDefinition('sonatra_resource.domain_manager')
+        $container->getDefinition('fxp_resource.domain_manager')
             ->replaceArgument(0, $managers);
 
-        $container->getDefinition('sonatra_resource.domain_factory')
+        $container->getDefinition('fxp_resource.domain_factory')
             ->addMethodCall('addResolveTargets', array($this->getResolveTargets($container)));
     }
 

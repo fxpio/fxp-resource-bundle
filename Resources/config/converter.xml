@@ -6,13 +6,13 @@
 
     <services>
         <!-- Converter Registry -->
-        <service id="sonatra_resource.converter_registry" class="Sonatra\Component\Resource\Converter\ConverterRegistry" public="true">
+        <service id="fxp_resource.converter_registry" class="Fxp\Component\Resource\Converter\ConverterRegistry" public="true">
             <argument type="collection" />
         </service>
 
         <!-- Json Converter -->
-        <service id="sonatra_resource.converter.json" class="Sonatra\Component\Resource\Converter\JsonConverter">
-            <tag name="sonatra_resource.converter" />
+        <service id="fxp_resource.converter.json" class="Fxp\Component\Resource\Converter\JsonConverter">
+            <tag name="fxp_resource.converter" />
             <argument type="service" id="translator" />
         </service>
     </services>

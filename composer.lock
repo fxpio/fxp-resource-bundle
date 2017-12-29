@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "4f835fcd421ef1cef0031b45513004a4",
+    "content-hash": "01503126a31e830e64cddd8ebe912fe2",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -619,6 +619,243 @@
             "time": "2017-12-20T00:38:15+00:00"
         },
         {
+            "name": "fxp/default-value",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fxpio/fxp-default-value.git",
+                "reference": "53bd25a803a6c41ccfedfd5f41c020e8ecc557ce"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fxpio/fxp-default-value/zipball/53bd25a803a6c41ccfedfd5f41c020e8ecc557ce",
+                "reference": "53bd25a803a6c41ccfedfd5f41c020e8ecc557ce",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1.0",
+                "symfony/options-resolver": "^3.4.0|^4.0.0",
+                "symfony/property-access": "^3.4.0|^4.0.0"
+            },
+            "require-dev": {
+                "symfony/dependency-injection": "^3.4.0|^4.0.0",
+                "symfony/security": "^3.4.0|^4.0.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Fxp\\Component\\DefaultValue\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "François Pluchino",
+                    "email": "francois.pluchino@gmail.com"
+                }
+            ],
+            "description": "Creates or injects the default values ​​with a advanced configuration in the object",
+            "homepage": "https://github.com/fxpio/fxp-default-value",
+            "keywords": [
+                "default value",
+                "document",
+                "entity",
+                "object"
+            ],
+            "time": "2017-12-28T18:23:55+00:00"
+        },
+        {
+            "name": "fxp/default-value-bundle",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fxpio/fxp-default-value-bundle.git",
+                "reference": "db16c9285866b21d6fa0841e2976893761cf6130"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fxpio/fxp-default-value-bundle/zipball/db16c9285866b21d6fa0841e2976893761cf6130",
+                "reference": "db16c9285866b21d6fa0841e2976893761cf6130",
+                "shasum": ""
+            },
+            "require": {
+                "fxp/default-value": "^1.0.0",
+                "php": "^7.1.0",
+                "symfony/framework-bundle": "^3.4.0|^4.0.0"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Fxp\\Bundle\\DefaultValueBundle\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "François Pluchino",
+                    "email": "francois.pluchino@gmail.com"
+                }
+            ],
+            "description": "Creates or injects the default values ​​with a advanced configuration in the object",
+            "homepage": "https://github.com/fxpio/fxp-default-value-bundle",
+            "keywords": [
+                "default value",
+                "document",
+                "entity",
+                "object"
+            ],
+            "time": "2017-12-28T18:39:10+00:00"
+        },
+        {
+            "name": "fxp/doctrine-extensions",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fxpio/fxp-doctrine-extensions.git",
+                "reference": "c13f68d7fcbce80b73c519acad8d2adda26e0686"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fxpio/fxp-doctrine-extensions/zipball/c13f68d7fcbce80b73c519acad8d2adda26e0686",
+                "reference": "c13f68d7fcbce80b73c519acad8d2adda26e0686",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/orm": "^2.6.0",
+                "php": "^7.1.0"
+            },
+            "require-dev": {
+                "symfony/doctrine-bridge": "^3.4.0|^4.0.0",
+                "symfony/event-dispatcher": "^3.4.0|^4.0.0",
+                "symfony/http-kernel": "^3.4.0|^4.0.0",
+                "symfony/validator": "^3.4.0|^4.0.0"
+            },
+            "suggest": {
+                "creof/doctrine2-spatial": "For add geo spacial extensions",
+                "stof/doctrine-extensions-bundle": "For use some nice extensions for doctrine"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Fxp\\Component\\DoctrineExtensions\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "François Pluchino",
+                    "email": "francois.pluchino@gmail.com"
+                }
+            ],
+            "description": "Add doctrine unique entity validator",
+            "homepage": "https://github.com/fxpio/fxp-doctrine-extensions",
+            "keywords": [
+                "doctrine",
+                "extensions",
+                "unique entity",
+                "validator"
+            ],
+            "time": "2017-12-29T09:35:28+00:00"
+        },
+        {
+            "name": "fxp/resource",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fxpio/fxp-resource.git",
+                "reference": "7f213a6a49a7fa3b97fb9aac3ee67d81361c197c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fxpio/fxp-resource/zipball/7f213a6a49a7fa3b97fb9aac3ee67d81361c197c",
+                "reference": "7f213a6a49a7fa3b97fb9aac3ee67d81361c197c",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/orm": "^2.6.0",
+                "fxp/default-value": "^1.0.0",
+                "fxp/doctrine-extensions": "^1.0.0",
+                "php": "^7.1.0",
+                "symfony/dependency-injection": "^3.4.0|^4.0.0",
+                "symfony/event-dispatcher": "^3.4.0|^4.0.0",
+                "symfony/expression-language": "^3.4.0|^4.0.0",
+                "symfony/form": "^3.4.0|^4.0.0",
+                "symfony/http-foundation": "^3.4.0|^4.0.0",
+                "symfony/translation": "^3.4.0|^4.0.0",
+                "symfony/validator": "^3.4.0|^4.0.0"
+            },
+            "require-dev": {
+                "symfony/config": "^3.4.0|^4.0.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Fxp\\Component\\Resource\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "François Pluchino",
+                    "email": "francois.pluchino@gmail.com"
+                }
+            ],
+            "description": "Resource management layer for doctrine",
+            "homepage": "https://github.com/fxpio/fxp-resource",
+            "keywords": [
+                "batch",
+                "doctrine",
+                "manager",
+                "resource",
+                "validation"
+            ],
+            "time": "2017-12-29T09:55:55+00:00"
+        },
+        {
             "name": "psr/cache",
             "version": "1.0.1",
             "source": {
@@ -807,243 +1044,6 @@
                 "simple-cache"
             ],
             "time": "2017-01-02T13:31:39+00:00"
-        },
-        {
-            "name": "sonatra/default-value",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/sonatra/sonatra-default-value.git",
-                "reference": "3fea0b4cf2acf0a4b2a85d1263c13255938ee9d9"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/sonatra/sonatra-default-value/zipball/3fea0b4cf2acf0a4b2a85d1263c13255938ee9d9",
-                "reference": "3fea0b4cf2acf0a4b2a85d1263c13255938ee9d9",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.1.0",
-                "symfony/options-resolver": "^3.4.0|^4.0.0",
-                "symfony/property-access": "^3.4.0|^4.0.0"
-            },
-            "require-dev": {
-                "symfony/dependency-injection": "^3.4.0|^4.0.0",
-                "symfony/security": "^3.4.0|^4.0.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.0-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Sonatra\\Component\\DefaultValue\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "François Pluchino",
-                    "email": "francois.pluchino@sonatra.com"
-                }
-            ],
-            "description": "Creates or injects the default values ​​with a advanced configuration in the object",
-            "homepage": "https://github.com/sonatra/sonatra-default-value",
-            "keywords": [
-                "default value",
-                "document",
-                "entity",
-                "object"
-            ],
-            "time": "2017-12-26T15:45:17+00:00"
-        },
-        {
-            "name": "sonatra/default-value-bundle",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/sonatra/sonatra-default-value-bundle.git",
-                "reference": "444beb29d13cf4360d0371c33297bd7678888508"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/sonatra/sonatra-default-value-bundle/zipball/444beb29d13cf4360d0371c33297bd7678888508",
-                "reference": "444beb29d13cf4360d0371c33297bd7678888508",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.1.0",
-                "sonatra/default-value": "^1.0.0",
-                "symfony/framework-bundle": "^3.4.0|^4.0.0"
-            },
-            "type": "symfony-bundle",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.0-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Sonatra\\Bundle\\DefaultValueBundle\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "François Pluchino",
-                    "email": "francois.pluchino@sonatra.com"
-                }
-            ],
-            "description": "Creates or injects the default values ​​with a advanced configuration in the object",
-            "homepage": "https://github.com/sonatra/sonatra-default-value-bundle",
-            "keywords": [
-                "default value",
-                "document",
-                "entity",
-                "object"
-            ],
-            "time": "2017-12-26T15:50:17+00:00"
-        },
-        {
-            "name": "sonatra/doctrine-extensions",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/sonatra/sonatra-doctrine-extensions.git",
-                "reference": "6fc95d2375eb355cc41afc9a1c1422c8ce923e2a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/sonatra/sonatra-doctrine-extensions/zipball/6fc95d2375eb355cc41afc9a1c1422c8ce923e2a",
-                "reference": "6fc95d2375eb355cc41afc9a1c1422c8ce923e2a",
-                "shasum": ""
-            },
-            "require": {
-                "doctrine/orm": "^2.6.0",
-                "php": "^7.1.0"
-            },
-            "require-dev": {
-                "symfony/doctrine-bridge": "^3.4.0|^4.0.0",
-                "symfony/event-dispatcher": "^3.4.0|^4.0.0",
-                "symfony/http-kernel": "^3.4.0|^4.0.0",
-                "symfony/validator": "^3.4.0|^4.0.0"
-            },
-            "suggest": {
-                "creof/doctrine2-spatial": "For add geo spacial extensions",
-                "stof/doctrine-extensions-bundle": "For use some nice extensions for doctrine"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.0-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Sonatra\\Component\\DoctrineExtensions\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "François Pluchino",
-                    "email": "francois.pluchino@sonatra.com"
-                }
-            ],
-            "description": "Add doctrine unique entity validator",
-            "homepage": "https://github.com/sonatra/sonatra-doctrine-extensions",
-            "keywords": [
-                "doctrine",
-                "extensions",
-                "unique entity",
-                "validator"
-            ],
-            "time": "2017-12-26T16:14:26+00:00"
-        },
-        {
-            "name": "sonatra/resource",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/sonatra/sonatra-resource.git",
-                "reference": "972fb6e6060abdeeb9de96eb6b079174c158f9c6"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/sonatra/sonatra-resource/zipball/972fb6e6060abdeeb9de96eb6b079174c158f9c6",
-                "reference": "972fb6e6060abdeeb9de96eb6b079174c158f9c6",
-                "shasum": ""
-            },
-            "require": {
-                "doctrine/orm": "^2.6.0",
-                "php": "^7.1.0",
-                "sonatra/default-value": "^1.0.0",
-                "sonatra/doctrine-extensions": "^1.0.0",
-                "symfony/dependency-injection": "^3.4.0|^4.0.0",
-                "symfony/event-dispatcher": "^3.4.0|^4.0.0",
-                "symfony/expression-language": "^3.4.0|^4.0.0",
-                "symfony/form": "^3.4.0|^4.0.0",
-                "symfony/http-foundation": "^3.4.0|^4.0.0",
-                "symfony/translation": "^3.4.0|^4.0.0",
-                "symfony/validator": "^3.4.0|^4.0.0"
-            },
-            "require-dev": {
-                "symfony/config": "^3.4.0|^4.0.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.0-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Sonatra\\Component\\Resource\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "François Pluchino",
-                    "email": "francois.pluchino@sonatra.com"
-                }
-            ],
-            "description": "Resource management layer for doctrine",
-            "homepage": "https://github.com/sonatra/sonatra-resource",
-            "keywords": [
-                "batch",
-                "doctrine",
-                "manager",
-                "resource",
-                "validation"
-            ],
-            "time": "2017-12-26T17:15:59+00:00"
         },
         {
             "name": "symfony/cache",

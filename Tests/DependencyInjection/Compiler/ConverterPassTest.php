@@ -1,19 +1,19 @@
 <?php
 
 /*
- * This file is part of the Sonatra package.
+ * This file is part of the Fxp package.
  *
- * (c) François Pluchino <francois.pluchino@sonatra.com>
+ * (c) François Pluchino <francois.pluchino@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace Sonatra\Bundle\ResourceBundle\Tests\DependencyInjection\Compiler;
+namespace Fxp\Bundle\ResourceBundle\Tests\DependencyInjection\Compiler;
 
+use Fxp\Bundle\ResourceBundle\DependencyInjection\Compiler\ConverterPass;
+use Fxp\Bundle\ResourceBundle\Tests\Fixtures\Converter\CustomConverter;
 use PHPUnit\Framework\TestCase;
-use Sonatra\Bundle\ResourceBundle\DependencyInjection\Compiler\ConverterPass;
-use Sonatra\Bundle\ResourceBundle\Tests\Fixtures\Converter\CustomConverter;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -22,7 +22,7 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * Tests case for converter pass compiler.
  *
- * @author François Pluchino <francois.pluchino@sonatra.com>
+ * @author François Pluchino <francois.pluchino@gmail.com>
  */
 class ConverterPassTest extends TestCase
 {
@@ -43,7 +43,7 @@ class ConverterPassTest extends TestCase
 
     protected function setUp()
     {
-        $this->rootDir = sys_get_temp_dir().'/sonatra_resource_bundle_converter_test';
+        $this->rootDir = sys_get_temp_dir().'/fxp_resource_bundle_converter_test';
         $this->fs = new Filesystem();
         $this->pass = new ConverterPass();
     }
@@ -58,21 +58,21 @@ class ConverterPassTest extends TestCase
     {
         $container = $this->getContainer();
 
-        $this->assertFalse($container->has('sonatra_resource.converter_registry'));
+        $this->assertFalse($container->has('fxp_resource.converter_registry'));
         $this->pass->process($container);
-        $this->assertFalse($container->has('sonatra_resource.converter_registry'));
+        $this->assertFalse($container->has('fxp_resource.converter_registry'));
     }
 
     public function testProcess()
     {
         $container = $this->getContainer(array(
-            'SonatraResourceBundle' => 'Sonatra\\Bundle\\ResourceBundle\\SonatraResourceBundle',
+            'FxpResourceBundle' => 'Fxp\\Bundle\\ResourceBundle\\FxpResourceBundle',
         ));
 
-        $this->assertTrue($container->has('sonatra_resource.converter_registry'));
-        $this->assertTrue($container->has('sonatra_resource.converter.json'));
+        $this->assertTrue($container->has('fxp_resource.converter_registry'));
+        $this->assertTrue($container->has('fxp_resource.converter.json'));
 
-        $def = $container->getDefinition('sonatra_resource.converter_registry');
+        $def = $container->getDefinition('fxp_resource.converter_registry');
 
         $this->assertCount(1, $def->getArguments());
         $this->assertEmpty($def->getArgument(0));
@@ -87,18 +87,18 @@ class ConverterPassTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage The service id "test_invalid_converter_type" must be an class implementing the "Sonatra\Component\Resource\Converter\ConverterInterface" interface.
+     * @expectedExceptionMessage The service id "test_invalid_converter_type" must be an class implementing the "Fxp\Component\Resource\Converter\ConverterInterface" interface.
      */
     public function testProcessWithInvalidInterface()
     {
         $container = $this->getContainer(array(
-            'SonatraResourceBundle' => 'Sonatra\\Bundle\\ResourceBundle\\SonatraResourceBundle',
+            'FxpResourceBundle' => 'Fxp\\Bundle\\ResourceBundle\\FxpResourceBundle',
         ));
 
-        $this->assertTrue($container->has('sonatra_resource.converter_registry'));
+        $this->assertTrue($container->has('fxp_resource.converter_registry'));
 
         $def = new Definition('stdClass');
-        $def->addTag('sonatra_resource.converter');
+        $def->addTag('fxp_resource.converter');
         $container->setDefinition('test_invalid_converter_type', $def);
 
         $this->pass->process($container);
@@ -106,18 +106,18 @@ class ConverterPassTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage The service id "test_invalid_converter_type" must have the "type" parameter in the "sonatra_resource.converter" tag.
+     * @expectedExceptionMessage The service id "test_invalid_converter_type" must have the "type" parameter in the "fxp_resource.converter" tag.
      */
     public function testProcessWithInvalidType()
     {
         $container = $this->getContainer(array(
-            'SonatraResourceBundle' => 'Sonatra\\Bundle\\ResourceBundle\\SonatraResourceBundle',
+            'FxpResourceBundle' => 'Fxp\\Bundle\\ResourceBundle\\FxpResourceBundle',
         ));
 
-        $this->assertTrue($container->has('sonatra_resource.converter_registry'));
+        $this->assertTrue($container->has('fxp_resource.converter_registry'));
 
         $def = new Definition(CustomConverter::class);
-        $def->addTag('sonatra_resource.converter');
+        $def->addTag('fxp_resource.converter');
         $container->setDefinition('test_invalid_converter_type', $def);
 
         $this->pass->process($container);
@@ -143,13 +143,13 @@ class ConverterPassTest extends TestCase
         )));
 
         if (count($bundles) > 0) {
-            $crDef = new Definition('Sonatra\Component\Resource\Converter\ConverterRegistry');
+            $crDef = new Definition('Fxp\Component\Resource\Converter\ConverterRegistry');
             $crDef->addArgument(array());
-            $container->setDefinition('sonatra_resource.converter_registry', $crDef);
+            $container->setDefinition('fxp_resource.converter_registry', $crDef);
 
-            $jcDef = new Definition('Sonatra\Component\Resource\Converter\JsonConverter');
-            $jcDef->addTag('sonatra_resource.converter');
-            $container->setDefinition('sonatra_resource.converter.json', $jcDef);
+            $jcDef = new Definition('Fxp\Component\Resource\Converter\JsonConverter');
+            $jcDef->addTag('fxp_resource.converter');
+            $container->setDefinition('fxp_resource.converter.json', $jcDef);
         }
 
         return $container;

@@ -1,24 +1,24 @@
 <?php
 
 /*
- * This file is part of the Sonatra package.
+ * This file is part of the Fxp package.
  *
- * (c) François Pluchino <francois.pluchino@sonatra.com>
+ * (c) François Pluchino <francois.pluchino@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace Sonatra\Bundle\ResourceBundle\DependencyInjection\Compiler;
+namespace Fxp\Bundle\ResourceBundle\DependencyInjection\Compiler;
 
-use Sonatra\Component\Resource\Converter\ConverterInterface;
+use Fxp\Component\Resource\Converter\ConverterInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
 /**
- * @author François Pluchino <francois.pluchino@sonatra.com>
+ * @author François Pluchino <francois.pluchino@gmail.com>
  */
 class ConverterPass implements CompilerPassInterface
 {
@@ -27,12 +27,12 @@ class ConverterPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('sonatra_resource.converter_registry')) {
+        if (!$container->hasDefinition('fxp_resource.converter_registry')) {
             return;
         }
 
         $converters = $this->findConverters($container);
-        $container->getDefinition('sonatra_resource.converter_registry')->replaceArgument(0, $converters);
+        $container->getDefinition('fxp_resource.converter_registry')->replaceArgument(0, $converters);
     }
 
     /**
@@ -46,7 +46,7 @@ class ConverterPass implements CompilerPassInterface
     {
         $converters = array();
 
-        foreach ($container->findTaggedServiceIds('sonatra_resource.converter') as $serviceId => $tag) {
+        foreach ($container->findTaggedServiceIds('fxp_resource.converter') as $serviceId => $tag) {
             $type = isset($tag[0]['type']) ? $this->getRealValue($container, $tag[0]['type']) : $this->getType($container, $serviceId);
             $converters[$type] = $container->getDefinition($serviceId);
         }
@@ -64,9 +64,7 @@ class ConverterPass implements CompilerPassInterface
      */
     protected function getRealValue(ContainerBuilder $container, $value)
     {
-        return 0 === strpos($value, '%')
-            ? $container->getParameter(trim($value, '%'))
-            : $value;
+        return 0 === strpos($value, '%') ? $container->getParameter(trim($value, '%')) : $value;
     }
 
     /**
@@ -96,7 +94,7 @@ class ConverterPass implements CompilerPassInterface
                 return $type;
             }
 
-            $error = sprintf('The service id "%s" must have the "type" parameter in the "sonatra_resource.converter" tag.', $serviceId);
+            $error = sprintf('The service id "%s" must have the "type" parameter in the "fxp_resource.converter" tag.', $serviceId);
         }
 
         throw new InvalidConfigurationException($error);

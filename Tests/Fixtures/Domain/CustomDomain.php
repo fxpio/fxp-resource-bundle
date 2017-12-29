@@ -1,22 +1,22 @@
 <?php
 
 /*
- * This file is part of the Sonatra package.
+ * This file is part of the Fxp package.
  *
- * (c) François Pluchino <francois.pluchino@sonatra.com>
+ * (c) François Pluchino <francois.pluchino@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace Sonatra\Bundle\ResourceBundle\Tests\Fixtures\Domain;
+namespace Fxp\Bundle\ResourceBundle\Tests\Fixtures\Domain;
 
-use Sonatra\Component\Resource\Domain\Domain;
+use Fxp\Component\Resource\Domain\Domain;
 
 /**
  * Custom domain mock.
  *
- * @author François Pluchino <francois.pluchino@sonatra.com>
+ * @author François Pluchino <francois.pluchino@gmail.com>
  */
 class CustomDomain extends Domain
 {

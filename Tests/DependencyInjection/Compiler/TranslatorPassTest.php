@@ -1,18 +1,18 @@
 <?php
 
 /*
- * This file is part of the Sonatra package.
+ * This file is part of the Fxp package.
  *
- * (c) François Pluchino <francois.pluchino@sonatra.com>
+ * (c) François Pluchino <francois.pluchino@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace Sonatra\Bundle\ResourceBundle\Tests\DependencyInjection\Compiler;
+namespace Fxp\Bundle\ResourceBundle\Tests\DependencyInjection\Compiler;
 
+use Fxp\Bundle\ResourceBundle\DependencyInjection\Compiler\TranslatorPass;
 use PHPUnit\Framework\TestCase;
-use Sonatra\Bundle\ResourceBundle\DependencyInjection\Compiler\TranslatorPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Filesystem\Filesystem;
@@ -20,7 +20,7 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * Tests case for translator pass compiler.
  *
- * @author François Pluchino <francois.pluchino@sonatra.com>
+ * @author François Pluchino <francois.pluchino@gmail.com>
  */
 class TranslatorPassTest extends TestCase
 {
@@ -41,7 +41,7 @@ class TranslatorPassTest extends TestCase
 
     protected function setUp()
     {
-        $this->rootDir = sys_get_temp_dir().'/sonatra_resource_bundle_translator_test';
+        $this->rootDir = sys_get_temp_dir().'/fxp_resource_bundle_translator_test';
         $this->fs = new Filesystem();
         $this->pass = new TranslatorPass();
     }
