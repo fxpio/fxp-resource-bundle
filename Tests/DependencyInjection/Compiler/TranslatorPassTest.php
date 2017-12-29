@@ -68,9 +68,9 @@ class TranslatorPassTest extends TestCase
      *
      * @return ContainerBuilder
      */
-    protected function getContainer(array $bundles = array())
+    protected function getContainer(array $bundles = [])
     {
-        $container = new ContainerBuilder(new ParameterBag(array(
+        $container = new ContainerBuilder(new ParameterBag([
             'kernel.cache_dir' => $this->rootDir.'/cache',
             'kernel.debug' => false,
             'kernel.environment' => 'test',
@@ -78,7 +78,7 @@ class TranslatorPassTest extends TestCase
             'kernel.root_dir' => $this->rootDir,
             'kernel.charset' => 'UTF-8',
             'kernel.bundles' => $bundles,
-        )));
+        ]));
 
         return $container;
     }

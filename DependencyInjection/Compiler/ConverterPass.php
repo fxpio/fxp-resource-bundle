@@ -44,7 +44,7 @@ class ConverterPass implements CompilerPassInterface
      */
     private function findConverters(ContainerBuilder $container)
     {
-        $converters = array();
+        $converters = [];
 
         foreach ($container->findTaggedServiceIds('fxp_resource.converter') as $serviceId => $tag) {
             $type = isset($tag[0]['type']) ? $this->getRealValue($container, $tag[0]['type']) : $this->getType($container, $serviceId);

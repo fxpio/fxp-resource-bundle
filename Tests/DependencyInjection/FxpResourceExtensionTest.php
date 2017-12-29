@@ -41,14 +41,14 @@ class FxpResourceExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('fxp_resource.form_handler'));
     }
 
-    protected function createContainer(array $configs = array())
+    protected function createContainer(array $configs = [])
     {
-        $container = new ContainerBuilder(new ParameterBag(array(
-            'kernel.bundles' => array(
+        $container = new ContainerBuilder(new ParameterBag([
+            'kernel.bundles' => [
                 'FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle',
                 'FxpResourceBundle' => 'Fxp\\Bundle\\ResourceBundle\\FxpResourceBundle',
-            ),
-            'kernel.bundles_metadata' => array(),
+            ],
+            'kernel.bundles_metadata' => [],
             'kernel.cache_dir' => sys_get_temp_dir().'/fxp_resource_bundle',
             'kernel.debug' => false,
             'kernel.environment' => 'test',
@@ -56,7 +56,7 @@ class FxpResourceExtensionTest extends TestCase
             'kernel.root_dir' => sys_get_temp_dir().'/fxp_resource_bundle',
             'kernel.project_dir' => sys_get_temp_dir().'/fxp_resource_bundle',
             'kernel.charset' => 'UTF-8',
-        )));
+        ]));
 
         $sfExt = new FrameworkExtension();
         $extension = new FxpResourceExtension();
@@ -64,14 +64,14 @@ class FxpResourceExtensionTest extends TestCase
         $container->registerExtension($sfExt);
         $container->registerExtension($extension);
 
-        $sfExt->load(array(array('form' => true)), $container);
+        $sfExt->load([['form' => true]], $container);
         $extension->load($configs, $container);
 
         $bundle = new FxpResourceBundle();
         $bundle->build($container);
 
-        $container->getCompilerPassConfig()->setOptimizationPasses(array());
-        $container->getCompilerPassConfig()->setRemovingPasses(array());
+        $container->getCompilerPassConfig()->setOptimizationPasses([]);
+        $container->getCompilerPassConfig()->setRemovingPasses([]);
         $container->compile();
 
         return $container;

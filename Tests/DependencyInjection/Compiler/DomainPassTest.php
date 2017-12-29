@@ -60,12 +60,12 @@ class DomainPassTest extends TestCase
 
     public function getBundles()
     {
-        return array(
-            array(array()),
-            array(array(
+        return [
+            [[]],
+            [[
                 'FxpResourceBundle' => 'Fxp\\Bundle\\ResourceBundle\\FxpResourceBundle',
-            )),
-        );
+            ]],
+        ];
     }
 
     /**
@@ -85,17 +85,17 @@ class DomainPassTest extends TestCase
 
     public function testProcessWithCustomDomainManager()
     {
-        $container = $this->getContainer(array(
+        $container = $this->getContainer([
             'FxpResourceBundle' => 'Fxp\\Bundle\\ResourceBundle\\FxpResourceBundle',
-        ));
+        ]);
 
         $this->assertTrue($container->has('fxp_resource.domain_manager'));
 
         $def = new Definition(CustomDomain::class);
         $def->addTag('fxp_resource.domain');
-        $def->setArguments(array(
+        $def->setArguments([
             \stdClass::class,
-        ));
+        ]);
         $container->setDefinition('test_valid_custom_domain', $def);
 
         $this->pass->process($container);
@@ -105,15 +105,15 @@ class DomainPassTest extends TestCase
 
     public function testProcessWithDoctrineResolveTargets()
     {
-        $container = $this->getContainer(array(
+        $container = $this->getContainer([
             'FxpResourceBundle' => 'Fxp\\Bundle\\ResourceBundle\\FxpResourceBundle',
-        ));
+        ]);
 
         $this->assertTrue($container->hasDefinition('fxp_resource.domain_manager'));
         $this->assertFalse($container->hasDefinition('doctrine.orm.listeners.resolve_target_entity'));
 
         $rteDef = new Definition();
-        $rteDef->addMethodCall('addResolveTargetEntity', array('stdClassInterface', \stdClass::class));
+        $rteDef->addMethodCall('addResolveTargetEntity', ['stdClassInterface', \stdClass::class]);
         $container->setDefinition('doctrine.orm.listeners.resolve_target_entity', $rteDef);
 
         $factoryDef = $container->getDefinition('fxp_resource.domain_factory');
@@ -135,7 +135,7 @@ class DomainPassTest extends TestCase
      */
     protected function getContainer(array $bundles, $empty = false)
     {
-        $container = new ContainerBuilder(new ParameterBag(array(
+        $container = new ContainerBuilder(new ParameterBag([
             'kernel.cache_dir' => $this->rootDir.'/cache',
             'kernel.debug' => false,
             'kernel.environment' => 'test',
@@ -143,23 +143,23 @@ class DomainPassTest extends TestCase
             'kernel.root_dir' => $this->rootDir,
             'kernel.charset' => 'UTF-8',
             'kernel.bundles' => $bundles,
-        )));
+        ]));
 
         if (!$empty) {
             $dmDef = new Definition(DomainManager::class);
-            $dmDef->setArguments(array(
-                array(),
+            $dmDef->setArguments([
+                [],
                 new Reference('fxp_resource.domain_factory'),
-            ));
+            ]);
             $container->setDefinition('fxp_resource.domain_manager', $dmDef);
 
             $dfDef = new Definition(DomainFactory::class);
-            $dfDef->setArguments(array(
+            $dfDef->setArguments([
                 new Reference('doctrine'),
                 new Reference('event_dispatcher'),
                 new Reference('fxp_default_value.factory'),
                 new Reference('validator'),
-            ));
+            ]);
             $container->setDefinition('fxp_resource.domain_factory', $dfDef);
 
             $drDef = new Definition(ManagerRegistry::class);

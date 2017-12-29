@@ -65,9 +65,9 @@ class ConverterPassTest extends TestCase
 
     public function testProcess()
     {
-        $container = $this->getContainer(array(
+        $container = $this->getContainer([
             'FxpResourceBundle' => 'Fxp\\Bundle\\ResourceBundle\\FxpResourceBundle',
-        ));
+        ]);
 
         $this->assertTrue($container->has('fxp_resource.converter_registry'));
         $this->assertTrue($container->has('fxp_resource.converter.json'));
@@ -91,9 +91,9 @@ class ConverterPassTest extends TestCase
      */
     public function testProcessWithInvalidInterface()
     {
-        $container = $this->getContainer(array(
+        $container = $this->getContainer([
             'FxpResourceBundle' => 'Fxp\\Bundle\\ResourceBundle\\FxpResourceBundle',
-        ));
+        ]);
 
         $this->assertTrue($container->has('fxp_resource.converter_registry'));
 
@@ -110,9 +110,9 @@ class ConverterPassTest extends TestCase
      */
     public function testProcessWithInvalidType()
     {
-        $container = $this->getContainer(array(
+        $container = $this->getContainer([
             'FxpResourceBundle' => 'Fxp\\Bundle\\ResourceBundle\\FxpResourceBundle',
-        ));
+        ]);
 
         $this->assertTrue($container->has('fxp_resource.converter_registry'));
 
@@ -130,9 +130,9 @@ class ConverterPassTest extends TestCase
      *
      * @return ContainerBuilder
      */
-    protected function getContainer(array $bundles = array())
+    protected function getContainer(array $bundles = [])
     {
-        $container = new ContainerBuilder(new ParameterBag(array(
+        $container = new ContainerBuilder(new ParameterBag([
             'kernel.cache_dir' => $this->rootDir.'/cache',
             'kernel.debug' => false,
             'kernel.environment' => 'test',
@@ -140,11 +140,11 @@ class ConverterPassTest extends TestCase
             'kernel.root_dir' => $this->rootDir,
             'kernel.charset' => 'UTF-8',
             'kernel.bundles' => $bundles,
-        )));
+        ]));
 
         if (count($bundles) > 0) {
             $crDef = new Definition('Fxp\Component\Resource\Converter\ConverterRegistry');
-            $crDef->addArgument(array());
+            $crDef->addArgument([]);
             $container->setDefinition('fxp_resource.converter_registry', $crDef);
 
             $jcDef = new Definition('Fxp\Component\Resource\Converter\JsonConverter');

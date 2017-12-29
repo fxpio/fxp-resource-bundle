@@ -35,7 +35,7 @@ class DomainPass implements CompilerPassInterface
             return;
         }
 
-        $managers = array();
+        $managers = [];
 
         foreach ($container->findTaggedServiceIds('fxp_resource.domain') as $serviceId => $tag) {
             $managers[$serviceId] = new Reference($serviceId);
@@ -45,7 +45,7 @@ class DomainPass implements CompilerPassInterface
             ->replaceArgument(0, $managers);
 
         $container->getDefinition('fxp_resource.domain_factory')
-            ->addMethodCall('addResolveTargets', array($this->getResolveTargets($container)));
+            ->addMethodCall('addResolveTargets', [$this->getResolveTargets($container)]);
     }
 
     /**
@@ -58,7 +58,7 @@ class DomainPass implements CompilerPassInterface
     private function getResolveTargets(ContainerBuilder $container)
     {
         if (null === $this->resolveTargets) {
-            $this->resolveTargets = array();
+            $this->resolveTargets = [];
 
             if ($container->hasDefinition('doctrine.orm.listeners.resolve_target_entity')) {
                 $def = $container->getDefinition('doctrine.orm.listeners.resolve_target_entity');
