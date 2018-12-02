@@ -142,7 +142,7 @@ class ConverterPassTest extends TestCase
             'kernel.bundles' => $bundles,
         ]));
 
-        if (count($bundles) > 0) {
+        if (\count($bundles) > 0) {
             $crDef = new Definition('Fxp\Component\Resource\Converter\ConverterRegistry');
             $crDef->addArgument([]);
             $container->setDefinition('fxp_resource.converter_registry', $crDef);

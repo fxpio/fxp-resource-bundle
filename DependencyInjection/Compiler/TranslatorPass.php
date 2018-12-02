@@ -33,11 +33,11 @@ class TranslatorPass implements CompilerPassInterface
 
         $translator = $container->getDefinition('translator.default');
         $ref = new \ReflectionClass(ResourceInterface::class);
-        $dir = realpath(dirname($ref->getFileName()).'/Resources/translations');
+        $dir = realpath(\dirname($ref->getFileName()).'/Resources/translations');
 
         $container->addResource(new DirectoryResource($dir));
 
-        $optionsArgumentIndex = count($translator->getArguments()) - 1;
+        $optionsArgumentIndex = \count($translator->getArguments()) - 1;
         $options = $translator->getArgument($optionsArgumentIndex);
         $options['resource_files'] = isset($options['resource_files']) ? $options['resource_files'] : [];
 

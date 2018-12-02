@@ -84,7 +84,7 @@ class ConverterPass implements CompilerPassInterface
         $interfaces = class_implements($class);
         $error = sprintf('The service id "%s" must be an class implementing the "%s" interface.', $serviceId, ConverterInterface::class);
 
-        if (in_array(ConverterInterface::class, $interfaces)) {
+        if (\in_array(ConverterInterface::class, $interfaces)) {
             $ref = new \ReflectionClass($class);
             /* @var ConverterInterface $instance */
             $instance = $ref->newInstanceWithoutConstructor();

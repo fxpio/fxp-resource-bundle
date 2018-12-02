@@ -47,7 +47,7 @@ class DomainPassTest extends TestCase
 
     protected function setUp()
     {
-        $this->rootDir = sys_get_temp_dir().DIRECTORY_SEPARATOR.'fxp_resource_bundle_compiler';
+        $this->rootDir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'fxp_resource_bundle_compiler';
         $this->fs = new Filesystem();
         $this->pass = new DomainPass();
     }
