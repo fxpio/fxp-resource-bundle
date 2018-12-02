@@ -15,10 +15,9 @@
     "prefer-stable": true,
     "require": {
         "php": "^7.1.0",
-        "symfony/framework-bundle": "^4.1.0",
-        "fxp/default-value-bundle": "^1.0.0",
-        "fxp/resource": "^1.0.0",
-        "fxp/default-value": "^1.0.0"
+        "symfony/framework-bundle": "^4.2.0",
+        "fxp/default-value-bundle": "^1.1.0",
+        "fxp/resource": "^1.1.0"
     },
     "autoload": {
         "psr-4": { "Fxp\\Bundle\\ResourceBundle\\": "" },
@@ -28,7 +27,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.0-dev"
+            "dev-master": "1.1-dev"
         }
     }
 }
