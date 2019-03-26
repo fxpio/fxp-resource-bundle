@@ -11,6 +11,7 @@
 
 namespace Fxp\Bundle\ResourceBundle\DependencyInjection;
 
+use Fxp\Bundle\DefaultValueBundle\FxpDefaultValueBundle;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -37,6 +38,14 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('undelete_disable_filters')
                     ->defaultValue(['soft_deletable'])
                     ->prototype('scalar')->end()
+                ->end()
+                ->arrayNode('object_factory')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->booleanNode('use_default_value')
+                            ->defaultValue(class_exists(FxpDefaultValueBundle::class))
+                        ->end()
+                    ->end()
                 ->end()
             ->end()
         ;

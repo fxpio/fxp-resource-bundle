@@ -13,6 +13,8 @@ namespace Fxp\Bundle\ResourceBundle\Tests\DependencyInjection;
 
 use Fxp\Bundle\ResourceBundle\DependencyInjection\FxpResourceExtension;
 use Fxp\Bundle\ResourceBundle\FxpResourceBundle;
+use Fxp\Component\Resource\Object\DefaultValueObjectFactory;
+use Fxp\Component\Resource\Object\DoctrineObjectFactory;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -39,6 +41,28 @@ class FxpResourceExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('fxp_resource.converter_registry'));
         $this->assertTrue($container->hasDefinition('fxp_resource.domain_manager'));
         $this->assertTrue($container->hasDefinition('fxp_resource.form_handler'));
+
+        $def = $container->getDefinition('fxp_resource.object_factory');
+        $this->assertSame(DefaultValueObjectFactory::class, $def->getClass());
+    }
+
+    public function testExtensionDisableDefaultValue()
+    {
+        $container = $this->createContainer([
+            [
+                'object_factory' => [
+                    'use_default_value' => false,
+                ],
+            ],
+        ]);
+
+        $this->assertTrue($container->hasDefinition('fxp_resource.converter_registry'));
+        $this->assertTrue($container->hasDefinition('fxp_resource.domain_manager'));
+        $this->assertTrue($container->hasDefinition('fxp_resource.form_handler'));
+        $this->assertTrue($container->hasDefinition('fxp_resource.object_factory'));
+
+        $def = $container->getDefinition('fxp_resource.object_factory');
+        $this->assertSame(DoctrineObjectFactory::class, $def->getClass());
     }
 
     protected function createContainer(array $configs = [])

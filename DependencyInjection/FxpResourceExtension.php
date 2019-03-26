@@ -11,9 +11,13 @@
 
 namespace Fxp\Bundle\ResourceBundle\DependencyInjection;
 
+use Fxp\Component\Resource\Object\DefaultValueObjectFactory;
+use Fxp\Component\Resource\Object\DoctrineObjectFactory;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
@@ -38,5 +42,27 @@ class FxpResourceExtension extends Extension
 
         $container->setParameter('fxp_resource.domain.undelete_disable_filters', $config['undelete_disable_filters']);
         $container->setParameter('fxp_resource.form_handler_default_limit', $config['form_handler_default_limit']);
+
+        $container->setDefinition('fxp_resource.object_factory', $this->getObjectFactoryDefinition($config));
+    }
+
+    /**
+     * Get the object factory definition.
+     *
+     * @param array $config The config
+     *
+     * @return Definition
+     */
+    private function getObjectFactoryDefinition(array $config)
+    {
+        if ($config['object_factory']['use_default_value']) {
+            $class = DefaultValueObjectFactory::class;
+            $args = [new Reference('fxp_default_value.factory')];
+        } else {
+            $class = DoctrineObjectFactory::class;
+            $args = [new Reference('doctrine.orm.entity_manager')];
+        }
+
+        return new Definition($class, $args);
     }
 }
