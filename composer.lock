@@ -995,7 +995,7 @@
         },
         {
             "name": "fxp/resource",
-            "version": "dev-master",
+            "version": "v1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fxpio/fxp-resource.git",
