@@ -9,7 +9,7 @@
         <service id="fxp_resource.domain_factory" class="Fxp\Component\Resource\Domain\DomainFactory" public="false">
             <argument type="service" id="doctrine" />
             <argument type="service" id="event_dispatcher" />
-            <argument type="service" id="fxp_default_value.factory" />
+            <argument type="service" id="fxp_resource.object_factory" />
             <argument type="service" id="validator" />
             <argument type="service" id="translator" />
             <argument>%fxp_resource.domain.undelete_disable_filters%</argument>
