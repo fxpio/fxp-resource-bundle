@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
@@ -37,11 +38,14 @@ class FxpResourceExtension extends Extension
 
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('domain.xml');
-        $loader->load('converter.xml');
-        $loader->load('handler.xml');
+
+        if (class_exists(Form::class)) {
+            $loader->load('converter.xml');
+            $loader->load('handler.xml');
+            $container->setParameter('fxp_resource.form_handler_default_limit', $config['form_handler_default_limit']);
+        }
 
         $container->setParameter('fxp_resource.domain.undelete_disable_filters', $config['undelete_disable_filters']);
-        $container->setParameter('fxp_resource.form_handler_default_limit', $config['form_handler_default_limit']);
 
         $container->setDefinition('fxp_resource.object_factory', $this->getObjectFactoryDefinition($config));
     }

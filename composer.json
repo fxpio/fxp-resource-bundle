@@ -19,7 +19,8 @@
         "fxp/resource": "^2.0.0"
     },
     "require-dev": {
-        "fxp/default-value-bundle": "^1.1.0"
+        "fxp/default-value-bundle": "^1.1.0",
+        "symfony/form": "^4.2.0"
     },
     "autoload": {
         "psr-4": { "Fxp\\Bundle\\ResourceBundle\\": "" },
