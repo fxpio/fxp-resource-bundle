@@ -13,7 +13,6 @@ namespace Fxp\Bundle\ResourceBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * @author François Pluchino <francois.pluchino@gmail.com>
@@ -30,19 +29,10 @@ class DomainPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('fxp_resource.domain_manager')
+        if (!$container->hasDefinition('fxp_resource.domain_factory')
                 || !$container->hasDefinition('doctrine')) {
             return;
         }
-
-        $managers = [];
-
-        foreach ($container->findTaggedServiceIds('fxp_resource.domain') as $serviceId => $tag) {
-            $managers[$serviceId] = new Reference($serviceId);
-        }
-
-        $container->getDefinition('fxp_resource.domain_manager')
-            ->replaceArgument(0, $managers);
 
         $container->getDefinition('fxp_resource.domain_factory')
             ->addMethodCall('addResolveTargets', [$this->getResolveTargets($container)]);

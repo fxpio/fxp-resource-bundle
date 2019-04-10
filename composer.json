@@ -16,7 +16,7 @@
     "require": {
         "php": "^7.1.0",
         "symfony/framework-bundle": "^4.2.0",
-        "fxp/resource": "^1.2.0"
+        "fxp/resource": "^2.0.0"
     },
     "require-dev": {
         "fxp/default-value-bundle": "^1.1.0"
@@ -29,7 +29,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.2-dev"
+            "dev-master": "2.0-dev"
         }
     }
 }

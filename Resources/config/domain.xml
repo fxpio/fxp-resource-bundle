@@ -18,7 +18,6 @@
 
         <!-- Domain Manager -->
         <service id="fxp_resource.domain_manager" class="Fxp\Component\Resource\Domain\DomainManager" public="true">
-            <argument type="collection" />
             <argument type="service" id="fxp_resource.domain_factory" />
         </service>
     </services>
