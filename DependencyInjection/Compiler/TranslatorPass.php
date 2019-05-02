@@ -25,7 +25,7 @@ class TranslatorPass implements CompilerPassInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition('translator.default')) {
             return;
@@ -39,9 +39,9 @@ class TranslatorPass implements CompilerPassInterface
 
         $optionsArgumentIndex = \count($translator->getArguments()) - 1;
         $options = $translator->getArgument($optionsArgumentIndex);
-        $options['resource_files'] = isset($options['resource_files']) ? $options['resource_files'] : [];
+        $options['resource_files'] = $options['resource_files'] ?? [];
 
-        /* @var Finder|\SplFileInfo[] $finder */
+        /** @var Finder|\SplFileInfo[] $finder */
         $finder = Finder::create()
             ->files()
             ->filter(function (\SplFileInfo $file) {
@@ -52,7 +52,7 @@ class TranslatorPass implements CompilerPassInterface
 
         foreach ($finder as $file) {
             list(, $locale) = explode('.', $file->getBasename(), 3);
-            $options['resource_files'][$locale] = isset($options['resource_files'][$locale]) ? $options['resource_files'][$locale] : [];
+            $options['resource_files'][$locale] = $options['resource_files'][$locale] ?? [];
 
             array_unshift($options['resource_files'][$locale], (string) $file);
         }

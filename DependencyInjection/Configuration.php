@@ -29,24 +29,24 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder('fxp_resource');
-        /* @var ArrayNodeDefinition $rootNode */
+        /** @var ArrayNodeDefinition $rootNode */
         $rootNode = $treeBuilder->getRootNode();
         $rootNode
             ->addDefaultsIfNotSet()
             ->children()
-                ->integerNode('form_handler_default_limit')->defaultNull()->end()
-                ->arrayNode('undelete_disable_filters')
-                    ->defaultValue(['soft_deletable'])
-                    ->prototype('scalar')->end()
-                ->end()
-                ->arrayNode('object_factory')
-                    ->addDefaultsIfNotSet()
-                    ->children()
-                        ->booleanNode('use_default_value')
-                            ->defaultValue(class_exists(FxpDefaultValueBundle::class))
-                        ->end()
-                    ->end()
-                ->end()
+            ->integerNode('form_handler_default_limit')->defaultNull()->end()
+            ->arrayNode('undelete_disable_filters')
+            ->defaultValue(['soft_deletable'])
+            ->prototype('scalar')->end()
+            ->end()
+            ->arrayNode('object_factory')
+            ->addDefaultsIfNotSet()
+            ->children()
+            ->booleanNode('use_default_value')
+            ->defaultValue(class_exists(FxpDefaultValueBundle::class))
+            ->end()
+            ->end()
+            ->end()
             ->end()
         ;
 

@@ -20,14 +20,14 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class DomainPass implements CompilerPassInterface
 {
     /**
-     * @var array|null
+     * @var null|array
      */
     private $resolveTargets;
 
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition('fxp_resource.domain_factory')
                 || !$container->hasDefinition('doctrine')) {
@@ -35,7 +35,8 @@ class DomainPass implements CompilerPassInterface
         }
 
         $container->getDefinition('fxp_resource.domain_factory')
-            ->addMethodCall('addResolveTargets', [$this->getResolveTargets($container)]);
+            ->addMethodCall('addResolveTargets', [$this->getResolveTargets($container)])
+        ;
     }
 
     /**

@@ -25,7 +25,7 @@ class ConverterPass implements CompilerPassInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition('fxp_resource.converter_registry')) {
             return;
@@ -33,25 +33,6 @@ class ConverterPass implements CompilerPassInterface
 
         $converters = $this->findConverters($container);
         $container->getDefinition('fxp_resource.converter_registry')->replaceArgument(0, $converters);
-    }
-
-    /**
-     * Find the converters.
-     *
-     * @param ContainerBuilder $container The container service
-     *
-     * @return Definition[] The converter definitions
-     */
-    private function findConverters(ContainerBuilder $container)
-    {
-        $converters = [];
-
-        foreach ($container->findTaggedServiceIds('fxp_resource.converter') as $serviceId => $tag) {
-            $type = isset($tag[0]['type']) ? $this->getRealValue($container, $tag[0]['type']) : $this->getType($container, $serviceId);
-            $converters[$type] = $container->getDefinition($serviceId);
-        }
-
-        return array_values($converters);
     }
 
     /**
@@ -73,9 +54,9 @@ class ConverterPass implements CompilerPassInterface
      * @param ContainerBuilder $container The container builder
      * @param string           $serviceId The service id of converter
      *
-     * @return string
-     *
      * @throws InvalidConfigurationException When the converter name is not got
+     *
+     * @return string
      */
     protected function getType(ContainerBuilder $container, $serviceId)
     {
@@ -84,9 +65,9 @@ class ConverterPass implements CompilerPassInterface
         $interfaces = class_implements($class);
         $error = sprintf('The service id "%s" must be an class implementing the "%s" interface.', $serviceId, ConverterInterface::class);
 
-        if (\in_array(ConverterInterface::class, $interfaces)) {
+        if (\in_array(ConverterInterface::class, $interfaces, true)) {
             $ref = new \ReflectionClass($class);
-            /* @var ConverterInterface $instance */
+            /** @var ConverterInterface $instance */
             $instance = $ref->newInstanceWithoutConstructor();
             $type = $instance->getName();
 
@@ -98,5 +79,24 @@ class ConverterPass implements CompilerPassInterface
         }
 
         throw new InvalidConfigurationException($error);
+    }
+
+    /**
+     * Find the converters.
+     *
+     * @param ContainerBuilder $container The container service
+     *
+     * @return Definition[] The converter definitions
+     */
+    private function findConverters(ContainerBuilder $container)
+    {
+        $converters = [];
+
+        foreach ($container->findTaggedServiceIds('fxp_resource.converter') as $serviceId => $tag) {
+            $type = isset($tag[0]['type']) ? $this->getRealValue($container, $tag[0]['type']) : $this->getType($container, $serviceId);
+            $converters[$type] = $container->getDefinition($serviceId);
+        }
+
+        return array_values($converters);
     }
 }

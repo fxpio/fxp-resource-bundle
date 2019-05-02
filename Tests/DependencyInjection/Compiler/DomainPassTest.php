@@ -27,8 +27,10 @@ use Symfony\Component\Filesystem\Filesystem;
  * Tests case for domain pass compiler.
  *
  * @author François Pluchino <francois.pluchino@gmail.com>
+ *
+ * @internal
  */
-class DomainPassTest extends TestCase
+final class DomainPassTest extends TestCase
 {
     /**
      * @var string
@@ -45,14 +47,14 @@ class DomainPassTest extends TestCase
      */
     protected $pass;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->rootDir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'fxp_resource_bundle_compiler';
         $this->fs = new Filesystem();
         $this->pass = new DomainPass();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->fs->remove($this->rootDir);
         $this->pass = null;
@@ -73,7 +75,7 @@ class DomainPassTest extends TestCase
      *
      * @param array $bundles
      */
-    public function testProcessWithoutService(array $bundles)
+    public function testProcessWithoutService(array $bundles): void
     {
         $container = $this->getContainer($bundles, true);
 
@@ -83,7 +85,7 @@ class DomainPassTest extends TestCase
         $this->pass->process($container);
     }
 
-    public function testProcessWithCustomDomainManager()
+    public function testProcessWithCustomDomainManager(): void
     {
         $container = $this->getContainer([
             'FxpResourceBundle' => 'Fxp\\Bundle\\ResourceBundle\\FxpResourceBundle',
@@ -103,7 +105,7 @@ class DomainPassTest extends TestCase
         $this->assertCount(0, $def->getMethodCalls());
     }
 
-    public function testProcessWithDoctrineResolveTargets()
+    public function testProcessWithDoctrineResolveTargets(): void
     {
         $container = $this->getContainer([
             'FxpResourceBundle' => 'Fxp\\Bundle\\ResourceBundle\\FxpResourceBundle',

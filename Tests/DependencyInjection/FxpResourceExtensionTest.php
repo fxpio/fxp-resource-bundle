@@ -24,17 +24,19 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
  * Tests case for Extension.
  *
  * @author François Pluchino <francois.pluchino@gmail.com>
+ *
+ * @internal
  */
-class FxpResourceExtensionTest extends TestCase
+final class FxpResourceExtensionTest extends TestCase
 {
-    public function testExtensionExist()
+    public function testExtensionExist(): void
     {
         $container = $this->createContainer();
 
         $this->assertTrue($container->hasExtension('fxp_resource'));
     }
 
-    public function testExtensionLoader()
+    public function testExtensionLoader(): void
     {
         $container = $this->createContainer();
 
@@ -46,7 +48,7 @@ class FxpResourceExtensionTest extends TestCase
         $this->assertSame(DefaultValueObjectFactory::class, $def->getClass());
     }
 
-    public function testExtensionDisableDefaultValue()
+    public function testExtensionDisableDefaultValue(): void
     {
         $container = $this->createContainer([
             [

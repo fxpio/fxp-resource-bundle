@@ -21,8 +21,10 @@ use Symfony\Component\Filesystem\Filesystem;
  * Tests case for translator pass compiler.
  *
  * @author François Pluchino <francois.pluchino@gmail.com>
+ *
+ * @internal
  */
-class TranslatorPassTest extends TestCase
+final class TranslatorPassTest extends TestCase
 {
     /**
      * @var string
@@ -39,20 +41,20 @@ class TranslatorPassTest extends TestCase
      */
     protected $pass;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->rootDir = sys_get_temp_dir().'/fxp_resource_bundle_translator_test';
         $this->fs = new Filesystem();
         $this->pass = new TranslatorPass();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->fs->remove($this->rootDir);
         $this->pass = null;
     }
 
-    public function testProcessWithoutService()
+    public function testProcessWithoutService(): void
     {
         $container = $this->getContainer();
 
@@ -70,7 +72,7 @@ class TranslatorPassTest extends TestCase
      */
     protected function getContainer(array $bundles = [])
     {
-        $container = new ContainerBuilder(new ParameterBag([
+        return new ContainerBuilder(new ParameterBag([
             'kernel.cache_dir' => $this->rootDir.'/cache',
             'kernel.debug' => false,
             'kernel.environment' => 'test',
@@ -79,7 +81,5 @@ class TranslatorPassTest extends TestCase
             'kernel.charset' => 'UTF-8',
             'kernel.bundles' => $bundles,
         ]));
-
-        return $container;
     }
 }

@@ -23,8 +23,10 @@ use Symfony\Component\Filesystem\Filesystem;
  * Tests case for converter pass compiler.
  *
  * @author François Pluchino <francois.pluchino@gmail.com>
+ *
+ * @internal
  */
-class ConverterPassTest extends TestCase
+final class ConverterPassTest extends TestCase
 {
     /**
      * @var string
@@ -41,20 +43,20 @@ class ConverterPassTest extends TestCase
      */
     protected $pass;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->rootDir = sys_get_temp_dir().'/fxp_resource_bundle_converter_test';
         $this->fs = new Filesystem();
         $this->pass = new ConverterPass();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->fs->remove($this->rootDir);
         $this->pass = null;
     }
 
-    public function testProcessWithoutService()
+    public function testProcessWithoutService(): void
     {
         $container = $this->getContainer();
 
@@ -63,7 +65,7 @@ class ConverterPassTest extends TestCase
         $this->assertFalse($container->has('fxp_resource.converter_registry'));
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = $this->getContainer([
             'FxpResourceBundle' => 'Fxp\\Bundle\\ResourceBundle\\FxpResourceBundle',
@@ -85,12 +87,11 @@ class ConverterPassTest extends TestCase
         $this->assertInstanceOf('Symfony\Component\DependencyInjection\Definition', $arg[0]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage The service id "test_invalid_converter_type" must be an class implementing the "Fxp\Component\Resource\Converter\ConverterInterface" interface.
-     */
-    public function testProcessWithInvalidInterface()
+    public function testProcessWithInvalidInterface(): void
     {
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The service id "test_invalid_converter_type" must be an class implementing the "Fxp\\Component\\Resource\\Converter\\ConverterInterface" interface.');
+
         $container = $this->getContainer([
             'FxpResourceBundle' => 'Fxp\\Bundle\\ResourceBundle\\FxpResourceBundle',
         ]);
@@ -104,12 +105,11 @@ class ConverterPassTest extends TestCase
         $this->pass->process($container);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage The service id "test_invalid_converter_type" must have the "type" parameter in the "fxp_resource.converter" tag.
-     */
-    public function testProcessWithInvalidType()
+    public function testProcessWithInvalidType(): void
     {
+        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The service id "test_invalid_converter_type" must have the "type" parameter in the "fxp_resource.converter" tag.');
+
         $container = $this->getContainer([
             'FxpResourceBundle' => 'Fxp\\Bundle\\ResourceBundle\\FxpResourceBundle',
         ]);
