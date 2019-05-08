@@ -30,6 +30,8 @@ class FxpResourceExtension extends Extension
 {
     /**
      * {@inheritdoc}
+     *
+     * @throws \Exception
      */
     public function load(array $configs, ContainerBuilder $container): void
     {
@@ -57,7 +59,7 @@ class FxpResourceExtension extends Extension
      *
      * @return Definition
      */
-    private function getObjectFactoryDefinition(array $config)
+    private function getObjectFactoryDefinition(array $config): Definition
     {
         if ($config['object_factory']['use_default_value']) {
             $class = DefaultValueObjectFactory::class;

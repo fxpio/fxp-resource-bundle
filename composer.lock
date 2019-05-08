@@ -874,16 +874,16 @@
         },
         {
             "name": "fxp/doctrine-extensions",
-            "version": "v1.1.1",
+            "version": "v1.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fxpio/fxp-doctrine-extensions.git",
-                "reference": "7d68211ea242b5c6fdacdf44af719eb2d0dd018d"
+                "reference": "82942f51d47cdd79a20a5725ee1b3ecfc69e9d77"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fxpio/fxp-doctrine-extensions/zipball/7d68211ea242b5c6fdacdf44af719eb2d0dd018d",
-                "reference": "7d68211ea242b5c6fdacdf44af719eb2d0dd018d",
+                "url": "https://api.github.com/repos/fxpio/fxp-doctrine-extensions/zipball/82942f51d47cdd79a20a5725ee1b3ecfc69e9d77",
+                "reference": "82942f51d47cdd79a20a5725ee1b3ecfc69e9d77",
                 "shasum": ""
             },
             "require": {
@@ -939,11 +939,11 @@
                 "unique entity",
                 "validator"
             ],
-            "time": "2019-04-29T13:31:37+00:00"
+            "time": "2019-05-02T09:06:11+00:00"
         },
         {
             "name": "fxp/doctrine-extra",
-            "version": "dev-master",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fxpio/fxp-doctrine-extra.git",
@@ -1002,12 +1002,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/fxpio/fxp-resource.git",
-                "reference": "202b89322659225b24a2e519b9d3a80b3113ab22"
+                "reference": "a0168fb7f0d364780d33812f1766966a62efc350"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fxpio/fxp-resource/zipball/202b89322659225b24a2e519b9d3a80b3113ab22",
-                "reference": "202b89322659225b24a2e519b9d3a80b3113ab22",
+                "url": "https://api.github.com/repos/fxpio/fxp-resource/zipball/a0168fb7f0d364780d33812f1766966a62efc350",
+                "reference": "a0168fb7f0d364780d33812f1766966a62efc350",
                 "shasum": ""
             },
             "require": {
@@ -1062,7 +1062,7 @@
                 "resource",
                 "validation"
             ],
-            "time": "2019-04-29T12:54:11+00:00"
+            "time": "2019-05-08T18:22:19+00:00"
         },
         {
             "name": "psr/cache",
@@ -2560,16 +2560,16 @@
     "packages-dev": [
         {
             "name": "fxp/default-value",
-            "version": "v1.1.0",
+            "version": "v1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fxpio/fxp-default-value.git",
-                "reference": "9d37a9d18e1117373ac8921b6f1fbfbb6877f25a"
+                "reference": "c045f5c7e3078377a092f197f8e5c633f5084091"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fxpio/fxp-default-value/zipball/9d37a9d18e1117373ac8921b6f1fbfbb6877f25a",
-                "reference": "9d37a9d18e1117373ac8921b6f1fbfbb6877f25a",
+                "url": "https://api.github.com/repos/fxpio/fxp-default-value/zipball/c045f5c7e3078377a092f197f8e5c633f5084091",
+                "reference": "c045f5c7e3078377a092f197f8e5c633f5084091",
                 "shasum": ""
             },
             "require": {
@@ -2613,20 +2613,20 @@
                 "entity",
                 "object"
             ],
-            "time": "2018-12-02T19:48:11+00:00"
+            "time": "2019-05-02T10:12:51+00:00"
         },
         {
             "name": "fxp/default-value-bundle",
-            "version": "v1.1.0",
+            "version": "v1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fxpio/fxp-default-value-bundle.git",
-                "reference": "b0da81712e21be36dc13ff4f6491edfbc1158577"
+                "reference": "f2610281aa59b3d841931dc952af79664a6fc063"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fxpio/fxp-default-value-bundle/zipball/b0da81712e21be36dc13ff4f6491edfbc1158577",
-                "reference": "b0da81712e21be36dc13ff4f6491edfbc1158577",
+                "url": "https://api.github.com/repos/fxpio/fxp-default-value-bundle/zipball/f2610281aa59b3d841931dc952af79664a6fc063",
+                "reference": "f2610281aa59b3d841931dc952af79664a6fc063",
                 "shasum": ""
             },
             "require": {
@@ -2666,7 +2666,7 @@
                 "entity",
                 "object"
             ],
-            "time": "2018-12-02T19:52:32+00:00"
+            "time": "2019-05-02T10:15:30+00:00"
         },
         {
             "name": "symfony/form",

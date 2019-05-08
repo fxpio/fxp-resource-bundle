@@ -44,7 +44,7 @@ class TranslatorPass implements CompilerPassInterface
         /** @var Finder|\SplFileInfo[] $finder */
         $finder = Finder::create()
             ->files()
-            ->filter(function (\SplFileInfo $file) {
+            ->filter(static function (\SplFileInfo $file) {
                 return 2 === substr_count($file->getBasename(), '.') && preg_match('/\.\w+$/', $file->getBasename());
             })
             ->in([$dir])

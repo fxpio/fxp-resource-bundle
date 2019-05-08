@@ -23,9 +23,9 @@ class CustomConverter implements ConverterInterface
     /**
      * @var string
      */
-    protected $name;
+    protected $name = '';
 
-    public function __construct($name)
+    public function __construct($name = '')
     {
         $this->name = $name;
     }
@@ -33,7 +33,7 @@ class CustomConverter implements ConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -41,8 +41,8 @@ class CustomConverter implements ConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function convert($content)
+    public function convert(string $content): array
     {
-        return $content;
+        return [];
     }
 }

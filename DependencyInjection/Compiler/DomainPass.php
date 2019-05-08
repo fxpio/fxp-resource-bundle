@@ -46,7 +46,7 @@ class DomainPass implements CompilerPassInterface
      *
      * @return array
      */
-    private function getResolveTargets(ContainerBuilder $container)
+    private function getResolveTargets(ContainerBuilder $container): array
     {
         if (null === $this->resolveTargets) {
             $this->resolveTargets = [];

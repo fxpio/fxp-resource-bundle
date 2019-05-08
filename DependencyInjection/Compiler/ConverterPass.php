@@ -55,10 +55,11 @@ class ConverterPass implements CompilerPassInterface
      * @param string           $serviceId The service id of converter
      *
      * @throws InvalidConfigurationException When the converter name is not got
+     * @throws \Exception
      *
      * @return string
      */
-    protected function getType(ContainerBuilder $container, $serviceId)
+    protected function getType(ContainerBuilder $container, $serviceId): string
     {
         $def = $container->getDefinition($serviceId);
         $class = $this->getRealValue($container, $def->getClass());
@@ -86,9 +87,11 @@ class ConverterPass implements CompilerPassInterface
      *
      * @param ContainerBuilder $container The container service
      *
+     * @throws
+     *
      * @return Definition[] The converter definitions
      */
-    private function findConverters(ContainerBuilder $container)
+    private function findConverters(ContainerBuilder $container): array
     {
         $converters = [];
 
