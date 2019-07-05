@@ -58,9 +58,9 @@ final class TranslatorPassTest extends TestCase
     {
         $container = $this->getContainer();
 
-        $this->assertFalse($container->has('translator.default'));
+        static::assertFalse($container->has('translator.default'));
         $this->pass->process($container);
-        $this->assertFalse($container->has('translator.default'));
+        static::assertFalse($container->has('translator.default'));
     }
 
     /**

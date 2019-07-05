@@ -60,9 +60,9 @@ final class ConverterPassTest extends TestCase
     {
         $container = $this->getContainer();
 
-        $this->assertFalse($container->has('fxp_resource.converter_registry'));
+        static::assertFalse($container->has('fxp_resource.converter_registry'));
         $this->pass->process($container);
-        $this->assertFalse($container->has('fxp_resource.converter_registry'));
+        static::assertFalse($container->has('fxp_resource.converter_registry'));
     }
 
     public function testProcess(): void
@@ -71,20 +71,20 @@ final class ConverterPassTest extends TestCase
             'FxpResourceBundle' => 'Fxp\\Bundle\\ResourceBundle\\FxpResourceBundle',
         ]);
 
-        $this->assertTrue($container->has('fxp_resource.converter_registry'));
-        $this->assertTrue($container->has('fxp_resource.converter.json'));
+        static::assertTrue($container->has('fxp_resource.converter_registry'));
+        static::assertTrue($container->has('fxp_resource.converter.json'));
 
         $def = $container->getDefinition('fxp_resource.converter_registry');
 
-        $this->assertCount(1, $def->getArguments());
-        $this->assertEmpty($def->getArgument(0));
+        static::assertCount(1, $def->getArguments());
+        static::assertEmpty($def->getArgument(0));
 
         $this->pass->process($container);
 
-        $this->assertCount(1, $def->getArguments());
+        static::assertCount(1, $def->getArguments());
         $arg = $def->getArgument(0);
-        $this->assertNotEmpty($arg);
-        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Definition', $arg[0]);
+        static::assertNotEmpty($arg);
+        static::assertInstanceOf('Symfony\Component\DependencyInjection\Definition', $arg[0]);
     }
 
     public function testProcessWithInvalidInterface(): void
@@ -96,7 +96,7 @@ final class ConverterPassTest extends TestCase
             'FxpResourceBundle' => 'Fxp\\Bundle\\ResourceBundle\\FxpResourceBundle',
         ]);
 
-        $this->assertTrue($container->has('fxp_resource.converter_registry'));
+        static::assertTrue($container->has('fxp_resource.converter_registry'));
 
         $def = new Definition('stdClass');
         $def->addTag('fxp_resource.converter');
@@ -114,7 +114,7 @@ final class ConverterPassTest extends TestCase
             'FxpResourceBundle' => 'Fxp\\Bundle\\ResourceBundle\\FxpResourceBundle',
         ]);
 
-        $this->assertTrue($container->has('fxp_resource.converter_registry'));
+        static::assertTrue($container->has('fxp_resource.converter_registry'));
 
         $def = new Definition(CustomConverter::class);
         $def->addTag('fxp_resource.converter');

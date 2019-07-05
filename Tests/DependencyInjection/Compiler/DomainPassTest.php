@@ -79,8 +79,8 @@ final class DomainPassTest extends TestCase
     {
         $container = $this->getContainer($bundles, true);
 
-        $this->assertFalse($container->hasDefinition('fxp_resource.domain_manager'));
-        $this->assertFalse($container->hasDefinition('doctrine'));
+        static::assertFalse($container->hasDefinition('fxp_resource.domain_manager'));
+        static::assertFalse($container->hasDefinition('doctrine'));
 
         $this->pass->process($container);
     }
@@ -91,7 +91,7 @@ final class DomainPassTest extends TestCase
             'FxpResourceBundle' => 'Fxp\\Bundle\\ResourceBundle\\FxpResourceBundle',
         ]);
 
-        $this->assertTrue($container->has('fxp_resource.domain_manager'));
+        static::assertTrue($container->has('fxp_resource.domain_manager'));
 
         $def = new Definition(CustomDomain::class);
         $def->addTag('fxp_resource.domain');
@@ -102,7 +102,7 @@ final class DomainPassTest extends TestCase
 
         $this->pass->process($container);
 
-        $this->assertCount(0, $def->getMethodCalls());
+        static::assertCount(0, $def->getMethodCalls());
     }
 
     public function testProcessWithDoctrineResolveTargets(): void
@@ -111,20 +111,20 @@ final class DomainPassTest extends TestCase
             'FxpResourceBundle' => 'Fxp\\Bundle\\ResourceBundle\\FxpResourceBundle',
         ]);
 
-        $this->assertTrue($container->hasDefinition('fxp_resource.domain_manager'));
-        $this->assertFalse($container->hasDefinition('doctrine.orm.listeners.resolve_target_entity'));
+        static::assertTrue($container->hasDefinition('fxp_resource.domain_manager'));
+        static::assertFalse($container->hasDefinition('doctrine.orm.listeners.resolve_target_entity'));
 
         $rteDef = new Definition();
         $rteDef->addMethodCall('addResolveTargetEntity', ['stdClassInterface', \stdClass::class]);
         $container->setDefinition('doctrine.orm.listeners.resolve_target_entity', $rteDef);
 
         $factoryDef = $container->getDefinition('fxp_resource.domain_factory');
-        $this->assertCount(0, $factoryDef->getMethodCalls());
+        static::assertCount(0, $factoryDef->getMethodCalls());
 
         $this->pass->process($container);
         $calls = $factoryDef->getMethodCalls();
-        $this->assertCount(1, $factoryDef->getMethodCalls());
-        $this->assertSame('addResolveTargets', $calls[0][0]);
+        static::assertCount(1, $factoryDef->getMethodCalls());
+        static::assertSame('addResolveTargets', $calls[0][0]);
     }
 
     /**

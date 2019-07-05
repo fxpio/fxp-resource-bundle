@@ -33,19 +33,19 @@ final class FxpResourceExtensionTest extends TestCase
     {
         $container = $this->createContainer();
 
-        $this->assertTrue($container->hasExtension('fxp_resource'));
+        static::assertTrue($container->hasExtension('fxp_resource'));
     }
 
     public function testExtensionLoader(): void
     {
         $container = $this->createContainer();
 
-        $this->assertTrue($container->hasDefinition('fxp_resource.converter_registry'));
-        $this->assertTrue($container->hasDefinition('fxp_resource.domain_manager'));
-        $this->assertTrue($container->hasDefinition('fxp_resource.form_handler'));
+        static::assertTrue($container->hasDefinition('fxp_resource.converter_registry'));
+        static::assertTrue($container->hasDefinition('fxp_resource.domain_manager'));
+        static::assertTrue($container->hasDefinition('fxp_resource.form_handler'));
 
         $def = $container->getDefinition('fxp_resource.object_factory');
-        $this->assertSame(DefaultValueObjectFactory::class, $def->getClass());
+        static::assertSame(DefaultValueObjectFactory::class, $def->getClass());
     }
 
     public function testExtensionDisableDefaultValue(): void
@@ -58,13 +58,13 @@ final class FxpResourceExtensionTest extends TestCase
             ],
         ]);
 
-        $this->assertTrue($container->hasDefinition('fxp_resource.converter_registry'));
-        $this->assertTrue($container->hasDefinition('fxp_resource.domain_manager'));
-        $this->assertTrue($container->hasDefinition('fxp_resource.form_handler'));
-        $this->assertTrue($container->hasDefinition('fxp_resource.object_factory'));
+        static::assertTrue($container->hasDefinition('fxp_resource.converter_registry'));
+        static::assertTrue($container->hasDefinition('fxp_resource.domain_manager'));
+        static::assertTrue($container->hasDefinition('fxp_resource.form_handler'));
+        static::assertTrue($container->hasDefinition('fxp_resource.object_factory'));
 
         $def = $container->getDefinition('fxp_resource.object_factory');
-        $this->assertSame(DoctrineObjectFactory::class, $def->getClass());
+        static::assertSame(DoctrineObjectFactory::class, $def->getClass());
     }
 
     protected function createContainer(array $configs = [])
