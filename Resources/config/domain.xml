@@ -5,6 +5,9 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <!-- Object Factory -->
+        <service id="Fxp\Component\Resource\Object\ObjectFactoryInterface" alias="fxp_resource.object_factory" />
+
         <!-- Domain Factory -->
         <service id="fxp_resource.domain_factory" class="Fxp\Component\Resource\Domain\DomainFactory" public="false">
             <argument type="service" id="doctrine" />

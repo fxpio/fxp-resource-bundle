@@ -69,6 +69,6 @@ class FxpResourceExtension extends Extension
             $args = [new Reference('doctrine.orm.entity_manager')];
         }
 
-        return new Definition($class, $args);
+        return (new Definition($class, $args))->setPublic(true);
     }
 }
