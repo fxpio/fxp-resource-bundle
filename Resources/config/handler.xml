@@ -12,6 +12,7 @@
             <argument type="service" id="request_stack" />
             <argument type="service" id="translator" />
             <argument>%fxp_resource.form_handler_default_limit%</argument>
+            <argument>%fxp_resource.form_handler_max_limit%</argument>
         </service>
 
         <service id="Fxp\Component\Resource\Handler\FormHandler" alias="fxp_resource.form_handler" />
