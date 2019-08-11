@@ -49,6 +49,10 @@ class FxpResourceExtension extends Extension
 
             if (\function_exists('json_encode')) {
                 $loader->load('converter_json.xml');
+
+                if (class_exists(\SimpleXMLElement::class)) {
+                    $loader->load('converter_xml.xml');
+                }
             }
         }
 
