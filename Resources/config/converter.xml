@@ -12,11 +12,5 @@
 
         <service id="Fxp\Component\Resource\Converter\ConverterRegistry" alias="fxp_resource.converter_registry" />
         <service id="Fxp\Component\Resource\Converter\ConverterRegistryInterface" alias="fxp_resource.converter_registry" />
-
-        <!-- Json Converter -->
-        <service id="fxp_resource.converter.json" class="Fxp\Component\Resource\Converter\JsonConverter">
-            <tag name="fxp_resource.converter" />
-            <argument type="service" id="translator" />
-        </service>
     </services>
 </container>

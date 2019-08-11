@@ -46,6 +46,10 @@ class FxpResourceExtension extends Extension
             $loader->load('handler.xml');
             $container->setParameter('fxp_resource.form_handler_default_limit', $config['form_handler_default_limit']);
             $container->setParameter('fxp_resource.form_handler_max_limit', $config['form_handler_max_limit']);
+
+            if (\function_exists('json_encode')) {
+                $loader->load('converter_json.xml');
+            }
         }
 
         $container->setParameter('fxp_resource.domain.undelete_disable_filters', $config['undelete_disable_filters']);
